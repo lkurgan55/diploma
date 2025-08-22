@@ -26,8 +26,8 @@ if __name__ == "__main__":
     strategy = BeamStrategy(model=model, tokenizer=tokenizer)
     
 
-    #sql = strategy.generate(prompt, max_new_tokens=120)
-    #print("\n=== SQL (fast) ===\n", sql)
+    sql = strategy.generate(prompt, max_new_tokens=120)
+    print("\n=== SQL (fast) ===\n", sql)
 
-    sql_dbg = strategy.custom_generate(prompt, debug=True, max_steps=120)
-    print("\n=== SQL (debug) ===\n", sql_dbg)
+    # sql_dbg = strategy.custom_generate(prompt, debug=True, max_steps=120)
+    # print("\n=== SQL (debug) ===\n", sql_dbg)
