@@ -39,7 +39,7 @@ class BeamStrategy(BaseStrategy):
         """Generates text using beam decoding with step-by-step debug output."""
         self.model.eval()
 
-        dev = self.model.get_input_embeddings().weight.device
+        dev = self.model.device
         enc = self.tokenizer(prompt, return_tensors="pt")
         input_ids = enc["input_ids"].to(dev)
 

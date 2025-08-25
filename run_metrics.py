@@ -1,4 +1,4 @@
-from src.evaluation.evaluation_ex import execution_equal
+from evaluation.evaluation_ex import execution_equal
 
 import argparse, json
 
