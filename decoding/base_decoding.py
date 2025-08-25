@@ -9,7 +9,12 @@ class BaseStrategy(ABC):
 
     @abstractmethod
     def generate(self, prompt: str) -> str:
-        """Generate text based on the provided prompt."""
+        """Build-in generate text based on the provided prompt."""
+        pass
+
+    @abstractmethod
+    def custom_generate(self, prompt: str) -> str:
+        """Cutsom generate text based on the provided prompt."""
         pass
 
     @abstractmethod
