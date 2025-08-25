@@ -1,0 +1,10 @@
+[
+  {
+    "id": 0,
+    "db_id": "debit_card_specializing",
+    "difficulty": "simple",
+    "question": "What is the ratio of customers who pay in EUR against customers who pay in CZK?",
+    "gold_sql": "select cast(sum(iif(currency = 'eur', 1, 0)) as float) / sum(iif(currency = 'czk', 1, 0)) as ratio from customers",
+    "pred_sql": "select (select count(*) from transactions_1k where currency='eur')/(select count(*) from transactions_1k where currency='czk')"
+  }
+]

@@ -21,7 +21,7 @@ class GreedyStrategy(BaseStrategy):
         gen_ids = out[0][enc["input_ids"].shape[1]:]
         return self.tokenizer.decode(gen_ids, skip_special_tokens=True)
 
-    def custom_generate(self, prompt: str, debug: bool = False, max_new_tokens: int = 50) -> str:
+    def custom_generate(self, prompt: str, debug: bool = False, max_steps: int = 50) -> str:
         """Generates text using greedy decoding with step-by-step debug output."""
         self.model.eval()
         enc = self.tokenizer(prompt, return_tensors="pt")
@@ -59,9 +59,9 @@ class GreedyStrategy(BaseStrategy):
                     if debug:
                         print("🔚 Found EOS.\n")
                     break
-                if step >= max_new_tokens:
+                if step >= max_steps:
                     if debug:
-                        print(f"⚠️ Limit {max_new_tokens} tokens.")
+                        print(f"⚠️ Limit {max_steps} tokens.")
                     break
 
         gen_ids = generated[0, input_ids.shape[1]:]

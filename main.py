@@ -11,7 +11,9 @@ import gc, torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 from src.schema.table_schema import generate_schema_prompt_sqlite
+from src.schema.prompt import build_prompt
 from decoding.greedy import GreedyStrategy
+from decoding.beam import BeamStrategy
 
 WS = re.compile(r"\s+")
 
@@ -24,35 +26,6 @@ def normalize_sql(s: str) -> str:
     s = s[:-1].strip() if s.endswith(";") else s
     return s
 
-# ---------- Prompt ----------
-def build_prompt(tokenizer, question: str, schema_text: str | None = None, dialect: str = 'SQLite') -> str:
-    """Builds a prompt for the model based on the question and schema."""
-    system = (
-        f"You are a Text-to-SQL generator for {dialect} dialect.\n"
-        "Use only table and column names exactly as in the schema.\n"
-        "Return EXACTLY ONE SQL query and NOTHING ELSE.\n"
-        "Do NOT use markdown or code fences.\n"
-        "Start the query with SELECT or WITH.\n"
-        "End your output with a single semicolon ';' and then stop.\n"
-        "No explanations, no comments."
-    )
-    if schema_text:
-        user = (
-            f"Schema:\n{schema_text}\n\n"
-            f"Instruction: {question}\n"
-            f"Output: SQL only, one statement, end with ';'"
-        )
-    else:
-        user = (
-            f"Instruction: {question}\n"
-            f"Output: SQL only, one statement, end with ';'"
-        )
-    messages = [
-        {"role": "system", "content": system},
-        {"role": "user",   "content": user},
-    ]
-    return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-
 # ---------- Decoding ----------
 def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_tokens: int) -> str:
 
@@ -60,7 +33,7 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
     if strategy == "greedy":
         out = GreedyStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "beam":
-        pass
+        out = BeamStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_k":
         pass
     elif strategy == "top_p":
@@ -94,7 +67,7 @@ def main():
     ap.add_argument("--model", type=str, default="./models/llama-3-8b-instruct")
     ap.add_argument("--data_json", type=str, default="./datasets/data_minidev/mini_dev_sqlite.json")
     ap.add_argument("--db_root", type=str, default="./datasets/data_minidev/dev_databases")
-    ap.add_argument("--strategy", type=str, default="greedy",
+    ap.add_argument("--strategy", type=str, default="beam",
                     choices=["greedy", "beam", "top_k", "top_p", "temp", "combined"])
     ap.add_argument("--max_new_tokens", type=int, default=100)
     ap.add_argument("--limit", type=int, default=0, help="0 = всі; >0 = перші N")

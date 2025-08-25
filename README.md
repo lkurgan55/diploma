@@ -9,6 +9,6 @@ src - source code
 
 main.py - run dataset
 
-query_model.py - test model
+test_query_model.py - test model
 
 run_metrics - calculate metrics for strategy 
