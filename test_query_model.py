@@ -5,9 +5,7 @@ from decoding.greedy import GreedyStrategy
 from decoding.beam import BeamStrategy
 from decoding.top_k import TopKStrategy
 
-import os
-os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
-os.environ["PYTHONHASHSEED"] = "5"
+
 
 
 MODEL_DIR = "./models/llama-3-8b-instruct"

@@ -3,12 +3,12 @@ import torch
 import torch.nn.functional as F
 from typing import Optional
 
+import os
+os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+os.environ["PYTHONHASHSEED"] = "5"
+
 class TopKStrategy(BaseStrategy):
-    """
-    Top-k sampling strategy for text generation.
-    - generate(): використовує HF generate з do_sample=True, top_k=...
-    - custom_generate(): покроковий top-k семплінг з дебагом.
-    """
+    """Top-k sampling strategy for text generation."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,21 +92,16 @@ class TopKStrategy(BaseStrategy):
                 outputs = self.model(input_ids=generated, attention_mask=attention_mask)
                 logits = outputs.logits[:, -1, :]
 
-                # temperature
                 if temperature is not None and temperature > 0.0:
                     logits = logits / temperature
 
-                # беремо top-k
                 topk_vals, topk_idx = torch.topk(logits, k=min(k, logits.shape[-1]), dim=-1)
 
-                # маскуємо все поза top-k
                 masked = torch.full_like(logits, float("-inf"))
                 masked.scatter_(1, topk_idx, topk_vals)
 
-                # softmax і семпл
                 probs = F.softmax(masked, dim=-1)
 
-                # torch.multinomial не приймає generator напряму на CUDA — семплимо поіменно
                 if gen is not None:
                     torch.manual_seed(gen.initial_seed())
                 next_token = torch.multinomial(probs, num_samples=1)
@@ -114,10 +109,8 @@ class TopKStrategy(BaseStrategy):
                 if debug:
                     self._debug_generate(step + 1, probs, next_token.item(), top_k=min(5, k))
 
-                # апендимо токен
                 generated = torch.cat([generated, next_token], dim=-1)
 
-                # оновлюємо attention_mask
                 if attention_mask is not None:
                     pad = torch.ones(
                         (attention_mask.shape[0], 1),
@@ -128,7 +121,6 @@ class TopKStrategy(BaseStrategy):
 
                 step += 1
 
-                # стоп-умови
                 if eos_id is not None and next_token.item() == eos_id:
                     if debug:
                         print("🔚 Found EOS.\n")

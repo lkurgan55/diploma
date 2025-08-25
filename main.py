@@ -14,6 +14,7 @@ from src.schema.table_schema import generate_schema_prompt_sqlite
 from src.schema.prompt import build_prompt
 from decoding.greedy import GreedyStrategy
 from decoding.beam import BeamStrategy
+from decoding.top_k import TopKStrategy
 
 WS = re.compile(r"\s+")
 
@@ -35,7 +36,7 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
     elif strategy == "beam":
         out = BeamStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_k":
-        pass
+        out = TopKStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_p":
         pass
     elif strategy == "temp":
@@ -67,7 +68,7 @@ def main():
     ap.add_argument("--model", type=str, default="./models/llama-3-8b-instruct")
     ap.add_argument("--data_json", type=str, default="./datasets/data_minidev/mini_dev_sqlite.json")
     ap.add_argument("--db_root", type=str, default="./datasets/data_minidev/dev_databases")
-    ap.add_argument("--strategy", type=str, default="beam",
+    ap.add_argument("--strategy", type=str, default="top_k",
                     choices=["greedy", "beam", "top_k", "top_p", "temp", "combined"])
     ap.add_argument("--max_new_tokens", type=int, default=100)
     ap.add_argument("--limit", type=int, default=0, help="0 = всі; >0 = перші N")
