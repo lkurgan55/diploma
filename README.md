@@ -5,7 +5,7 @@ decoding - folder for decoding strategy
 
 outputs - generated results
 
-src - source code
+src - source code, schema, prompt
 
 main.py - run dataset
 

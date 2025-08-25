@@ -15,6 +15,7 @@ from src.schema.prompt import build_prompt
 from decoding.greedy import GreedyStrategy
 from decoding.beam import BeamStrategy
 from decoding.top_k import TopKStrategy
+from decoding.top_p import TopPStrategy
 
 WS = re.compile(r"\s+")
 
@@ -38,11 +39,7 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
     elif strategy == "top_k":
         out = TopKStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_p":
-        pass
-    elif strategy == "temp":
-        pass
-    elif strategy == "combined":
-        pass
+        out = TopPStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     else:
         raise ValueError(f"Unknown strategy: {strategy}")
 
@@ -68,8 +65,8 @@ def main():
     ap.add_argument("--model", type=str, default="./models/llama-3-8b-instruct")
     ap.add_argument("--data_json", type=str, default="./datasets/data_minidev/mini_dev_sqlite.json")
     ap.add_argument("--db_root", type=str, default="./datasets/data_minidev/dev_databases")
-    ap.add_argument("--strategy", type=str, default="top_k",
-                    choices=["greedy", "beam", "top_k", "top_p", "temp", "combined"])
+    ap.add_argument("--strategy", type=str, default="beam",
+                    choices=["greedy", "beam", "top_k", "top_p"])
     ap.add_argument("--max_new_tokens", type=int, default=100)
     ap.add_argument("--limit", type=int, default=0, help="0 = всі; >0 = перші N")
     ap.add_argument("--save_csv", type=str, default="./outputs/mini_dev_sqlite_eval.csv")

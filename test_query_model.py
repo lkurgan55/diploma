@@ -4,7 +4,7 @@ import torch
 from decoding.greedy import GreedyStrategy
 from decoding.beam import BeamStrategy
 from decoding.top_k import TopKStrategy
-
+from decoding.top_p import TopPStrategy
 
 
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     #prompt = 'Test prompt generate me simple sql query?'
 
     #strategy = GreedyStrategy(model=model, tokenizer=tokenizer)
-    strategy = TopKStrategy(model=model, tokenizer=tokenizer)
+    strategy = TopPStrategy(model=model, tokenizer=tokenizer)
     
 
     sql = strategy.generate(prompt, max_new_tokens=120)
