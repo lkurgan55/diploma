@@ -61,7 +61,7 @@ def load_examples(json_path: str) -> list[dict[str, int | str]]:
 # ---------- Main ----------
 def main():
     ap = argparse.ArgumentParser(description="Run Text-to-SQL on mini_dev (SQLite) with schema + example rows.")
-    ap.add_argument("--model", type=str, default="./models/llama-3-8b-instruct")
+    ap.add_argument("--model", type=str, default="qwen2.5-3B-Instruct")
     ap.add_argument("--data_json", type=str, default="./datasets/data_minidev/mini_dev_sqlite.json")
     ap.add_argument("--db_root", type=str, default="./datasets/data_minidev/dev_databases")
     ap.add_argument("--strategy", type=str, default="beam",
@@ -72,19 +72,20 @@ def main():
     ap.add_argument("--device", type=str, default="cpu", choices=["auto", "cpu", "cuda"])
     ap.add_argument("--schema_rows", type=int, default=3, help="Додати N прикладів рядків у prompt (0=без рядків)")
     args = ap.parse_args()
-
-    save_file_path = f'outputs/mini_dev_sqlite_{args.strategy}.json'
+    
+    model_path = f'./models/{args.model}'
+    save_file_path = f'outputs/mini_dev_sqlite_{args.strategy}_{args.model}.json'
     os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
 
 
     print(f"📄 Loading: {args.data_json}")
     ds = load_examples(args.data_json)
 
-    print(f"🧠 Loading model: {args.model}")
-    tokenizer = AutoTokenizer.from_pretrained(args.model, use_fast=True)
+    print(f"🧠 Loading model: {model_path}")
+    tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
     dtype = torch.float16 if torch.cuda.is_available() and args.device != "cpu" else torch.float32
     model = AutoModelForCausalLM.from_pretrained(
-        args.model,
+        model_path,
         torch_dtype=dtype,
     )
     device = (torch.device("cuda") if (args.device in ["auto", "cuda"] and torch.cuda.is_available())

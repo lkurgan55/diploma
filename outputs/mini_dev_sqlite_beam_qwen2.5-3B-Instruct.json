@@ -1,0 +1,26 @@
+[
+  {
+    "id": 0,
+    "db_id": "debit_card_specializing",
+    "difficulty": "simple",
+    "question": "What is the ratio of customers who pay in EUR against customers who pay in CZK?",
+    "gold_sql": "select cast(sum(iif(currency = 'eur', 1, 0)) as float) / sum(iif(currency = 'czk', 1, 0)) as ratio from customers",
+    "pred_sql": "select cast(sum(case when t2.currency = 'czk' then 1 else 0 end) as real) * 100 / count(*) from transactions_1k as t1 inner join customers as t2 on t1.customerid = t2.customerid"
+  },
+  {
+    "id": 1,
+    "db_id": "debit_card_specializing",
+    "difficulty": "moderate",
+    "question": "In 2012, who had the least consumption in LAM?",
+    "gold_sql": "select t1.customerid from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where t1.segment = 'lam' and substr(t2.date, 1, 4) = '2012' group by t1.customerid order by sum(t2.consumption) asc limit 1",
+    "pred_sql": "select customerid from yearmonth where date like '2012%' and segment = 'lam' group by customerid order by sum(consumption) limit 1"
+  },
+  {
+    "id": 2,
+    "db_id": "debit_card_specializing",
+    "difficulty": "moderate",
+    "question": "What was the average monthly consumption of customers in SME for the year 2013?",
+    "gold_sql": "select avg(t2.consumption) / 12 from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where substr(t2.date, 1, 4) = '2013' and t1.segment = 'sme'",
+    "pred_sql": "select avg(consumption) from yearmonth where customerid in (select customerid from customers where segment = 'sme') and date like '2013%';"
+  }
+]

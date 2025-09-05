@@ -5,3 +5,6 @@ torchaudio --index-url https://download.pytorch.org/whl/cu121
 datasets
 sqlparse
 sqlglot
+accelerate
+safetensors
+hf_xet
