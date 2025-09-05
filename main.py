@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""Run Text-to-SQL on mini_dev (SQLite) with schema + example rows."""
 
 import argparse
 import os
@@ -70,7 +69,7 @@ def main():
     ap.add_argument("--max_new_tokens", type=int, default=100)
     ap.add_argument("--limit", type=int, default=0, help="0 = всі; >0 = перші N")
     ap.add_argument("--save_csv", type=str, default="./outputs/mini_dev_sqlite_eval.csv")
-    ap.add_argument("--device", type=str, default="auto", choices=["auto", "cpu", "cuda"])
+    ap.add_argument("--device", type=str, default="cpu", choices=["auto", "cpu", "cuda"])
     ap.add_argument("--schema_rows", type=int, default=3, help="Додати N прикладів рядків у prompt (0=без рядків)")
     args = ap.parse_args()
 
@@ -84,7 +83,10 @@ def main():
     print(f"🧠 Loading model: {args.model}")
     tokenizer = AutoTokenizer.from_pretrained(args.model, use_fast=True)
     dtype = torch.float16 if torch.cuda.is_available() and args.device != "cpu" else torch.float32
-    model = AutoModelForCausalLM.from_pretrained(args.model, torch_dtype=dtype)
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model,
+        torch_dtype=dtype,
+    )
     device = (torch.device("cuda") if (args.device in ["auto", "cuda"] and torch.cuda.is_available())
               else torch.device("cpu"))
     model.to(device).eval()

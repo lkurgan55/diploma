@@ -1022,5 +1022,133 @@
     "question": "For the patients with a normal range of creatinine phosphokinase, how many of them have a positive measure of degree of coagulation?",
     "gold_sql": "select count(t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id inner join examination as t3 on t1.id = t3.id where t2.cpk < 250 and (t3.kct = '+' or t3.rvvt = '+' or t3.lac = '+')",
     "pred_sql": "select count(*) from patient p join examination e on p.id = e.id join laboratory l on p.id = l.id where e.thrombosis = 0 and l.cpk between 0 and 200"
+  },
+  {
+    "id": 128,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Give the name of the league had the most goals in the 2016 season?",
+    "gold_sql": "select t2.name from match as t1 inner join league as t2 on t1.league_id = t2.id where t1.season = '2015/2016' group by t2.name order by sum(t1.home_team_goal + t1.away_team_goal) desc limit 1",
+    "pred_sql": "select name from league where id in (select league_id from match where extract(year from date) = 2016 group by league_id order by sum(home_team_goal + away_team_goal) desc limit 1)"
+  },
+  {
+    "id": 129,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "In Scotland Premier League, which away team won the most during the 2010 season?",
+    "gold_sql": "select teaminfo.team_long_name from league as leaguedata inner join match as matchdata on leaguedata.id = matchdata.league_id inner join team as teaminfo on matchdata.away_team_api_id = teaminfo.team_api_id where leaguedata.name = 'scotland premier league' and matchdata.season = '2009/2010' and matchdata.away_team_goal - matchdata.home_team_goal > 0 group by matchdata.away_team_api_id order by count(*) desc limit 1",
+    "pred_sql": "with away_wins as ( select away_team_api_id, count(*) as wins from match where season = '2010/2011' and league_id = (select id from league where name = 'scotland premier league') group by away_team_api_id ) select away_team_api_id from away_wins order by wins desc limit 1"
+  },
+  {
+    "id": 130,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "What are the speed in which attacks are put together of the top 4 teams with the highest build Up Play Speed?",
+    "gold_sql": "select t1.buildupplayspeed from team_attributes as t1 inner join team as t2 on t1.team_api_id = t2.team_api_id order by t1.buildupplayspeed asc limit 4",
+    "pred_sql": "with top_4_teams as ( select team_fifa_api_id, avg(buildupplayspeed) as avg_build_up_play_speed from team_attributes group by team_fifa_api_id order by avg_build_up_play_speed desc limit 4 ) select ta.team_fifa_api_id, ta.buildupplayspeed, ta.buildupplayspeedclass from team_attributes ta join top_4_teams"
+  },
+  {
+    "id": 131,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Give the name of the league had the most matches end as draw in the 2016 season?",
+    "gold_sql": "select t2.name from match as t1 inner join league as t2 on t1.league_id = t2.id where t1.season = '2015/2016' and t1.home_team_goal = t1.away_team_goal group by t2.name order by count(t1.id) desc limit 1",
+    "pred_sql": "select name from league where id in (select league_id from match where extract(year from date) = 2016 and home_team_goal = away_team_goal)"
+  },
+  {
+    "id": 132,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "At present, calculate for the player's age who have a sprint speed of no less than 97 between 2013 to 2015.",
+    "gold_sql": "select distinct datetime() - t2.birthday age from player_attributes as t1 inner join player as t2 on t1.player_api_id = t2.player_api_id where strftime('%y',t1.`date`) >= '2013' and strftime('%y',t1.`date`) <= '2015' and t1.sprint_speed >= 97",
+    "pred_sql": "with player_attributes as ( select p.player_api_id, p.player_name, pa.date, pa.sprint_speed from player p join player_attributes pa on p.player_api_id = pa.player_fifa_api_id where pa.date between '2013-01-01' and '2015-12-31' and pa.sprint_speed >= 97 ) select pa.player_api_id, p.player_name, datediff(pa.date, p.birthday"
+  },
+  {
+    "id": 133,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Give the name of the league with the highest matches of all time and how many matches were played in the said league.",
+    "gold_sql": "select t2.name, t1.max_count from league as t2 join (select league_id, max(cnt) as max_count from (select league_id, count(id) as cnt from match group by league_id) as subquery) as t1 on t1.league_id = t2.id",
+    "pred_sql": "with league_matches as ( select league_id, count(*) as num_matches from match group by league_id ) select league.name, num_matches from league_matches join league on league.id = league_matches.league_id order by num_matches desc limit 1"
+  },
+  {
+    "id": 134,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Give the team_fifa_api_id of teams with more than 50 but less than 60 build-up play speed.",
+    "gold_sql": "select distinct team_fifa_api_id from team_attributes where buildupplayspeed > 50 and buildupplayspeed < 60",
+    "pred_sql": "select team_fifa_api_id from team_attributes where buildupplayspeed between 50 and 60"
+  },
+  {
+    "id": 135,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "List the long name of teams with above-average build-up play passing in 2012.",
+    "gold_sql": "select distinct t4.team_long_name from team_attributes as t3 inner join team as t4 on t3.team_api_id = t4.team_api_id where substr(t3.`date`, 1, 4) = '2012' and t3.buildupplaypassing > ( select cast(sum(t2.buildupplaypassing) as real) / count(t1.id) from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where strftime('%y',t2.`date`) = '2012')",
+    "pred_sql": "select t.team_long_name from team_attributes ta join team t on ta.team_fifa_api_id = t.team_fifa_api_id where ta.date like '2012-%' and ta.buildupplaypassing > (select avg(buildupplaypassing) from team_attributes where date like '2012-%')"
+  },
+  {
+    "id": 136,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "Calculate the percentage of players who prefer left foot, who were born between 1987 and 1992.",
+    "gold_sql": "select cast(count(case when t2.preferred_foot = 'left' then t1.id else null end) as real) * 100 / count(t1.id) percent from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where substr(t1.birthday, 1, 4) between '1987' and '1992'",
+    "pred_sql": "select count(*) * 100.0 / (select count(*) from player where birthday between '1987-01-01' and '1992-12-31' and preferred_foot = 'left') as percentage from player where birthday between '1987-01-01' and '1992-12-31' and preferred_foot = 'left'"
+  },
+  {
+    "id": 137,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Find the average number of long-shot done by Ahmed Samir Farag.",
+    "gold_sql": "select cast(sum(t2.long_shots) as real) / count(t2.`date`) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'ahmed samir farag'",
+    "pred_sql": "select avg(long_shots) as average_long_shots from player_attributes where player_name = 'ahmed samir farag'"
+  },
+  {
+    "id": 138,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "List the top 10 players' names whose heights are above 180 in descending order of average heading accuracy.",
+    "gold_sql": "select t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height > 180 group by t1.id order by cast(sum(t2.heading_accuracy) as real) / count(t2.`player_fifa_api_id`) desc limit 10",
+    "pred_sql": "select p.player_name, avg(pa.heading_accuracy) as avg_heading_accuracy from player p join player_attributes pa on p.player_api_id = pa.player_api_id where p.height > 180 group by p.player_name order by avg_heading_accuracy desc limit 10"
+  },
+  {
+    "id": 139,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "List the name of leagues in which the average goals by the home team is higher than the away team in the 2009/2010 season.",
+    "gold_sql": "select t1.name from league as t1 inner join match as t2 on t1.id = t2.league_id where t2.season = '2009/2010' group by t1.name having (cast(sum(t2.home_team_goal) as real) / count(distinct t2.id)) - (cast(sum(t2.away_team_goal) as real) / count(distinct t2.id)) > 0",
+    "pred_sql": "select name from league where id in (select league_id from match where season = '2008/2009' group by league_id having avg(home_team_goal) > avg(away_team_goal))"
+  },
+  {
+    "id": 140,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "List the football players with a birthyear of 1970 and a birthmonth of October.",
+    "gold_sql": "select player_name from player where substr(birthday, 1, 7) = '1970-10'",
+    "pred_sql": "select * from player where strftime('%y', birthday) = '1970' and strftime('%m', birthday) = '10'"
+  },
+  {
+    "id": 141,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "What is the overall rating of the football player Gabriel Tamas in year 2011?",
+    "gold_sql": "select t2.overall_rating from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'gabriel tamas' and strftime('%y', t2.date) = '2011'",
+    "pred_sql": "select avg(overall_rating) from player_attributes where player_fifa_api_id in (select player_fifa_api_id from player where player_name = 'gabriel tamas') and date like '2011-%'"
+  },
+  {
+    "id": 142,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Calculate the average home team goal in the 2010/2011 season in the country of Poland.",
+    "gold_sql": "select cast(sum(t2.home_team_goal) as real) / count(t2.id) from country as t1 inner join match as t2 on t1.id = t2.country_id where t1.name = 'poland' and t2.season = '2010/2011'",
+    "pred_sql": "select avg(home_team_goal) from match where country_id = (select id from country where name = 'poland') and season = '2010/2011'"
+  },
+  {
+    "id": 143,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "Who has the highest average finishing rate between the highest and shortest football player?",
+    "gold_sql": "select a from ( select avg(finishing) result, 'max' a from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height = ( select max(height) from player ) union select avg(finishing) result, 'min' a from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height = ( select min(height) from player ) ) order by result desc limit 1",
+    "pred_sql": "select avg(f.finishing) as avg_finishing_rate from player p join player_attributes pa on p.player_api_id = pa.player_api_id where p.height = (select max(height) from player) or p.height = (select min(height) from player) group by p.player_api_id"
   }
 ]

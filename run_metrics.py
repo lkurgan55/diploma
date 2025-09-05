@@ -1,10 +1,14 @@
+"""Compute Execution Accuracy, String Match Accuracy, and Component Match Accuracy for JSON predictions."""
+
 from evaluation.evaluation_ex import execution_equal
 from evaluation.string_match import string_match_equal
+from evaluation.component_match import component_match_exact
 
 import argparse, json
 
 db_root = './datasets/data_minidev/dev_databases'
-# ---------- Main ----------
+
+
 def main():
     ap = argparse.ArgumentParser(description="Compute Execution Accuracy for JSON predictions.")
     ap.add_argument("--json_path", default='outputs/mini_dev_sqlite_greedy.json', help="Вхідний JSON із записами (list of dicts).")
@@ -14,7 +18,7 @@ def main():
     with open(args.json_path, "r", encoding="utf-8") as f:
         data: list[dict[str, int | str]] = json.load(f)
 
-    total, passed_ex, passed_sm = 0, 0, 0
+    total, passed_ex, passed_sm, passed_cm = 0, 0, 0, 0
     for record in data[:]:
         id = record.get("id")
         db_id    = record.get("db_id")
@@ -25,19 +29,25 @@ def main():
 
         ex = execution_equal(db_path, pred_sql, gold_sql)
         sm = string_match_equal(pred_sql, gold_sql)
+        cm = component_match_exact(pred_sql, gold_sql)
 
         record["ex"] = ex
         record["sm"] = sm
+        record["cm"] = cm
 
         total += 1
-        print(f"Record ID: {id} | DB: {db_id} | Execution Equal: {ex} | String Match: {sm}")
+        print(f"Record ID: {id} | DB: {db_id} | Execution Equal: {ex} | String Match: {sm} | Component Match: {cm}")
         passed_ex += ex
         passed_sm += sm
+        passed_cm += cm
 
     ex_acc = (passed_ex / total) if total else 0.0
     sm_acc = (passed_sm / total) if total else 0.0
-    print(f"Execution Accuracy: {passed_ex}/{total} = {ex_acc:.4f}")
+    cm_acc = (passed_cm / total) if total else 0.0
+
+    print(f"\nExecution Accuracy: {passed_ex}/{total} = {ex_acc:.4f}")
     print(f"String Match Accuracy: {passed_sm}/{total} = {sm_acc:.4f}")
+    print(f"Component Match Accuracy: {passed_cm}/{total} = {cm_acc:.4f}")
 
 if __name__ == "__main__":
     main()

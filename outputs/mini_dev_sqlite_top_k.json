@@ -6,5 +6,77 @@
     "question": "What is the ratio of customers who pay in EUR against customers who pay in CZK?",
     "gold_sql": "select cast(sum(iif(currency = 'eur', 1, 0)) as float) / sum(iif(currency = 'czk', 1, 0)) as ratio from customers",
     "pred_sql": "select count(*)/(select count(*) from customers where currency='eur') as ratio from customers where currency='eur'"
+  },
+  {
+    "id": 1,
+    "db_id": "debit_card_specializing",
+    "difficulty": "moderate",
+    "question": "In 2012, who had the least consumption in LAM?",
+    "gold_sql": "select t1.customerid from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where t1.segment = 'lam' and substr(t2.date, 1, 4) = '2012' group by t1.customerid order by sum(t2.consumption) asc limit 1",
+    "pred_sql": "select c.customerid, y.date, y.consumption from yearmonth y join customers c on y.customerid = c.customerid where y.date like '2012%' and c.segment = 'lam' order by y.consumption limit 1"
+  },
+  {
+    "id": 2,
+    "db_id": "debit_card_specializing",
+    "difficulty": "moderate",
+    "question": "What was the average monthly consumption of customers in SME for the year 2013?",
+    "gold_sql": "select avg(t2.consumption) / 12 from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where substr(t2.date, 1, 4) = '2013' and t1.segment = 'sme'",
+    "pred_sql": "select avg(consumption) from yearmonth where customerid in (select customerid from customers where segment='sme') and date like '2013%'"
+  },
+  {
+    "id": 3,
+    "db_id": "debit_card_specializing",
+    "difficulty": "challenging",
+    "question": "What was the difference in gas consumption between CZK-paying customers and EUR-paying customers in 2012?",
+    "gold_sql": "select sum(iif(t1.currency = 'czk', t2.consumption, 0)) - sum(iif(t1.currency = 'eur', t2.consumption, 0)) from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where substr(t2.date, 1, 4) = '2012'",
+    "pred_sql": "select sum(case when y.date like '2012%' and c.currency='czk' then y.consumption else 0 end) - sum(case when y.date like '2012%' and c.currency='eur' then y.consumption else 0 end) as difference from yearmonth y join customers c on y.customerid = c.customerid"
+  },
+  {
+    "id": 4,
+    "db_id": "debit_card_specializing",
+    "difficulty": "moderate",
+    "question": "Which year recorded the most consumption of gas paid in CZK?",
+    "gold_sql": "select substr(t2.date, 1, 4) from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where t1.currency = 'czk' group by substr(t2.date, 1, 4) order by sum(t2.consumption) desc limit 1",
+    "pred_sql": "select strftime('%y', y.date) as year, sum(y.consumption) as totalconsumption from yearmonth y group by strftime('%y', y.date) order by totalconsumption desc limit 1"
+  },
+  {
+    "id": 5,
+    "db_id": "debit_card_specializing",
+    "difficulty": "moderate",
+    "question": "What was the gas consumption peak month for SME customers in 2013?",
+    "gold_sql": "select substr(t2.date, 5, 2) from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where substr(t2.date, 1, 4) = '2013' and t1.segment = 'sme' group by substr(t2.date, 5, 2) order by sum(t2.consumption) desc limit 1",
+    "pred_sql": "select date from yearmonth where customerid in (select customerid from customers where segment='sme' and 2013 <= strftime('%y',date) and strftime('%y',date) = 2013) order by consumption desc limit 1"
+  },
+  {
+    "id": 6,
+    "db_id": "debit_card_specializing",
+    "difficulty": "challenging",
+    "question": "What is the difference in the annual average consumption of the customers with the least amount of consumption paid in CZK for 2013 between SME and LAM, LAM and KAM, and KAM and SME?",
+    "gold_sql": "select cast(sum(iif(t1.segment = 'sme', t2.consumption, 0)) as real) / count(t1.customerid) - cast(sum(iif(t1.segment = 'lam', t2.consumption, 0)) as real) / count(t1.customerid) , cast(sum(iif(t1.segment = 'lam', t2.consumption, 0)) as real) / count(t1.customerid) - cast(sum(iif(t1.segment = 'kam', t2.consumption, 0)) as real) / count(t1.customerid) , cast(sum(iif(t1.segment = 'kam', t2.consumption, 0)) as real) / count(t1.customerid) - cast(sum(iif(t1.segment = 'sme', t2.consumption, 0)) as real) / count(t1.customerid) from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where t1.currency = 'czk' and t2.consumption = ( select min(consumption) from yearmonth ) and t2.date between 201301 and 201312",
+    "pred_sql": "select (select avg(consumption) from yearmonth where customerid in (select customerid from customers where segment='sme' and date like '2013%') and date like '2013%') - (select avg(consumption) from yearmonth where customerid in (select customerid from customers where segment='lam' and date like '2013%') and date like '2013%') as diff_sme_lam, (select avg"
+  },
+  {
+    "id": 7,
+    "db_id": "debit_card_specializing",
+    "difficulty": "challenging",
+    "question": "Which of the three segments—SME, LAM and KAM—has the biggest and lowest percentage increases in consumption paid in EUR between 2012 and 2013?",
+    "gold_sql": "select cast((sum(iif(t1.segment = 'sme' and t2.date like '2013%', t2.consumption, 0)) - sum(iif(t1.segment = 'sme' and t2.date like '2012%', t2.consumption, 0))) as float) * 100 / sum(iif(t1.segment = 'sme' and t2.date like '2012%', t2.consumption, 0)), cast(sum(iif(t1.segment = 'lam' and t2.date like '2013%', t2.consumption, 0)) - sum(iif(t1.segment = 'lam' and t2.date like '2012%', t2.consumption, 0)) as float) * 100 / sum(iif(t1.segment = 'lam' and t2.date like '2012%', t2.consumption, 0)) , cast(sum(iif(t1.segment = 'kam' and t2.date like '2013%', t2.consumption, 0)) - sum(iif(t1.segment = 'kam' and t2.date like '2012%', t2.consumption, 0)) as float) * 100 / sum(iif(t1.segment = 'kam' and t2.date like '2012%', t2.consumption, 0)) from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid",
+    "pred_sql": "with segment_consumption as ( select s.segment, ym.customerid, ym.date, ym.consumption, lag(ym.consumption, 1, 0) over (partition by ym.customerid, ym.segment order by ym.date) as prev_consumption, (ym.consumption - lag(ym.consumption, 1, 0) over ("
+  },
+  {
+    "id": 8,
+    "db_id": "debit_card_specializing",
+    "difficulty": "simple",
+    "question": "How much did customer 6 consume in total between August and November 2013?",
+    "gold_sql": "select sum(consumption) from yearmonth where customerid = 6 and date between '201308' and '201311'",
+    "pred_sql": "select sum(consumption) from yearmonth where customerid = 6 and substr(date, 1, 7) between '2013-08-01' and '2013-11-30'"
+  },
+  {
+    "id": 9,
+    "db_id": "debit_card_specializing",
+    "difficulty": "simple",
+    "question": "How many more \"discount\" gas stations does the Czech Republic have compared to Slovakia?",
+    "gold_sql": "select sum(iif(country = 'cze', 1, 0)) - sum(iif(country = 'svk', 1, 0)) from gasstations where segment = 'discount'",
+    "pred_sql": "select count(*) from gasstations where country='cze' and segment='discount'"
   }
 ]

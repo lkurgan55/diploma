@@ -1,3 +1,4 @@
+"""Evaluation based on string matching of the predicted and gold SQL queries."""
 import re
 import sqlparse
 

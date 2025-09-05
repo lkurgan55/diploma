@@ -1,4 +1,4 @@
-# ---------- Execution Accuracy helpers ----------
+"""Evaluation based on executing the predicted and gold SQL queries on the same database and comparing results."""
 import sqlite3
 
 def _normalize_cell(v):
@@ -42,6 +42,7 @@ def execution_equal(db_path: str, pred_sql: str, gold_sql: str) -> int:
         return False
 
     if rows_p is None:
+        print(f"[SQL PRED ERROR]")
         return False
 
     return _rows_to_set(rows_p) == _rows_to_set(rows_g)
