@@ -5,7 +5,7 @@
     "difficulty": "simple",
     "question": "What is the ratio of customers who pay in EUR against customers who pay in CZK?",
     "gold_sql": "select cast(sum(iif(currency = 'eur', 1, 0)) as float) / sum(iif(currency = 'czk', 1, 0)) as ratio from customers",
-    "pred_sql": "select cast(sum(case when t2.currency = 'czk' then 1 else 0 end) as real) * 100 / count(*) from transactions_1k as t1 inner join customers as t2 on t1.customerid = t2.customerid"
+    "pred_sql": "select cast(sum(iif(t2.currency = 'czk', 1, 0)) as real) / count(t1.customerid) from transactions_1k as t1 inner join customers as t2 on t1.customerid = t2.customerid"
   },
   {
     "id": 1,
@@ -125,7 +125,7 @@
     "difficulty": "moderate",
     "question": "Please list the countries of the gas stations with transactions taken place in June, 2013.",
     "gold_sql": "select distinct t2.country from transactions_1k as t1 inner join gasstations as t2 on t1.gasstationid = t2.gasstationid inner join yearmonth as t3 on t1.customerid = t3.customerid where t3.date = '201306'",
-    "pred_sql": "select t2.country from transactions_1k as t1 join gasstations as t2 on t1.gasstationid = t2.gasstationid where strftime('%y%m', t1.date) = '201306' group by t2.country"
+    "pred_sql": "select t2.country from transactions_1k as t1 inner join gasstations as t2 on t1.gasstationid = t2.gasstationid where strftime('%y-%m', t1.date) = '2013-06' group by t2.country"
   },
   {
     "id": 16,
@@ -229,7 +229,7 @@
     "difficulty": "moderate",
     "question": "Who is the top spending customer and how much is the average price per single item purchased by this customer? What currency was being used?",
     "gold_sql": "select t2.customerid, sum(t2.price / t2.amount), t1.currency from customers as t1 inner join transactions_1k as t2 on t1.customerid = t2.customerid where t2.customerid = ( select customerid from yearmonth order by consumption desc limit 1 ) group by t2.customerid, t1.currency",
-    "pred_sql": "select segment, avg(price) as averageprice, currency from transactions_1k join customers on transactions_1k.customerid = customers.customerid where customerid = (select customerid from transactions_1k group by customerid order by sum(amount) desc limit 1) group by segment, currency"
+    "pred_sql": "select segment, currency, max(amount) / count(distinct productid) as averagepriceperitem from transactions_1k join customers on transactions_1k.customerid = customers.customerid where customers.customerid = (select customerid from transactions_1k group by customerid order by sum(amount) desc limit 1) group by segment, currency"
   },
   {
     "id": 29,
@@ -237,7 +237,7 @@
     "difficulty": "moderate",
     "question": "For all the people who paid more than 29.00 per unit of product id No.5. Give their consumption status in the August of 2012.",
     "gold_sql": "select t2.consumption from transactions_1k as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where t1.price / t1.amount > 29.00 and t1.productid = 5 and t2.date = '201208'",
-    "pred_sql": "select t1.customerid, t3.consumption from transactions_1k as t1 inner join products as t2 on t1.productid = t2.productid inner join yearmonth as t3 on t1.customerid = t3.customerid and t1.date = t3.date where t1.price > 29 and t1.date like '2012-08-%' and t1.customerid = (select customerid from products where productid ="
+    "pred_sql": "select t3.date, t3.consumption from transactions_1k as t1 inner join products as t2 on t1.productid = t2.productid inner join yearmonth as t3 on t1.customerid = t3.customerid and t1.date = t3.date where t1.price > 29 and t2.description = 'special' and t3.date like '201208'"
   },
   {
     "id": 30,
@@ -261,7 +261,7 @@
     "difficulty": "moderate",
     "question": "Among the events attended by more than 10 members of the Student_Club, how many of them are meetings?",
     "gold_sql": "select t1.event_name from event as t1 inner join attendance as t2 on t1.event_id = t2.link_to_event group by t1.event_id having count(t2.link_to_event) > 10 except select t1.event_name from event as t1 where t1.type = 'meeting'",
-    "pred_sql": "select count(*) from event where type = 'meeting' and event_id in (select link_to_event from attendance group by link_to_event having count(link_to_member) > 10);"
+    "pred_sql": "select count(*) from event where type = 'meeting' and event_id in (select link_to_event from attendance group by link_to_event having count(link_to_member) > 10)"
   },
   {
     "id": 33,
@@ -269,7 +269,7 @@
     "difficulty": "moderate",
     "question": "List all the names of events that had an attendance of over 20 students but were not fundraisers.",
     "gold_sql": "select t1.event_name from event as t1 inner join attendance as t2 on t1.event_id = t2.link_to_event group by t1.event_id having count(t2.link_to_event) > 20 except select t1.event_name from event as t1 where t1.type = 'fundraiser'",
-    "pred_sql": "select t1.event_name from event as t1 join attendance as t2 on t1.event_id = t2.link_to_event where t2.amount > 20 and t1.event_id not in (select budget.link_to_event from budget where budget.category like 'fund%')"
+    "pred_sql": "select t1.event_name from event as t1 join attendance as t2 on t1.event_id = t2.link_to_event where t2.amount > 20 and t1.event_id not in (select t3.link_to_event from expense as t4 join budget as t3 on t4.link_to_budget = t3.budget_id where t4.cost > 50)"
   },
   {
     "id": 34,
@@ -421,7 +421,7 @@
     "difficulty": "moderate",
     "question": "Among all the closed events, which event has the highest spend-to-budget ratio?",
     "gold_sql": "select t2.event_name from budget as t1 inner join event as t2 on t1.link_to_event = t2.event_id where t2.status = 'closed' order by t1.spent / t1.amount desc limit 1",
-    "pred_sql": "select event_id from budget where event_status = 'closed' order by spent / amount desc limit 1"
+    "pred_sql": "select event_id from budget where event_status = 'closed' order by spent / case when remaining = 0 then amount else remaining end desc limit 1"
   },
   {
     "id": 53,
@@ -453,7 +453,7 @@
     "difficulty": "moderate",
     "question": "Which student has been entrusted to manage the budget for the Yearly Kickoff?",
     "gold_sql": "select t4.first_name, t4.last_name from event as t1 inner join budget as t2 on t1.event_id = t2.link_to_event inner join expense as t3 on t2.budget_id = t3.link_to_budget inner join member as t4 on t3.link_to_member = t4.member_id where t1.event_name = 'yearly kickoff'",
-    "pred_sql": "select m.first_name, m.last_name from member m join budget b on m.member_id = b.link_to_member where b.event_status = 'open' and b.category = 'advertisement' order by m.member_id asc limit 1"
+    "pred_sql": "select t1.first_name, t1.last_name from member as t1 join budget as t2 on t1.member_id = t2.link_to_member where t2.event_status = 'open' and t2.category = 'advertisement' order by t1.member_id asc limit 1"
   },
   {
     "id": 57,
@@ -517,7 +517,7 @@
     "difficulty": "moderate",
     "question": "Indicate the name of the closed event whose cost has exceeded the budget the most.",
     "gold_sql": "select t2.event_name from budget as t1 inner join event as t2 on t2.event_id = t1.link_to_event where t1.event_status = 'closed' and t1.remaining < 0 order by t1.remaining limit 1",
-    "pred_sql": "select e.event_name from event e join budget b on e.event_id = b.link_to_event where b.event_status = 'closed' order by b.spent - b.remaining desc limit 1"
+    "pred_sql": "select e.event_name from event e join budget b on e.event_id = b.link_to_event where b.event_status = 'closed' group by e.event_id order by b.spent - b.remaining desc limit 1"
   },
   {
     "id": 65,
@@ -557,7 +557,7 @@
     "difficulty": "simple",
     "question": "State what kind of expenses that Sacha Harrison incurred?",
     "gold_sql": "select t2.expense_description from member as t1 inner join expense as t2 on t1.member_id = t2.link_to_member where t1.first_name = 'sacha' and t1.last_name = 'harrison'",
-    "pred_sql": "select expense_description from expense where link_to_member = 'rec1a5431d289892b' and approved = 'true'"
+    "pred_sql": "select expense_description from expense where link_to_member = 'rec1a5431d2898a2' and approved = 'true'"
   },
   {
     "id": 70,
@@ -573,7 +573,7 @@
     "difficulty": "moderate",
     "question": "List the last name of members with a major in environmental engineering and include its department and college name.",
     "gold_sql": "select t2.last_name, t1.department, t1.college from major as t1 inner join member as t2 on t1.major_id = t2.link_to_major where t2.position = 'member' and t1.major_name = 'environmental engineering'",
-    "pred_sql": "select t1.last_name, t3.department, t3.college from member as t1 inner join major as t2 on t1.link_to_major = t2.major_id inner join major as t3 on t2.department = t3.department where t3.major_name like '%environmental engineering%'"
+    "pred_sql": "select t3.last_name, t3.department, t3.college from member as t1 inner join major as t2 on t1.link_to_major = t2.major_id inner join zip_code as t4 on t1.zip = t4.zip_code inner join ( select t1.link_to_major, t1.member_id from expense as t1 inner join budget as t2 on t1.link_to_budget = t2.budget_id where t2.category = 'food' and t"
   },
   {
     "id": 72,
@@ -613,7 +613,7 @@
     "difficulty": "challenging",
     "question": "Write the full name of the member who spent money for water, veggie tray and supplies and include the cost of it.",
     "gold_sql": "select t2.first_name, t2.last_name, t1.cost from expense as t1 inner join member as t2 on t1.link_to_member = t2.member_id where t1.expense_description = 'water, veggie tray, supplies'",
-    "pred_sql": "select t3.first_name, t3.last_name, sum(t2.cost) as total_spent from expense as t2 join member as t3 on t2.link_to_member = t3.member_id join budget as t1 on t2.link_to_budget = t1.budget_id where t2.expense_description like '%water%' or t2.expense_description like '%veggie tray%' or t2.expense_description like '%supplies%' group by t2.link_to_member"
+    "pred_sql": "select t3.first_name, t3.last_name, sum(t1.cost) as total_spent from expense as t1 join member as t2 on t1.link_to_member = t2.member_id join member as t3 on t2.link_to_major = t3.link_to_major where t1.expense_description like '%water%' or t1.expense_description like '%veggie tray%' or t1.expense_description like '%supplies%' group by t2.member_id"
   },
   {
     "id": 77,
@@ -685,7 +685,7 @@
     "difficulty": "moderate",
     "question": "How many female patients who came at the hospital in 1997 was immediately followed at the outpatient clinic?",
     "gold_sql": "select count(*) from patient where strftime('%y', description) = '1997' and sex = 'f' and admission = '-'",
-    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and year(e.`examination date`) = 1997 and e.`examination date` < (select max(`examination date`) from examination where id = p.id) and (select count(*) from examination where id = p.id and `examination date` > (select max(`examination date`) from examination where id = p.id)) ="
+    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and year(e.`examination date`) = 1997 and e.`examination date` < (select max(`examination date`) from examination where id = p.id) and (select `examination date` from examination where id = p.id and `examination date` > e.`examination date`) <= '1997-12"
   },
   {
     "id": 86,
@@ -709,7 +709,7 @@
     "difficulty": "challenging",
     "question": "The oldest SJS patient's medical laboratory work was completed on what date, and what age was the patient when they initially arrived at the hospital?",
     "gold_sql": "select t1.date, strftime('%y', t2.`first date`) - strftime('%y', t2.birthday),t2.birthday from laboratory as t1 inner join patient as t2 on t1.id = t2.id where t2.diagnosis = 'sjs' and t2.birthday is not null order by t2.birthday asc limit 1",
-    "pred_sql": "select t1.date, datediff(t2.birthday, t1.date) / 365 from laboratory as t1 join patient as t2 on t1.id = t2.id where t2.sm = 'sjs' order by t1.date asc limit 1"
+    "pred_sql": "select t1.date, datediff(t2.first_date, t1.date) / 365 from laboratory as t1 join patient as t2 on t1.id = t2.id where t2.sm = 'sjs' order by t1.date asc limit 1"
   },
   {
     "id": 89,
@@ -725,7 +725,7 @@
     "difficulty": "challenging",
     "question": "How many underage patients were examined during the course of the three-year period from 1990 to 1993?",
     "gold_sql": "select count(t1.id) from patient as t1 inner join examination as t2 on t1.id = t2.id where strftime('%y', t2.`examination date`) between '1990' and '1993' and strftime('%y', t2.`examination date`) - strftime('%y', t1.birthday) < 18",
-    "pred_sql": "select count(*) from examination join patient on examination.id = patient.id where year(`examination date`) between 1990 and 1993 and patient.birthday >= date('1990-01-01') and patient.birthday <= date('1993-12-31') and mod(year(current_date), 10) = 0"
+    "pred_sql": "select count(*) from examination inner join patient on examination.id = patient.id where `examination date` between '1990-01-01' and '1993-12-31' and year(patient.birthday) < extract(year from `examination date`)"
   },
   {
     "id": 91,
@@ -749,7 +749,7 @@
     "difficulty": "challenging",
     "question": "For the patient who was born on 1959/2/18, what is the decrease rate for his/her total cholesterol from November to December in 1981?",
     "gold_sql": "select cast((sum(case when t2.date like '1981-11-%' then t2.`t-cho` else 0 end) - sum(case when t2.date like '1981-12-%' then t2.`t-cho` else 0 end)) as real) / sum(case when t2.date like '1981-12-%' then t2.`t-cho` else 0 end) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t1.birthday = '1959-02-18'",
-    "pred_sql": "select cast(sum(case when t2.date >= '1981-11-01' then t2.`t-cho` else 0 end) - sum(case when t2.date >= '1981-01-01' and t2.date < '1981-11-01' then t2.`t-cho` else 0 end) as real) * 100 / sum(case when"
+    "pred_sql": "select cast(sum(iif(t2.date >= '1981-11-01' and t2.date <= '1981-12-31', t2.`t-cho`, 0)) as real) / count(case when t1.date >= '1981-11-01' then t1.date end) * 100 as decreaserate from laboratory as t1 inner join laboratory as t2 on"
   },
   {
     "id": 94,
@@ -757,7 +757,7 @@
     "difficulty": "moderate",
     "question": "How many patients who were examined between 1987/7/6 and 1996/1/31 had a GPT level greater than 30 and an ALB level less than 4? List them by their ID.",
     "gold_sql": "select distinct id from laboratory where date between '1987-07-06' and '1996-01-31' and gpt > 30 and alb < 4",
-    "pred_sql": "select id from examination where `examination date` between '1987-07-06' and '1996-01-31' and gpt > 30 and alb < 4 group by id"
+    "pred_sql": "select id from laboratory where date between '1987-07-06' and '1996-01-31' group by id having max(gpt) > 30 and min(alb) < 4"
   },
   {
     "id": 95,
@@ -773,7 +773,7 @@
     "difficulty": "challenging",
     "question": "List all patients who were followed up at the outpatient clinic who underwent a laboratory test in October 1991 and had a total blood bilirubin level within the normal range.",
     "gold_sql": "select distinct t1.id from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t1.admission = '-' and t2.`t-bil` < 2.0 and t2.date like '1991-10-%'",
-    "pred_sql": "select distinct p.id from patient p join examination e on p.id = e.id join laboratory l on p.id = l.id where e.kct = 'outpatient' and l.date between '1991-10-01' and '1991-10-31' and l.`t-bil` is null"
+    "pred_sql": "select distinct p.id from patient p join examination e on p.id = e.id join laboratory l on p.id = l.id where e.kct = 'outpatient' and l.date between '1991-10-01' and '1991-10-31' and l.`t-bil` between 0 and 1.2"
   },
   {
     "id": 97,
@@ -781,7 +781,7 @@
     "difficulty": "moderate",
     "question": "What is the average blood albumin level for female patients with a PLT greater than 400 who have been diagnosed with SLE?",
     "gold_sql": "select avg(t2.alb) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.plt > 400 and t1.diagnosis = 'sle' and t1.sex = 'f'",
-    "pred_sql": "select avg(t2.alb) from laboratory as t1 inner join patient as t2 on t1.id = t2.id where t2.sex = 'f' and t2.plt > 400 and t2.diagnosis = 'sle'"
+    "pred_sql": "select avg(t2.alb) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t1.sex = 'f' and t2.plt > 400 and t1.diagnosis = 'sle'"
   },
   {
     "id": 98,
@@ -797,7 +797,7 @@
     "difficulty": "moderate",
     "question": "What percentage of patients who were born in 1980 and were diagnosed with RA are women?",
     "gold_sql": "select cast(sum(case when sex = 'f' then 1 else 0 end) as real) * 100 / count(id) from patient where diagnosis = 'ra' and strftime('%y', birthday) = '1980'",
-    "pred_sql": "select cast(sum(case when t2.sex = 'f' then 1 else 0 end) as real) * 100 / count(t1.id) from patient as t1 inner join examination as t2 on t1.id = t2.id where t1.diagnosis = 'ra' and year(t1.birthday) = 1980"
+    "pred_sql": "select cast(sum(iif(t2.sex = 'f', 1, 0)) as real) * 100 / count(*) from patient as t1 inner join examination as t2 on t1.id = t2.id where year(t1.birthday) = 1980 and t2.diagnosis = 'ra'"
   },
   {
     "id": 100,
@@ -805,7 +805,7 @@
     "difficulty": "moderate",
     "question": "Was the patient with the number 57266's uric acid within a normal range?",
     "gold_sql": "select case when (t1.sex = 'f' and t2.ua > 6.5) or (t1.sex = 'm' and t2.ua > 8.0) then true else false end from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t1.id = 57266",
-    "pred_sql": "select avg(t.u-pro) > 0.4 or avg(t.u-pro) < 0.2 as isoutsidenormalrange from laboratory as t inner join patient as p on t.id = p.id where p.id = 57266"
+    "pred_sql": "select avg(t.u-pro) > 0.4 or avg(t.u-pro) < 0.2 as isoutsidenormalrange from laboratory as t join patient as p on t.id = p.id where p.id = 57266"
   },
   {
     "id": 101,
@@ -821,7 +821,7 @@
     "difficulty": "moderate",
     "question": "Please provide the diagnosis of patients with ALT glutamic pylvic transaminase beyond the normal range by ascending order of their date of birth.",
     "gold_sql": "select distinct t1.diagnosis from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.gpt > 60 order by t1.birthday asc",
-    "pred_sql": "select distinct p.id, p.diagnosis from patient as p join laboratory as l on p.id = l.id where l.gpt > 30 order by p.birthday asc"
+    "pred_sql": "select distinct p.diagnosis from patient as p join laboratory as l on p.id = l.id where l.gpt > 30 order by p.birthday asc"
   },
   {
     "id": 103,
@@ -837,7 +837,7 @@
     "difficulty": "moderate",
     "question": "List and group all patients by sex for total bilirubin (T-BIL) level not within the normal range.",
     "gold_sql": "select t1.id,t1.sex from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.`t-bil` >= 2.0 group by t1.sex,t1.id",
-    "pred_sql": "select p.sex, l.t-bil from patient as p join laboratory as l on p.id = l.id group by p.sex, l.t-bil having l.t-bil not between 0 and 1.5"
+    "pred_sql": "select p.sex, l.t-bil from patient as p join laboratory as l on p.id = l.id group by p.sex, l.t-bil having l.t-bil not in (0.3, 0.8)"
   },
   {
     "id": 105,
@@ -869,7 +869,7 @@
     "difficulty": "challenging",
     "question": "Provide ID, sex and age of patient who has blood glucose (GLU) not within normal range but with total cholesterol(T-CHO) within normal range.",
     "gold_sql": "select distinct t1.id, t1.sex , strftime('%y', current_timestamp) - strftime('%y', t1.birthday) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.glu >= 180 and t2.`t-cho` < 250",
-    "pred_sql": "select p.id, p.sex, datediff(curdate(), p.birthday) as age from patient as p join laboratory as l on p.id = l.id where l.glu > 200 and l.t_chol between 40 and 60"
+    "pred_sql": "select p.id, p.sex, datediff(current_date, p.birthday) as age from patient as p join laboratory as l on p.id = l.id where l.glu > 200 and l.t_chol between 40 and 60"
   },
   {
     "id": 109,
@@ -901,7 +901,7 @@
     "difficulty": "challenging",
     "question": "For patients with abnormal platelet level, state the number of patients with lower than normal range. How is it compare to the number of patients with higher than normal range?",
     "gold_sql": "select sum(case when t2.plt <= 100 then 1 else 0 end) - sum(case when t2.plt >= 400 then 1 else 0 end) from patient as t1 inner join laboratory as t2 on t1.id = t2.id",
-    "pred_sql": "select sum(case when plt < (select avg(tp) from laboratory group by id) then 1 else 0 end) as below_normal, sum(case when plt > (select avg(tp) from laboratory group by id) then 1 else 0 end) as above_normal from laboratory join patient on laboratory.id = patient.id where plt < (select avg(tp) from laboratory group by id) or plt > (select avg(tp) from laboratory"
+    "pred_sql": "select sum(case when plt < (select avg(plt) from laboratory group by id) then 1 else 0 end) as below_normal_count, sum(case when plt > (select avg(plt) from laboratory group by id) then 1 else 0 end) as above_normal_count from laboratory"
   },
   {
     "id": 113,
@@ -917,7 +917,7 @@
     "difficulty": "challenging",
     "question": "For all patients who are older than 55 years old, what is the percentage of female who has abnormal prothrombin time (PT)?",
     "gold_sql": "select cast(sum(case when t2.pt >= 14 and t1.sex = 'f' then 1 else 0 end) as real) * 100 / count(case when t2.pt >= 14 then 1 else 0 end) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where strftime('%y', current_timestamp) - strftime('%y', t1.birthday) > 55",
-    "pred_sql": "select cast(sum(case when sex = 'f' then 1 else 0 end) as real) * 100 / count(id) as femalepercentage from patient where id in ( select p.id from patient p join examination e on p.id = e.id where datediff(current_date, p.birthday) > 365 * 55 ) and pt > 120"
+    "pred_sql": "select cast(sum(case when sex = 'f' then 1 else 0 end) as real) * 100 / count(id) as femalepercentage from patient where id in ( select p.id from patient p join examination e on p.id = e.id where datediff(current_date, p.birthday) > 365 * 55 ) and pt > 30"
   },
   {
     "id": 115,
@@ -997,7 +997,7 @@
     "difficulty": "challenging",
     "question": "Among the patients who has a normal anti-scl70, how many of them are female and does not have any symptom?",
     "gold_sql": "select count(distinct t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id inner join examination as t3 on t3.id = t2.id where (t2.sc170 = 'negative' or t2.sc170 = '0') and t1.sex = 'f' and t3.symptoms is null",
-    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and e.lac = 'none' and p.id in (select id from laboratory where sc170 = 'negative')"
+    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and e.lac = 'none' and p.id in (select id from laboratory where sc170 = 'none')"
   },
   {
     "id": 125,
@@ -1093,7 +1093,7 @@
     "difficulty": "challenging",
     "question": "Calculate the percentage of players who prefer left foot, who were born between 1987 and 1992.",
     "gold_sql": "select cast(count(case when t2.preferred_foot = 'left' then t1.id else null end) as real) * 100 / count(t1.id) percent from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where substr(t1.birthday, 1, 4) between '1987' and '1992'",
-    "pred_sql": "select cast(sum(case when t2.preferred_foot = 'left' then 1 else 0 end) as real) * 100 / count(*) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.birthday between '1987-01-01' and '1992-12-31'"
+    "pred_sql": "select cast(sum(case when t2.preferred_foot = 'left' then 1 else 0 end) as real) * 100 / count(*) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.birthday >= '1987-01-01' and t1.birthday <= '1992-12-31'"
   },
   {
     "id": 137,
@@ -1109,7 +1109,7 @@
     "difficulty": "moderate",
     "question": "List the top 10 players' names whose heights are above 180 in descending order of average heading accuracy.",
     "gold_sql": "select t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height > 180 group by t1.id order by cast(sum(t2.heading_accuracy) as real) / count(t2.`player_fifa_api_id`) desc limit 10",
-    "pred_sql": "select t.player_name from player as t join player_attributes as p on t.player_api_id = p.player_api_id where t.height > 180 group by t.player_name order by avg(p.heading_accuracy) desc limit 10"
+    "pred_sql": "select t3.player_name from player_attributes as t1 join player as t3 on t1.player_api_id = t3.player_api_id where t3.height > 180 group by t3.player_name order by avg(t1.heading_accuracy) desc limit 10"
   },
   {
     "id": 139,
@@ -1205,7 +1205,7 @@
     "difficulty": "moderate",
     "question": "Please list the names of the players whose volley score and dribbling score are over 70.",
     "gold_sql": "select distinct t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t2.volleys > 70 and t2.dribbling > 70",
-    "pred_sql": "select t3.player_name from team_attributes as t1 join match as t2 on t1.team_api_id = t2.home_team_api_id or t1.team_api_id = t2.away_team_api_id join player_attributes as t3 on t3.player_api_id = t2.home_player_x7 or t3.player_api_id = t2.away_player_x7 where t3.volley > 70 and t3.dribbling > 70"
+    "pred_sql": "select t3.player_name from team_attributes as t1 join match as t2 on t1.team_api_id = t2.home_team_api_id or t1.team_api_id = t2.away_team_api_id join player_attributes as t3 on t3.player_api_id = t2.home_player_x6 or t3.player_api_id = t2.away_player_x6 where t3.volley > 70 and t3.dribbling > 70"
   },
   {
     "id": 151,
@@ -1213,7 +1213,7 @@
     "difficulty": "moderate",
     "question": "How many matches were held in the Belgium Jupiler League in April, 2009?",
     "gold_sql": "select count(t2.id) from league as t1 inner join match as t2 on t1.id = t2.league_id where t1.name = 'belgium jupiler league' and substr(t2.`date`, 1, 7) = '2009-04'",
-    "pred_sql": "select count(*) from match join league on match.league_id = league.id join team on match.home_team_api_id = team.team_api_id or match.away_team_api_id = team.team_api_id where league.name = 'belgium jupiler league' and month(date) = 4 and year(date) = 2009"
+    "pred_sql": "select count(*) from match join league on match.league_id = league.id join team_attributes on match.home_team_api_id = team_attributes.team_api_id or match.away_team_api_id = team_attributes.team_api_id where league.name = 'belgium jupiler league' and month(date) = 4 and year(date) = 2009"
   },
   {
     "id": 152,
@@ -1285,7 +1285,7 @@
     "difficulty": "moderate",
     "question": "Tell the build Up play passing class for \"FC Lorient\" on 2010/2/22.",
     "gold_sql": "select t2.buildupplaypassingclass from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t1.team_long_name = 'fc lorient' and t2.`date` like '2010-02-22%'",
-    "pred_sql": "select t3.buildupplaypassingclass from team as t1 join league as t2 on t1.league_id = t2.id join match as t4 on t1.team_api_id = t4.home_team_api_id or t1.team_api_id = t4.away_team_api_id join team_attributes as t3 on t3.team_api_id = t1.team_api_id where t2.name = 'france ligue 1' and t4.date = '20"
+    "pred_sql": "select t3.buildupplaypassingclass from team as t1 inner join league as t2 on t1.league_id = t2.id inner join team_attributes as t3 on t1.id = t3.team_api_id where t2.name = 'france ligue 1' and t3.date = '2010-02-22 00:00:00' and t1.team_long_name = 'fc lorient'"
   },
   {
     "id": 161,
@@ -1373,7 +1373,7 @@
     "difficulty": "moderate",
     "question": "How many players had the highest potential score for crossing that preferred to use their left foots while attacking?",
     "gold_sql": "select count(t1.id) from player_attributes as t1 where t1.preferred_foot = 'left' and t1.crossing = ( select max(crossing) from player_attributes)",
-    "pred_sql": "select count(distinct t2.player_api_id) from player_attributes as t1 join player as t2 on t1.player_api_id = t2.player_api_id where t1.preferred_foot = 'left' and t1.crossing = (select max(crossing) from player_attributes where preferred_foot = 'left') and t1.overall_rating = (select max(overall_rating) from player_attributes where preferred_foot = 'left' and crossing = (select max"
+    "pred_sql": "select count(distinct t2.player_api_id) from player_attributes as t1 inner join player as t2 on t1.player_api_id = t2.player_api_id where t1.preferred_foot = 'left' and t1.crossing = (select max(crossing) from player_attributes where preferred_foot = 'left')"
   },
   {
     "id": 172,
@@ -1421,7 +1421,7 @@
     "difficulty": "simple",
     "question": "Please name one player whose overall strength is the greatest.",
     "gold_sql": "select distinct t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t2.overall_rating = ( select max(overall_rating) from player_attributes)",
-    "pred_sql": "select player_name from player where player_fifa_api_id = (select player_fifa_api_id from player_attributes order by strength desc limit 1)"
+    "pred_sql": "select player_name from player where player_fifa_api_id = (select player_fifa_api_id from player_attributes where overall_rating = (select max(overall_rating) from player_attributes))"
   },
   {
     "id": 178,
@@ -1445,7 +1445,7 @@
     "difficulty": "simple",
     "question": "What is the surname of the driver with the best lap time in race number 19 in the second qualifying period?",
     "gold_sql": "select t2.surname from qualifying as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 19 order by t1.q2 asc limit 1",
-    "pred_sql": "select t3.surname from qualifying as t1 join drivers as t3 on t1.driverid = t3.driverid join races as t2 on t1.raceid = t2.raceid where t1.number = 2 and t2.round = 19 order by t1.q3 desc limit 1"
+    "pred_sql": "select t3.surname from qualifying as t1 join drivers as t3 on t1.driverid = t3.driverid join races as t2 on t1.raceid = t2.raceid where t1.number = 2 and t2.round = 19 order by t1.q3 asc limit 1"
   },
   {
     "id": 181,
@@ -1485,7 +1485,7 @@
     "difficulty": "simple",
     "question": "What is his number of the driver who finished 0:01:54 in the Q3 of qualifying race No.903?",
     "gold_sql": "select t2.number from qualifying as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 903 and t1.q3 like '1:54%'",
-    "pred_sql": "select t2.number from qualifying as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.qualifyid = 903 and t1.position = 3 and t1.q3 = '01:54.000'"
+    "pred_sql": "select t2.number from qualifying as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.raceid = 903 and t1.position = 3 and t1.q3 = '01:54.000'"
   },
   {
     "id": 186,
@@ -1637,7 +1637,7 @@
     "difficulty": "simple",
     "question": "Name the races along with its circuit name and location for f1 races hosted in September 2005.",
     "gold_sql": "select distinct t2.name, t1.name, t1.location from circuits as t1 inner join races as t2 on t2.circuitid = t1.circuitid where t2.year = 2005 and strftime('%m', t2.date) = '09'",
-    "pred_sql": "select t1.name , t2.location from races as t1 join circuits as t2 on t1.circuitid = t2.circuitid where t1.year = 2005 and month(t1.date) = 9"
+    "pred_sql": "select t1.name , t2.location from races as t1 inner join circuits as t2 on t1.circuitid = t2.circuitid where t1.date like '2005-09-%'"
   },
   {
     "id": 205,
@@ -1645,7 +1645,7 @@
     "difficulty": "simple",
     "question": "Which race was Alex Yoong in when he was in track number less than 20?",
     "gold_sql": "select t1.name from races as t1 inner join driverstandings as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t3.forename = 'alex' and t3.surname = 'yoong' and t2.position < 20",
-    "pred_sql": "select t1.name from races as t1 join laptimes as t2 on t1.raceid = t2.raceid join drivers as t3 on t2.driverid = t3.driverid where t3.forename = 'alex' and t3.surname = 'yoong' and t2.number < 20"
+    "pred_sql": "select t1.name from races as t1 join laptimes as t2 on t1.raceid = t2.raceid join drivers as t3 on t2.driverid = t3.driverid where t3.forename = 'alex' and t3.surname = 'yoong' and t2.number < 20 group by t1.name"
   },
   {
     "id": 206,
@@ -1701,7 +1701,7 @@
     "difficulty": "moderate",
     "question": "Which driver ranked the first in the Canadian Grand Prix in 2007? Please give his reference name.",
     "gold_sql": "select t3.forename, t3.surname, t3.driverref from races as t1 inner join results as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t1.name = 'canadian grand prix' and t2.rank = 1 and t1.year = 2007",
-    "pred_sql": "select t2.driverref from races as t1 join results as t2 on t1.raceid = t2.raceid where t1.name = 'canadian grand prix' and t1.year = 2007 and t2.position = 1"
+    "pred_sql": "select t3.driverref from races as t1 inner join results as t2 on t1.raceid = t2.raceid inner join drivers as t3 on t2.driverid = t3.driverid where t1.name = 'canadian grand prix' and t1.year = 2007 and t2.position = 1"
   },
   {
     "id": 213,
@@ -1733,7 +1733,7 @@
     "difficulty": "simple",
     "question": "What's the finish time for the driver who ranked second in 2008's AustChineseralian Grand Prix?",
     "gold_sql": "select t1.time from results as t1 inner join races as t2 on t1.raceid = t2.raceid where t1.rank = 2 and t2.name = 'chinese grand prix' and t2.year = 2008",
-    "pred_sql": "select t3.time from results as t1 inner join races as t2 on t1.raceid = t2.raceid inner join drivers as t4 on t1.driverid = t4.driverid where t1.position = 2 and t2.name = 'austchineseralian grand prix 2008'"
+    "pred_sql": "select t3.time from results as t1 inner join races as t2 on t1.raceid = t2.raceid inner join drivers as t4 on t1.driverid = t4.driverid where t1.position = 2 and t2.name like 'austchineseralian grand prix 2008'"
   },
   {
     "id": 217,
@@ -1741,7 +1741,7 @@
     "difficulty": "moderate",
     "question": "Among the drivers that finished the race in the 2008 Chinese Grand Prix, how many of them have participated in Formula_1 races?",
     "gold_sql": "select count(*) from ( select t1.driverid from results as t1 inner join races as t2 on t1.raceid = t2.raceid where t2.name = 'chinese grand prix' and t2.year = 2008 and t1.time is not null group by t1.driverid having count(t2.raceid) > 0 )",
-    "pred_sql": "select count(distinct t2.driverid) from races as t1 join results as t2 on t1.raceid = t2.raceid where t1.name = 'chinese grand prix' and t1.year = 2008 and t2.position > 0"
+    "pred_sql": "select count(distinct t2.driverid) from races as t1 inner join results as t2 on t1.raceid = t2.raceid where t1.name = 'chinese grand prix' and t1.year = 2008 and t2.position is not null"
   },
   {
     "id": 218,
@@ -1749,7 +1749,7 @@
     "difficulty": "challenging",
     "question": "How much faster in percentage is the champion than the driver who finished the race last in the 2008 Australian Grand Prix?",
     "gold_sql": "with time_in_seconds as ( select t1.positionorder, case when t1.positionorder = 1 then (cast(substr(t1.time, 1, 1) as real) * 3600) + (cast(substr(t1.time, 3, 2) as real) * 60) + cast(substr(t1.time, 6) as real) else cast(substr(t1.time, 2) as real) end as time_seconds from results as t1 inner join races as t2 on t1.raceid = t2.raceid where t2.name = 'australian grand prix' and t1.time is not null and t2.year = 2008 ), champion_time as ( select time_seconds from time_in_seconds where positionorder = 1), last_driver_incremental as ( select time_seconds from time_in_seconds where positionorder = (select max(positionorder) from time_in_seconds) ) select (cast((select time_seconds from last_driver_incremental) as real) * 100) / (select time_seconds + (select time_seconds from last_driver_incremental) from champion_time)",
-    "pred_sql": "select cast((select max(points) from driverstandings where raceid = (select raceid from races where name = 'australian grand prix' and year = 2008) - (select min(points) from driverstandings where raceid = (select raceid from races where name = 'australian grand prix' and year = 2008)) as real) / (select min(points) from driverstandings where raceid = (select raceid from races where name"
+    "pred_sql": "select cast(max(points) as real) / min(points) * 100 - 100 from driverstandings where raceid = (select raceid from races where year = 2008 and name = 'australian grand prix')"
   },
   {
     "id": 219,
@@ -1805,7 +1805,7 @@
     "difficulty": "simple",
     "question": "What is the fastest lap number of the champion in 2009?",
     "gold_sql": "select t1.fastestlap from results as t1 inner join races as t2 on t1.raceid = t2.raceid where t2.year = 2009 and t1.time like '_:%:__.___'",
-    "pred_sql": "select t2.position from driverstandings as t1 join races as t2 on t1.raceid = t2.raceid where t1.points = (select max(points) from driverstandings where year = 2009) and t2.year = 2009 order by t1.position asc limit 1"
+    "pred_sql": "select t3.position from races as t1 inner join constructorresults as t2 on t1.raceid = t2.raceid inner join constructors as t3 on t2.constructorid = t3.constructorid where t1.year = 2009 and t3.name = 'ferrari' order by t2.points desc limit 1"
   },
   {
     "id": 226,
@@ -1829,7 +1829,7 @@
     "difficulty": "moderate",
     "question": "How many French drivers who obtain the laptime less than 02:00.00?",
     "gold_sql": "select count(t1.driverid) from drivers as t1 inner join laptimes as t2 on t1.driverid = t2.driverid where t1.nationality = 'french' and (cast(substr(t2.time, 1, 2) as integer) * 60 + cast(substr(t2.time, 4, 2) as integer) + cast(substr(t2.time, 7, 2) as real) / 1000) < 120",
-    "pred_sql": "select count(*) from drivers where nationality = 'french' and (select sum(milliseconds / 1000) from laptimes where laptimes.driverid = drivers.driverid group by laptimes.driverid having sum(laptimes.milliseconds / 1000) < 120) > 0"
+    "pred_sql": "select count(*) from drivers where nationality = 'french' and (select sum(milliseconds / 1000) from laptimes where laptimes.driverid = drivers.driverid group by laptimes.driverid having sum(milliseconds / 1000) < 120)"
   },
   {
     "id": 229,
@@ -1877,7 +1877,7 @@
     "difficulty": "simple",
     "question": "How many times the circuits were held in Austria? Please give their location and coordinates.",
     "gold_sql": "select distinct location, lat, lng from circuits where country = 'austria'",
-    "pred_sql": "select t1.location, t1.lat, t1.lng from circuits as t1 inner join results as t2 on t1.circuitid = t2.circuitid where t1.country = 'austria'"
+    "pred_sql": "select t1.location, t1.lat, t1.lng from circuits as t1 join races as t2 on t1.circuitid = t2.circuitid where t1.country = 'austria'"
   },
   {
     "id": 235,
@@ -1885,7 +1885,7 @@
     "difficulty": "moderate",
     "question": "On what year did the youngest driver had his first qualifying race? Also state the name, date and time of the race.",
     "gold_sql": "select t3.year, t3.name, t3.date, t3.time from qualifying as t1 inner join drivers as t2 on t1.driverid = t2.driverid inner join races as t3 on t1.raceid = t3.raceid where t1.driverid = ( select driverid from drivers order by dob desc limit 1 ) order by t3.date asc limit 1",
-    "pred_sql": "select t1.year , t1.date , t1.time from races as t1 join qualifying as t2 on t1.raceid = t2.raceid join drivers as t3 on t2.driverid = t3.driverid where t3.dob in (select min(dob) from drivers) and t3.driverid = t2.driverid order by t1.year asc limit 1"
+    "pred_sql": "select t1.year , t1.date , t1.time from races as t1 join qualifying as t2 on t1.raceid = t2.raceid join drivers as t3 on t2.driverid = t3.driverid where t3.dob in (select min(dob) from drivers) and t2.number = 1 order by t1.year asc limit 1"
   },
   {
     "id": 236,
@@ -1949,7 +1949,7 @@
     "difficulty": "moderate",
     "question": "How many accidents did the driver who had the highest number accidents in the Canadian Grand Prix have?",
     "gold_sql": "select count(t1.driverid) from results as t1 inner join races as t2 on t1.raceid = t2.raceid inner join status as t3 on t1.statusid = t3.statusid where t3.statusid = 3 and t2.name = 'canadian grand prix' group by t1.driverid order by count(t1.driverid) desc limit 1",
-    "pred_sql": "select count(*) from pitstops where raceid in (select raceid from races where name = 'canadian grand prix') and status = 'accident' group by driverid order by count(*) desc limit 1"
+    "pred_sql": "select count(*) from driverstandings where raceid in (select raceid from races where name = 'canadian grand prix') and positiontext = 'accident'"
   },
   {
     "id": 244,
@@ -1957,7 +1957,7 @@
     "difficulty": "challenging",
     "question": "Which top 20 driver created the shortest lap time ever record in a Formula_1 race? Please give them full names.",
     "gold_sql": "with lap_times_in_seconds as (select driverid, (case when substr(time, 1, instr(time, ':') - 1) <> '' then cast(substr(time, 1, instr(time, ':') - 1) as real) * 60 else 0 end + case when substr(time, instr(time, ':') + 1, instr(time, '.') - instr(time, ':') - 1) <> '' then cast(substr(time, instr(time, ':') + 1, instr(time, '.') - instr(time, ':') - 1) as real) else 0 end + case when substr(time, instr(time, '.') + 1) <> '' then cast(substr(time, instr(time, '.') + 1) as real) / 1000 else 0 end) as time_in_seconds from laptimes) select t2.forename, t2.surname, t1.driverid from (select driverid, min(time_in_seconds) as min_time_in_seconds from lap_times_in_seconds group by driverid) as t1 inner join drivers as t2 on t1.driverid = t2.driverid order by t1.min_time_in_seconds asc limit 20",
-    "pred_sql": "select t1.forename , t1.surname from drivers as t1 join laptimes as t2 on t1.driverid = t2.driverid where t2.milliseconds = (select min(milliseconds) from laptimes) order by t1.driverid limit 20"
+    "pred_sql": "select t3.forename, t3.surname from driverstandings as t1 join drivers as t3 on t1.driverid = t3.driverid join laptimes as t2 on t1.raceid = t2.raceid and t1.driverid = t2.driverid order by t2.milliseconds asc limit 20"
   },
   {
     "id": 245,
@@ -2005,7 +2005,7 @@
     "difficulty": "moderate",
     "question": "Rank superheroes from Marvel Comics by their eye color popularity, starting with the most common color.",
     "gold_sql": "select colour.colour as eyecolor, count(superhero.id) as count, rank() over (order by count(superhero.id) desc) as popularityrank from superhero inner join colour on superhero.eye_colour_id = colour.id inner join publisher on superhero.publisher_id = publisher.id where publisher.publisher_name = 'marvel comics' group by colour.colour",
-    "pred_sql": "select colour.colour, count(*) as count from superhero join hero_attribute on superhero.id = hero_attribute.hero_id join colour on hero_attribute.eye_colour_id = colour.id where superhero.publisher_id = 13 group by colour.colour order by count desc"
+    "pred_sql": "select colour.colour, count(hero_attribute.hero_id) as count from hero_attribute join colour on hero_attribute.eye_colour_id = colour.id where hero_attribute.hero_id in ( select superhero_id from superhero where publisher_id = 13 ) group by colour.colour order by count desc"
   },
   {
     "id": 251,
@@ -2077,7 +2077,7 @@
     "difficulty": "challenging",
     "question": "What is the percentage of superheroes who act in their own self-interest or make decisions based on their own moral code? Indicate how many of the said superheroes were published by Marvel Comics.",
     "gold_sql": "select (cast(count(*) as real) * 100 / (select count(*) from superhero)), cast(sum(case when t2.publisher_name = 'marvel comics' then 1 else 0 end) as real) from superhero as t1 inner join publisher as t2 on t1.publisher_id = t2.id inner join alignment as t3 on t3.id = t1.alignment_id where t3.alignment = 'bad'",
-    "pred_sql": "select cast(sum(case when t.alignment = 'good' then 1 else 0 end) as real) * 100 / count(*) as percentage, count(*) as total_published_by_marvel from superhero as t1 inner join publisher as t2 on t1.publisher_id = t2.id where t2.publisher_name = 'marvel comics' and t1.alignment_id = (select id from alignment where alignment = 'good')"
+    "pred_sql": "select cast(sum(case when t.alignment = 'good' then 1 else 0 end) as real) * 100 / count(*) as percentage, count(*) as total_superheroes from superhero as t1 inner join alignment as t2 on t1.alignment_id = t2.id inner join publisher as t3 on t1.publisher_id = t3.id where t3.publisher_name = 'marvel comics' and t2.alignment = 'good'"
   },
   {
     "id": 260,
@@ -2165,7 +2165,7 @@
     "difficulty": "simple",
     "question": "How many heroes have stealth power?",
     "gold_sql": "select count(t1.hero_id) from hero_power as t1 inner join superpower as t2 on t1.power_id = t2.id where t2.power_name = 'stealth'",
-    "pred_sql": "select count(distinct h.id) from superhero as s join hero_power as hp on s.id = hp.hero_id join superpower as sp on hp.power_id = sp.id where sp.power_name = 'stealth'"
+    "pred_sql": "select count(distinct h.id) from superhero as s inner join hero_power as hp on s.id = hp.hero_id inner join superpower as sp on hp.power_id = sp.id where sp.power_name like '%stealth%';"
   },
   {
     "id": 271,
@@ -2173,7 +2173,7 @@
     "difficulty": "moderate",
     "question": "What is the hero's full name with the highest attribute in strength?",
     "gold_sql": "select t1.full_name from superhero as t1 inner join hero_attribute as t2 on t1.id = t2.hero_id inner join attribute as t3 on t2.attribute_id = t3.id where t3.attribute_name = 'strength' order by t2.attribute_value desc limit 1",
-    "pred_sql": "select t1.full_name from superhero as t1 inner join hero_attribute as t2 on t1.id = t2.hero_id where t2.attribute_id = (select id from attribute where attribute_name = 'strength') order by t2.attribute_value desc limit 1"
+    "pred_sql": "select t3.full_name from hero_attribute as t1 inner join superhero as t3 on t1.hero_id = t3.id inner join attribute as t2 on t1.attribute_id = t2.id where t2.attribute_name = 'strength' order by t1.attribute_value desc limit 1"
   },
   {
     "id": 272,
@@ -2197,7 +2197,7 @@
     "difficulty": "challenging",
     "question": "Which superhero has the same eyes, hair and skin colour? Indicate the publisher of the superhero.",
     "gold_sql": "select t1.superhero_name, t2.publisher_name from superhero as t1 inner join publisher as t2 on t1.publisher_id = t2.id where t1.eye_colour_id = t1.hair_colour_id and t1.eye_colour_id = t1.skin_colour_id",
-    "pred_sql": "select t1.publisher_name from superhero as t1 inner join colour as t2 on t1.eye_colour_id = t2.id inner join colour as t3 on t1.hair_colour_id = t3.id inner join colour as t4 on t1.skin_colour_id = t4.id where t2.colour = t3.colour and t3.colour = t4.colour group by t1.publisher_name"
+    "pred_sql": "select t1.publisher_name from superhero as t1 inner join colour as t2 on t1.eye_colour_id = t2.id inner join colour as t3 on t1.hair_colour_id = t3.id inner join colour as t4 on t1.skin_colour_id = t4.id where t2.id = t3.id and t3.id = t4.id group by t1.publisher_name"
   },
   {
     "id": 275,
@@ -2245,7 +2245,7 @@
     "difficulty": "moderate",
     "question": "How many heroes have the highest attribute value in strength?",
     "gold_sql": "select count(t1.hero_id) from hero_attribute as t1 inner join attribute as t2 on t1.attribute_id = t2.id where t2.attribute_name = 'strength' and t1.attribute_value = ( select max(attribute_value) from hero_attribute )",
-    "pred_sql": "select count(distinct t1.hero_id) from hero_attribute as t1 inner join attribute as t2 on t1.attribute_id = t2.id where t2.attribute_name = 'strength' and t1.attribute_value = (select max(attribute_value) from hero_attribute where attribute_id = (select id from attribute where attribute_name = 'strength'))"
+    "pred_sql": "select count(distinct t1.id) from superhero as t1 inner join hero_attribute as t2 on t1.id = t2.hero_id where t2.attribute_id = (select id from attribute where attribute_name = 'strength') and t2.attribute_value = (select max(attribute_value) from hero_attribute where attribute_id = (select id from attribute where attribute_name = 'strength'))"
   },
   {
     "id": 281,
@@ -2285,7 +2285,7 @@
     "difficulty": "moderate",
     "question": "Which hero was the fastest?",
     "gold_sql": "select t1.superhero_name from superhero as t1 inner join hero_attribute as t2 on t1.id = t2.hero_id inner join attribute as t3 on t2.attribute_id = t3.id where t3.attribute_name = 'speed' order by t2.attribute_value desc limit 1",
-    "pred_sql": "select superhero_name from superhero where race_id = (select id from race where race = 'alpha') order by height_cm asc limit 1"
+    "pred_sql": "select superhero_name from superhero order by height_cm asc limit 1"
   },
   {
     "id": 286,
@@ -2341,7 +2341,7 @@
     "difficulty": "challenging",
     "question": "In superheroes with missing weight data, calculate the difference between the number of superheroes with blue eyes and no eye color.",
     "gold_sql": "select sum(case when t2.id = 7 then 1 else 0 end) - sum(case when t2.id = 1 then 1 else 0 end) from superhero as t1 inner join colour as t2 on t1.eye_colour_id = t2.id where t1.weight_kg = 0 or t1.weight_kg is null",
-    "pred_sql": "select sum(case when t.eye_colour_id = 1 then 1 else 0 end) - sum(case when t.eye_colour_id = 9 then 1 else 0 end) as diff from ( select distinct h.id, colour.colour as eye_colour_id from superhero as h join colour as colour on colour.id = h.eye_colour_id where colour.colour = 'blue' union all select distinct h"
+    "pred_sql": "select sum(case when t.eye_colour_id = 10 then 1 else 0 end) - sum(case when t.eye_colour_id is null then 1 else 0 end) as diff from ( select superhero.*, coalesce(t.colour, 'no colour') as eye_colour_id from superhero left join colour as t on superhero.eye_colour_id = t.id ) t where t.eye_colour_id = 10 and t.skin_colour"
   },
   {
     "id": 293,
@@ -2349,7 +2349,7 @@
     "difficulty": "moderate",
     "question": "How many green-skinned villains are there in the superhero universe?",
     "gold_sql": "select count(t1.id) from superhero as t1 inner join alignment as t2 on t1.alignment_id = t2.id inner join colour as t3 on t1.skin_colour_id = t3.id where t2.alignment = 'bad' and t3.colour = 'green'",
-    "pred_sql": "select count(*) from superhero where skin_colour_id = (select id from colour where colour = 'green') and alignment_id = (select id from alignment where alignment = 'bad')"
+    "pred_sql": "select count(*) from superhero where skin_colour_id = (select id from colour where colour = 'green') and gender_id = (select id from gender where gender = 'male')"
   },
   {
     "id": 294,
@@ -2469,7 +2469,7 @@
     "difficulty": "moderate",
     "question": "User No.23853 gave a comment to a post at 9:08:18 on 2013/7/12, was that post well-finished?",
     "gold_sql": "select iif(t2.closeddate is null, 'not well-finished', 'well-finished') as resylt from comments as t1 inner join posts as t2 on t1.postid = t2.id where t1.userid = 23853 and t1.creationdate = '2013-07-12 09:08:18.0'",
-    "pred_sql": "select t1.creationdate from posts as t1 inner join comments as t2 on t1.id = t2.postid where t2.userid = 23853 and t2.creationdate = '2013-07-12 09:08:18'"
+    "pred_sql": "select count(*) > 0 as iscommented from comments where userid = 23853 and creationdate >= '2013-07-12 09:08:18'"
   },
   {
     "id": 309,
@@ -2493,7 +2493,7 @@
     "difficulty": "moderate",
     "question": "For the user No.24, how many times is the number of his/her posts compared to his/her votes?",
     "gold_sql": "select cast(count(distinct t2.id) as real) / count(distinct t1.id) from votes as t1 inner join posts as t2 on t1.userid = t2.owneruserid where t1.userid = 24",
-    "pred_sql": "select count(id) as posts_count from posts where owneruserid = 24 ; select count(id) as votes_count from votes where userid = 24 ; select cast((select count(id) from posts where owneruserid = 24) as real) / (select count(id) from votes where userid = 24) from posts where owneruserid = 24"
+    "pred_sql": "select count(id) as posts_count from posts where owneruserid = 24 ; select count(id) as votes_count from votes where userid = 24 ; select cast((select posts_count from (select count(id) as posts_count from posts where owneruserid = 24 )) as real) / (select votes_count from (select count(id) as votes_count from votes where userid = 24 )) from (select count(id) as posts_count from posts where owneruserid"
   },
   {
     "id": 312,
@@ -2541,7 +2541,7 @@
     "difficulty": "moderate",
     "question": "Write all the comments left by users who edited the post titled 'Why square the difference instead of taking the absolute value in standard deviation?'",
     "gold_sql": "select t2.comment from posts as t1 inner join posthistory as t2 on t1.id = t2.postid where t1.title = 'why square the difference instead of taking the absolute value in standard deviation?'",
-    "pred_sql": "select text, creationdate, userid, userdisplayname from comments where postid = (select id from posts where title = 'why square the difference instead of taking the absolute value in standard deviation?') and userid in (select lasteditoruserid from posts where title = 'why square the difference instead of taking the absolute value in standard deviation?') order by creationdate asc"
+    "pred_sql": "select text, creationdate, userid, userdisplayname from comments where postid = (select id from posts where title = 'why square the difference instead of taking the absolute value in standard deviation?') and userid in (select userid from posthistory where postid = (select id from posts where title = 'why square the difference instead of taking the absolute value in standard deviation?'))"
   },
   {
     "id": 318,
@@ -2645,7 +2645,7 @@
     "difficulty": "moderate",
     "question": "What is the average monthly number of links created in 2010 for posts that have no more than 2 answers?",
     "gold_sql": "select cast(count(t1.id) as real) / 12 from postlinks as t1 inner join posts as t2 on t1.postid = t2.id where t2.answercount <= 2 and strftime('%y', t1.creationdate) = '2010'",
-    "pred_sql": "select avg(t2.count) from posts as t1 join postlinks as t2 on t1.id = t2.postid where t1.answercount <= 2 and year(t1.creationdate) = 2010"
+    "pred_sql": "select avg(t2.creationdate - t1.creationdate)/30 as avgmonthlylinks from posts as t1 join postlinks as t2 on t1.id = t2.postid where t1.answercount <= 2 and year(t1.creationdate) = 2010"
   },
   {
     "id": 331,
@@ -2661,7 +2661,7 @@
     "difficulty": "simple",
     "question": "What is the display name of the user who acquired the first Autobiographer badge?",
     "gold_sql": "select t1.displayname from users as t1 inner join badges as t2 on t1.id = t2.userid where t2.`name` = 'autobiographer' order by t2.date limit 1",
-    "pred_sql": "select t2.displayname from badges as t1 join users as t2 on t1.userid = t2.id where t1.name = 'autobiographer' order by t1.date asc limit 1"
+    "pred_sql": "select t1.displayname from users as t1 inner join badges as t2 on t1.id = t2.userid where t2.name = 'autobiographer' order by t2.date asc limit 1"
   },
   {
     "id": 333,
@@ -2773,7 +2773,7 @@
     "difficulty": "simple",
     "question": "Which are the cards that have incredibly powerful foils.",
     "gold_sql": "select id from cards where cardkingdomfoilid is not null and cardkingdomid is not null",
-    "pred_sql": "select uuid from cards where hasfoil = 1 and manacost like '%{7}' or manacost like '%{8}' or manacost like '%{9}' or manacost like '%{x}' or manacost like '%{y}' or manacost like '%{z}'"
+    "pred_sql": "select uuid from cards where hasfoil = 1 and manacost like '%{7}' or manacost like '%{8}' or manacost like '%{9}' or manacost like '%{x}' or manacost like '%{y}' or manacost like '%{z}' order by manacost desc"
   },
   {
     "id": 347,
@@ -2781,7 +2781,7 @@
     "difficulty": "simple",
     "question": "What are the borderless cards available without powerful foils?",
     "gold_sql": "select id from cards where bordercolor = 'borderless' and (cardkingdomid is null or cardkingdomid is null)",
-    "pred_sql": "select name from cards where bordercolor is null and hasfoil = 0 and hasnonfoil = 1"
+    "pred_sql": "select name from cards where bordercolor = 'borderless' and hasfoil = 0 and hasnonfoil = 1"
   },
   {
     "id": 348,
@@ -2813,7 +2813,7 @@
     "difficulty": "moderate",
     "question": "Find all cards illustrated by Stephen Daniel and describe the text of the ruling of these cards. State if these cards have missing or degraded properties and values.",
     "gold_sql": "select t1.id, t2.text, t1.hascontentwarning from cards as t1 inner join rulings as t2 on t1.uuid = t2.uuid where t1.artist = 'stephen daniele'",
-    "pred_sql": "select c.uuid, s.translation, count(distinct r.id) as ruling_count, group_concat(r.text) as rulings, sum(case when c.manacost is null then 1 else 0 end) as missing_mana_cost, sum(case when c.flavortext is null then 1 else 0 end) as missing_flavor_text, sum(case when c.text is null then 1 else 0 end) as missing_text, sum(case when c"
+    "pred_sql": "select c.uuid, s.translation, count(distinct r.id) as ruling_count, group_concat(r.text) as rulings_text, case when count(distinct c.hasfoil) = 0 then 'missing' else 'present' end as has_foil, case when count(distinct c.hasnonfoil) = 0 then 'missing' else 'present' end as has_non_foil, case when count(distinct c.manacost) = 0"
   },
   {
     "id": 352,
@@ -3005,7 +3005,7 @@
     "difficulty": "moderate",
     "question": "What languages are available in the set known as Archenemy on the magic card market and having the code ARC?",
     "gold_sql": "select t2.language from sets as t1 inner join set_translations as t2 on t1.code = t2.setcode where t1.mcmname = 'archenemy' and t2.setcode = 'arc'",
-    "pred_sql": "select distinct t2.language from sets as t1 inner join set_translations as t2 on t1.code = t2.setcode where t1.code = 'arc' and t2.language in (select t3.language from foreign_data as t3 where t3.uuid in (select uuid from cards where setcode = 'arc'))"
+    "pred_sql": "select distinct t2.language from sets as t1 inner join set_translations as t2 on t1.code = t2.setcode where t1.code = 'arc' and t2.language in (select t3.language from foreign_data as t3 where t3.uuid in (select uuid from cards where multiverseid = 150317))"
   },
   {
     "id": 376,
@@ -3077,7 +3077,7 @@
     "difficulty": "moderate",
     "question": "Is the set of cards with Adarkar Valkyrie only available outside the United States?",
     "gold_sql": "select iif(isforeignonly = 1, 'yes', 'no') from cards as t1 inner join sets as t2 on t2.code = t1.setcode where t1.name = 'adarkar valkyrie'",
-    "pred_sql": "select count(*) > 0 as is_only_outside_us from cards join sets on cards.setcode = sets.code where uuid in (select uuid from foreign_data where name = 'adarkar valkyrie') and sets.isforeignonly = 1 and sets.isnonfoilonly = 0 and sets.isonlineonly = 0 and sets.ispartialpreview = 0"
+    "pred_sql": "select count(*) > 0 as is_only_outside_us from cards inner join sets on cards.setcode = sets.code where uuid in (select uuid from legalities where format = 'paper') and name = 'adarkar valkyrie'"
   },
   {
     "id": 385,
@@ -3093,7 +3093,7 @@
     "difficulty": "challenging",
     "question": "Which of these artists have designed a card in the set Coldsnap, Jeremy Jarvis, Aaron Miller or Chippy?",
     "gold_sql": "select t1.artist from cards as t1 inner join sets as t2 on t2.code = t1.setcode where (t2.name = 'coldsnap' and t1.artist = 'chippy') or (t2.name = 'coldsnap' and t1.artist = 'aaron miller') or (t2.name = 'coldsnap' and t1.artist = 'jeremy jarvis') group by t1.artist",
-    "pred_sql": "select artist from cards where artist in ('jeremy jarvis', 'aaron miller', 'chippy') and multiverseid in (select multiverseid from legalities where uuid in (select uuid from cards where setcode = 'cold'))"
+    "pred_sql": "select distinct artist from cards where uuid in (select uuid from foreign_data where name in ('chippy', 'jeremy jarvis', 'aaron miller')) and uuid in (select uuid from cards join sets on cards.uuid = sets.mcmid where sets.code = 'cold')"
   },
   {
     "id": 387,
@@ -3117,7 +3117,7 @@
     "difficulty": "moderate",
     "question": "Please list the Italian text ruling of all the cards in the set Coldsnap.",
     "gold_sql": "select distinct t1.text from foreign_data as t1 inner join cards as t2 on t2.uuid = t1.uuid inner join sets as t3 on t3.code = t2.setcode where t3.name = 'coldsnap' and t1.language = 'italian'",
-    "pred_sql": "select t1.text from rulings as t1 inner join cards as t2 on t1.uuid = t2.uuid where t1.date = '2012-08-03' and t2.setcode = 'c17' and t1.language = 'italian'"
+    "pred_sql": "select t1.text from rulings as t1 inner join cards as t2 on t1.uuid = t2.uuid where t1.language = 'italian' and t2.setcode = 'cold'"
   },
   {
     "id": 390,
@@ -3125,7 +3125,7 @@
     "difficulty": "moderate",
     "question": "Please list the Italian names of the cards in the set Coldsnap with the highest converted mana cost.",
     "gold_sql": "select t2.name from foreign_data as t1 inner join cards as t2 on t2.uuid = t1.uuid inner join sets as t3 on t3.code = t2.setcode where t3.name = 'coldsnap' and t1.language = 'italian' order by t2.convertedmanacost desc",
-    "pred_sql": "select t1.name from cards as t1 inner join sets as t2 on t1.setcode = t2.code where t2.name = 'coldsnap' order by t1.convertedmanacost desc limit 1"
+    "pred_sql": "select t1.name from cards as t1 inner join sets as t2 on t1.setcode = t2.code where t2.name = 'coldsnap' and t1.convertedmanacost = (select max(t3.convertedmanacost) from cards as t3 inner join sets as t4 on t3.setcode = t4.code where t4.name = 'coldsnap') and t1.name in (select t5.name from foreign_data as t5 where t5.language"
   },
   {
     "id": 391,
@@ -3261,7 +3261,7 @@
     "difficulty": "moderate",
     "question": "What type of bond is there between the atoms TR004_8 and TR004_20?",
     "gold_sql": "select t1.bond_type from bond as t1 inner join connected as t2 on t1.bond_id = t2.bond_id where t2.atom_id = 'tr004_8' and t2.atom_id2 = 'tr004_20' or t2.atom_id2 = 'tr004_8' and t2.atom_id = 'tr004_20'",
-    "pred_sql": "select bond_type from bond where molecule_id in (select molecule_id from connected where atom_id = 'tr004_8' and atom_id2 = 'tr004_20' union select molecule_id from connected where atom_id = 'tr004_20' and atom_id2 = 'tr004_8')"
+    "pred_sql": "select bond.bond_type from bond join connected on bond.bond_id = connected.bond_id where connected.atom_id = 'tr004_8' and connected.atom_id2 = 'tr004_20'"
   },
   {
     "id": 408,
@@ -3301,7 +3301,7 @@
     "difficulty": "moderate",
     "question": "What is the percentage of double bonds in the molecule TR008? Please provide your answer as a percentage with five decimal places.",
     "gold_sql": "select round(cast(count(case when t.bond_type = '=' then t.bond_id else null end) as real) * 100 / count(t.bond_id),5) from bond as t where t.molecule_id = 'tr008'",
-    "pred_sql": "select cast(sum(case when t2.bond_type = 'double' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t1.molecule_id = 'tr008'"
+    "pred_sql": "select cast(sum(case when t2.bond_type = 'double' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join connected as t3 on t1.atom_id = t3.atom_id inner join bond as t2 on t3.bond_id = t2.bond_id where t1.molecule_id = 'tr008'"
   },
   {
     "id": 413,
@@ -3373,7 +3373,7 @@
     "difficulty": "challenging",
     "question": "List all the elements of the toxicology of the molecule \"TR004\".",
     "gold_sql": "select distinct t.element from atom as t where t.molecule_id = 'tr004'",
-    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t2.atom_id2 = t3.atom_id3 where t3.atom_id in (select atom_id from connected where atom_id2 = 'tr004') and t1.molecule_id = (select molecule_id from molecule where label = 'tr004')"
+    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t2.atom_id2 = t3.atom_id3 join molecule as t4 on t3.molecule_id = t4.molecule_id where t4.label = 'tr004' group by t1.element"
   },
   {
     "id": 422,
@@ -3445,7 +3445,7 @@
     "difficulty": "moderate",
     "question": "What proportion of single bonds are carcinogenic? Please provide your answer as a percentage with five decimal places.",
     "gold_sql": "select round(cast(count(case when t2.label = '+' then t1.bond_id else null end) as real) * 100 / count(t1.bond_id),5) from bond as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.bond_type = '-'",
-    "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(*) from connected as t1 join bond as t2 on t1.bond_id = t2.bond_id where t2.bond_type = 'single' and t2.molecule_id in (select molecule_id from molecule where label = '+')"
+    "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(*) from connected as t1 join bond as t2 on t1.bond_id = t2.bond_id where t2.bond_type = 'single' and t2.bond_type in (select bond_type from bond where molecule_id = 'tr000' and bond_type in ('c', 'd'))"
   },
   {
     "id": 431,
@@ -3485,7 +3485,7 @@
     "difficulty": "challenging",
     "question": "Tally the toxicology element of the 4th atom of each molecule that was carcinogenic.",
     "gold_sql": "select distinct t1.element from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '+' and substr(t1.atom_id, -1) = '4' and length(t1.atom_id) = 7",
-    "pred_sql": "select count(t2.element) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.atom_id = (select atom_id from atom where molecule_id = (select molecule_id from molecule where label = '+') order by atom_id limit 3 offset 3) and t2.element = 'cl'"
+    "pred_sql": "select count(t2.element) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.atom_id = (select atom_id from atom where molecule_id = (select molecule_id from molecule where label = '-') order by molecule_id limit 3 offset 3) and t2.element = 'cl'"
   },
   {
     "id": 436,
@@ -3493,7 +3493,7 @@
     "difficulty": "challenging",
     "question": "What is the ratio of Hydrogen elements in molecule ID TR006? List the ratio with its label.",
     "gold_sql": "with subquery as (select distinct t1.atom_id, t1.element, t1.molecule_id, t2.label from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.molecule_id = 'tr006') select cast(count(case when element = 'h' then atom_id else null end) as real) / (case when count(atom_id) = 0 then null else count(atom_id) end) as ratio, label from subquery group by label",
-    "pred_sql": "select cast(sum(case when t2.element = 'hydrogen' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join atom as t2 on t1.atom_id = t2.atom_id2 where t1.molecule_id = 'tr006' and t2.element is not null"
+    "pred_sql": "select cast(sum(case when t2.element = 'hydrogen' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join atom as t2 on t1.atom_id = t2.atom_id2 where t1.molecule_id = 'tr006' and t2.element is not null and t2.element != ' ';"
   },
   {
     "id": 437,
@@ -3573,7 +3573,7 @@
     "difficulty": "moderate",
     "question": "What is the average score in writing for the schools that were opened after 1991 or closed before 2000? List the school names along with the score. Also, list the communication number of the schools if there is any.",
     "gold_sql": "select t2.school, t1.avgscrwrite, t2.phone from schools as t2 left join satscores as t1 on t2.cdscode = t1.cds where strftime('%y', t2.opendate) > '1991' or strftime('%y', t2.closeddate) < '2000'",
-    "pred_sql": "select t1.sname, t1.dname, t1.cname, avg(t1.avgscrwrite), t2.phone from satscores as t1 join schools as t2 on t1.cds = t2.cdscode where t2.closeddate < '2000-01-01' or t2.opendate > '1991-12-31' group by t1.sname, t1.dname, t1"
+    "pred_sql": "select t1.sname, t1.dname, t1.cname, avg(t1.avgscrwrite) as avgscrwrite, t2.phone, t2.ext from satscores t1 join schools t2 on t1.cds = t2.cdscode where t2.opendate > '1991-01-01' or t2.closeddate < '2000-01-01' group by t1.cds,"
   },
   {
     "id": 447,
@@ -3581,7 +3581,7 @@
     "difficulty": "challenging",
     "question": "Consider the average difference between K-12 enrollment and 15-17 enrollment of schools that are locally funded, list the names and DOC type of schools which has a difference above this average.",
     "gold_sql": "select t2.school, t2.doc from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.fundingtype = 'locally funded' and (t1.`enrollment (k-12)` - t1.`enrollment (ages 5-17)`) > (select avg(t3.`enrollment (k-12)` - t3.`enrollment (ages 5-17)`) from frpm as t3 inner join schools as t4 on t3.cdscode = t4.cdscode where t4.fundingtype = 'locally funded')",
-    "pred_sql": "select t1.school , t1.doctype from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode where t2.nslp provision status = 'local' group by t1.school , t1.doctype having max(case when t2.`age group` = 'k-12' then t2.enrollment (k-12) else null end) - max(case when t"
+    "pred_sql": "select t1.doc,t1.doctype from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode where t2.nslp_provision_status = 'locally funded' and t2.enrollment_(k-12) - t2.enrollment_(ages 5-17) > (select avg(enrollment_(k-12) - enrollment_(ages 5-17)) from fr"
   },
   {
     "id": 448,
@@ -3589,7 +3589,7 @@
     "difficulty": "moderate",
     "question": "What is the eligible free rate of the 10th and 11th schools with the highest enrolment for students in grades 1 through 12?",
     "gold_sql": "select cast(`free meal count (k-12)` as real) / `enrollment (k-12)` from frpm order by `enrollment (k-12)` desc limit 9, 2",
-    "pred_sql": "select avg(case when t2.cds = '01100170109835' then t1.percent_percent_eligible_free_k_12 else 0 end) as eligible_free_rate from ( select cdscode, cast(replace(replace(strftime('%y', `high grade`), '-', ''), ',', '') as real) / 10 as percent_percent_eligible_free_k_12"
+    "pred_sql": "select avg(case when t2.cname = '10th' then t1.percent_percent_eligible_free_k_12 else null end), avg(case when t2.cname = '11th' then t1.percent_percent_eligible_free_k_12 else null end) as avg_11th from frpm as t1 join schools as t2 on t1.cdscode = t2.cdscode where t2.enroll1"
   },
   {
     "id": 449,
@@ -3645,7 +3645,7 @@
     "difficulty": "moderate",
     "question": "What is the average writing score of each of the schools managed by Ricci Ulrich? List the schools and the corresponding average writing scores.",
     "gold_sql": "select t2.school, t1.avgscrwrite from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode where t2.admfname1 = 'ricci' and t2.admlname1 = 'ulrich'",
-    "pred_sql": "select t1.school,t2.avgscrwrite from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.admlname1 = 'ulrich' and t1.admlname1 = 'ricci' and t1.admfname1 = 'ricci' and t1.admfname1 = 'ulrich' and t2.rtype = 's' group by t"
+    "pred_sql": "select t1.school,t2.avgscrwrite from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.admlname1 = 'ulrich' and t1.admlname1 = 'ricci' and t1.admfname1 = 'ricci' and t1.admfname1 = 'ulrich' and t2.avgscrwrite is not null group by"
   },
   {
     "id": 456,
@@ -3653,7 +3653,7 @@
     "difficulty": "simple",
     "question": "Which state special schools have the highest number of enrollees from grades 1 through 12?",
     "gold_sql": "select t2.school from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.doc = 31 order by t1.`enrollment (k-12)` desc limit 1",
-    "pred_sql": "select distinct t1.state from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode where t2.`grade range` = 'k-12' group by t1.state order by count(t2.enrollment (k-12)) desc limit 1"
+    "pred_sql": "select distinct t1.state from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode where t2.`grade range` = 'k-12' group by t1.state order by count(*) desc limit 1"
   },
   {
     "id": 457,
@@ -3669,7 +3669,7 @@
     "difficulty": "moderate",
     "question": "What is the ratio of merged Unified School District schools in Orange County to merged Elementary School District schools?",
     "gold_sql": "select cast(sum(case when doc = 54 then 1 else 0 end) as real) / sum(case when doc = 52 then 1 else 0 end) from schools where statustype = 'merged' and county = 'orange'",
-    "pred_sql": "select cast(sum(case when t2.school like '%elementary%' then 1 else 0 end) as real) / sum(case when t2.county = 'orange' then 1 else 0 end) from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.statustype = 'merged' and t2.doctype = 'esd'"
+    "pred_sql": "select cast(sum(case when t2.school like '%elementary%' then 1 else 0 end) as real) / sum(case when t2.county = 'orange' then 1 else 0 end) from schools as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t1.charter = 1 and t1.statustype like '%unified%'"
   },
   {
     "id": 459,
@@ -3797,7 +3797,7 @@
     "difficulty": "moderate",
     "question": "Among the accounts who have loan validity more than 12 months, list out the accounts that have the highest approved amount and have account opening date in 1993.",
     "gold_sql": "select t1.account_id from loan as t1 inner join account as t2 on t1.account_id = t2.account_id where strftime('%y', t2.date) = '1993' and t1.duration > 12 order by t1.amount desc limit 1",
-    "pred_sql": "select account_id from loan where status = 'a' and datediff(curdate(), date) > 365 group by account_id having max(amount) and date < '1993-01-01'"
+    "pred_sql": "select account_id from loan where date < date('now', '-12 month') and status = 'a' group by account_id having max(amount)"
   },
   {
     "id": 475,
@@ -3893,7 +3893,7 @@
     "difficulty": "moderate",
     "question": "Which are the top ten withdrawals (non-credit card) by district names for the month of January 1996?",
     "gold_sql": "select distinct t1.a2 from district as t1 inner join account as t2 on t1.district_id = t2.district_id inner join trans as t3 on t2.account_id = t3.account_id where t3.type = 'vydaj' and t3.date like '1996-01%' order by a2 asc limit 10",
-    "pred_sql": "select t.district_id, t.a2, sum(t.amount) as total_withdrawals from ( select account_id, date, -amount as amount from trans where date like '1996-01-%' and type = 'prijem' and k_symbol not in ('y', 'z') ) as t join account on t.account_id = account.account_id join district on account.district_id = district.district_id group"
+    "pred_sql": "select t3.district_id, t3.a2, sum(t1.amount) as total_withdrawals from trans as t1 join account as t2 on t1.account_id = t2.account_id join district as t3 on t2.district_id = t3.district_id where t1.type = 'prijem' and t2.frequency = 'poplatek mesicne' and t1.date like '1996-01"
   },
   {
     "id": 487,
@@ -3917,7 +3917,7 @@
     "difficulty": "moderate",
     "question": "Who are the account holder identification numbers whose who have transactions on the credit card with the amount is less than the average, in 1998?",
     "gold_sql": "select t1.account_id from trans as t1 inner join account as t2 on t1.account_id = t2.account_id where strftime('%y', t1.date) = '1998' and t1.operation = 'vyber kartou' and t1.amount < (select avg(amount) from trans where strftime('%y', date) = '1998')",
-    "pred_sql": "select account_id from trans where type = 'prijem' and amount < (select avg(amount) from trans where type = 'prijem' and date between '1998-01-01' and '1998-12-31') and date between '1998-01-01' and '1998-12-31' and account_id in (select account_id from card where type ="
+    "pred_sql": "select account_id from trans where type = 'prijem' and amount < (select avg(amount) from trans where account_id in (select card_id from card where type = 'credit' and issued <= '1998-12-31')) and date >= '1998-01-01' group by account_id"
   },
   {
     "id": 490,
@@ -3933,7 +3933,7 @@
     "difficulty": "moderate",
     "question": "What is the average number of crimes committed in 1995 in regions where the number exceeds 4000 and the region has accounts that are opened starting from the year 1997?",
     "gold_sql": "select avg(t1.a15) from district as t1 inner join account as t2 on t1.district_id = t2.district_id where strftime('%y', t2.date) >= '1997' and t1.a15 > 4000",
-    "pred_sql": "select avg(t2.crimes) from trans as t1 inner join district as t2 on t1.district_id = t2.district_id where t2.year > 1995 and t2.crimes > 4000 and t1.date >= '1997-01-01' group by t2.district_id"
+    "pred_sql": "select avg(t2.crime_number) from trans as t1 inner join district as t2 on t1.district_id = t2.district_id where t2.year = 1995 and t2.crime_number > 4000 and t1.date >= '1997-01-01'"
   },
   {
     "id": 492,
@@ -3949,7 +3949,7 @@
     "difficulty": "moderate",
     "question": "What percentage of clients who opened their accounts in the district with an average salary of over 10000 are women?",
     "gold_sql": "select cast(sum(t2.gender = 'f') as real) * 100 / count(t2.client_id) from district as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.a11 > 10000",
-    "pred_sql": "select cast(sum(case when t2.gender = 'f' then 1 else 0 end) as real) * 100 / count(*) from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.date between (select date from district where a10 > 10000 order by a10 desc limit 1) and (select date from district where a10 > 1"
+    "pred_sql": "select cast(sum(case when t2.gender = 'f' then 1 else 0 end) as real) * 100 / count(*) from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.date <= date('now','-1 year') and t1.a10 > 10000"
   },
   {
     "id": 494,
@@ -3965,7 +3965,7 @@
     "difficulty": "challenging",
     "question": "How often does account number 3 request an account statement to be released? What was the aim of debiting 3539 in total?",
     "gold_sql": "select t1.frequency, t2.k_symbol from account as t1 inner join (select account_id, k_symbol, sum(amount) as total_amount from `order` group by account_id, k_symbol) as t2 on t1.account_id = t2.account_id where t1.account_id = 3 and t2.total_amount = 3539",
-    "pred_sql": "select count(*) from trans where account_id = 3 and type = 'predpayen' and operation like '%zakázka%' and k_symbol = 'sloužba';(select sum(amount) from trans where account_id = 3 and type = 'pridatel')"
+    "pred_sql": "select count(*) from trans where account_id = 3 and type = 'predpayen' or type = 'prevod z uctu';select sum(amount) from trans where account_id = 3 and type in ('predpayen', 'prevod z uctu');"
   },
   {
     "id": 496,
@@ -3981,7 +3981,7 @@
     "difficulty": "moderate",
     "question": "Name the account numbers of female clients who are oldest and have lowest average salary?",
     "gold_sql": "select t3.account_id from client as t1 inner join district as t2 on t1.district_id = t2.district_id inner join account as t3 on t2.district_id = t3.district_id inner join disp as t4 on t1.client_id = t4.client_id and t4.account_id = t3.account_id where t1.gender = 'f' order by t1.birth_date asc, t2.a11 asc limit 1",
-    "pred_sql": "select t1.account_id from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t2.gender = 'f' group by t1.account_id order by max(t2.birth_date), sum(t1.balance)/count(*) asc limit 1"
+    "pred_sql": "select t1.account_id from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t2.gender = 'f' group by t1.account_id order by max(t2.birth_date), sum(t1.balance)/count(*) desc limit 1"
   },
   {
     "id": 498,

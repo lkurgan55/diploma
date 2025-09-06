@@ -27,3 +27,13 @@ beam -
 Execution Accuracy: 196/500 = 0.3920
 String Match Accuracy: 11/500 = 0.0220
 Component Match Accuracy: 186.71666666666695/500 = 0.3734
+
+top_k - 
+Execution Accuracy: 171/500 = 0.3420
+String Match Accuracy: 11/500 = 0.0220
+Component Match Accuracy: 180.13333333333364/500 = 0.3603
+
+top_p -
+Execution Accuracy: 176/500 = 0.3520
+String Match Accuracy: 11/500 = 0.0220
+Component Match Accuracy: 180.05000000000032/500 = 0.3601
