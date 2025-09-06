@@ -28,7 +28,7 @@ class BeamStrategy(BaseStrategy):
         self,
         prompt: str,
         *,
-        num_beams: int = 3,
+        num_beams: int = 5,
         max_new_tokens: int = 64,
         length_penalty: float = 1.0,
         expand_k: int = 20,
