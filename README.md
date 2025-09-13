@@ -37,3 +37,5 @@ top_p -
 Execution Accuracy: 176/500 = 0.3520
 String Match Accuracy: 11/500 = 0.0220
 Component Match Accuracy: 180.05000000000032/500 = 0.3601
+
+EG beam -

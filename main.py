@@ -15,6 +15,7 @@ from decoding.greedy import GreedyStrategy
 from decoding.beam import BeamStrategy
 from decoding.top_k import TopKStrategy
 from decoding.top_p import TopPStrategy
+from decoding.execution_guided import EGBeamStrategy
 
 WS = re.compile(r"\s+")
 
@@ -28,7 +29,7 @@ def normalize_sql(s: str) -> str:
     return s
 
 # ---------- Decoding ----------
-def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_tokens: int) -> str:
+def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_tokens: int, db_id: str = '', db_path: str = '') -> str:
 
     strategy = strategy.lower()
     if strategy == "greedy":
@@ -39,6 +40,8 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
         out = TopKStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_p":
         out = TopPStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
+    elif strategy == "eg_beam":
+        out = EGBeamStrategy(model=model, tokenizer=tokenizer).preview_beam(prompt, max_new_tokens=max_new_tokens)#, eg_db_id=db_id, eg_db_path=db_path)
     else:
         raise ValueError(f"Unknown strategy: {strategy}")
 
@@ -64,12 +67,12 @@ def main():
     ap.add_argument("--model", type=str, default="qwen2.5-3B-Instruct")
     ap.add_argument("--data_json", type=str, default="./datasets/data_minidev/mini_dev_sqlite.json")
     ap.add_argument("--db_root", type=str, default="./datasets/data_minidev/dev_databases")
-    ap.add_argument("--strategy", type=str, default="top_p",
-                    choices=["greedy", "beam", "top_k", "top_p"])
+    ap.add_argument("--strategy", type=str, default="eg_beam",
+                    choices=["greedy", "beam", "top_k", "top_p", "eg_beam"])
     ap.add_argument("--max_new_tokens", type=int, default=100)
     ap.add_argument("--limit", type=int, default=0, help="0 = всі; >0 = перші N")
     ap.add_argument("--save_csv", type=str, default="./outputs/mini_dev_sqlite_eval.csv")
-    ap.add_argument("--device", type=str, default="cuda", choices=["auto", "cpu", "cuda"])
+    ap.add_argument("--device", type=str, default="cpu", choices=["auto", "cpu", "cuda"])
     ap.add_argument("--schema_rows", type=int, default=3, help="Додати N прикладів рядків у prompt (0=без рядків)")
     args = ap.parse_args()
     
@@ -121,7 +124,7 @@ def main():
         schema_text = generate_schema_prompt_sqlite(db_path, num_rows=args.schema_rows if args.schema_rows > 0 else None)
         prompt = build_prompt(tokenizer, question, schema_text)
 
-        generated_txt = gen_with_strategy(model, tokenizer, prompt, args.strategy, args.max_new_tokens)
+        generated_txt = gen_with_strategy(model, tokenizer, prompt, args.strategy, args.max_new_tokens, db_id=db_id, db_path=db_path)
         pred_sql = extract_sql_from_text(generated_txt)
 
         print(f"\nDB: {db_id}\nQ: {question}\nGold: {normalize_sql(gold_sql)}\nPred: {normalize_sql(pred_sql)}")

@@ -7,17 +7,14 @@ class BaseStrategy(ABC):
         self.model = model
         self.tokenizer = tokenizer
 
-    @abstractmethod
     def generate(self, prompt: str) -> str:
         """Build-in generate text based on the provided prompt."""
         pass
 
-    @abstractmethod
     def custom_generate(self, prompt: str) -> str:
         """Cutsom generate text based on the provided prompt."""
         pass
 
-    @abstractmethod
     def _debug_generate(self, **kwargs: dict) -> None:
         """Optional method for debugging generation step-by-step."""
         pass
