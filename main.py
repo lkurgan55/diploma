@@ -41,7 +41,7 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
     elif strategy == "top_p":
         out = TopPStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "eg_beam":
-        out = EGBeamStrategy(model=model, tokenizer=tokenizer).preview_beam(prompt, max_new_tokens=max_new_tokens)#, eg_db_id=db_id, eg_db_path=db_path)
+        out = EGBeamStrategy(model=model, tokenizer=tokenizer).custom_generate(prompt, max_new_tokens=max_new_tokens, db_path=db_path)
     else:
         raise ValueError(f"Unknown strategy: {strategy}")
 

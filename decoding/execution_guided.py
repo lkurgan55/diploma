@@ -11,7 +11,7 @@ from transformers.generation import (
 )
 from decoding.base_decoding import BaseStrategy
 from collections import UserDict
-
+from decoding.sql_validator import SQLValidator
 
 class EGBeamStrategy(BaseStrategy):
     """
@@ -234,7 +234,12 @@ class EGBeamStrategy(BaseStrategy):
         ensure_semicolon: bool = True,
         debug: bool = False,
         print_top: int = 5,
+        db_path: str | None = None,
     ) -> str:
+        if db_path:
+            self.validator = SQLValidator(db_path=db_path)
+            self.validator._maybe_load_schema()
+
         cands, _ = self.preview_beam(
             prompt,
             max_new_tokens=max_new_tokens,
@@ -361,6 +366,30 @@ class EGBeamStrategy(BaseStrategy):
             next_token_scores = topk.values
             next_tokens = topk.indices % vocab_size
             next_indices = topk.indices // vocab_size
+
+            # EG: перевірка на валідність SQL
+            if self.validator:
+                def _decode(ids_row: torch.Tensor) -> str:
+                    full_text = self.tokenizer.decode(ids_row.tolist(), skip_special_tokens=True)
+                    sql = full_text.split("assistant", 1)[-1].strip()
+                    return sql.strip().strip("`")
+
+                for j in range(next_tokens.size(1)):  # 2*num_beams кандидатів
+                    pidx = int(next_indices[0, j].item())
+                    cand_ids = torch.cat([seq_input_ids[pidx], next_tokens[0, j].unsqueeze(0)], dim=0)
+                    cand_sql = _decode(cand_ids)
+
+                    try:
+                        # якщо в SQL уже з’явився якийсь FROM/JOIN і якась таблиця не існує — знімаємо кандидата
+                        if not self.validator.tables_exist(cand_sql):
+                            next_token_scores[0, j] = -1e9
+                        if not self.validator.columns_exist(cand_sql):
+                            next_token_scores[0, j] = -1e9
+                    except Exception:
+                        # у разі збою валідації — не ріжемо кандидата
+                        pass
+
+            # --- EG END ---
 
             # процес відбору HF
             next_beam = scorer.process(

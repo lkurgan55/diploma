@@ -11,7 +11,7 @@ db_root = './datasets/data_minidev/dev_databases'
 
 def main():
     ap = argparse.ArgumentParser(description="Compute Execution Accuracy for JSON predictions.")
-    ap.add_argument("--json_path", default='outputs/mini_dev_sqlite_top_p_qwen2.5-3B-Instruct.json', help="Вхідний JSON із записами (list of dicts).")
+    ap.add_argument("--json_path", default='outputs/mini_dev_sqlite_eg_beam_qwen2.5-3B-Instruct.json', help="Вхідний JSON із записами (list of dicts).")
     ap.add_argument("--save_json", default='test_metrics', help="Куди зберегти оновлений JSON з полями ex/err_*")
     args = ap.parse_args()
 
@@ -19,6 +19,7 @@ def main():
         data: list[dict[str, int | str]] = json.load(f)
 
     total, passed_ex, passed_sm, passed_cm = 0, 0, 0, 0
+    new_records = []
     for record in data[:]:
         id = record.get("id")
         db_id    = record.get("db_id")
@@ -41,9 +42,14 @@ def main():
         passed_sm += sm
         passed_cm += cm
 
+        new_records.append(record)
+
     ex_acc = (passed_ex / total) if total else 0.0
     sm_acc = (passed_sm / total) if total else 0.0
     cm_acc = (passed_cm / total) if total else 0.0
+
+    with open(args.json_path, "w", encoding="utf-8") as f:
+        json.dump(new_records, f, ensure_ascii=False, indent=2)
 
     print(f"\nExecution Accuracy: {passed_ex}/{total} = {ex_acc:.4f}")
     print(f"String Match Accuracy: {passed_sm}/{total} = {sm_acc:.4f}")
