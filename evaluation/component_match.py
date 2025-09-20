@@ -152,7 +152,7 @@ def component_match_exact(pred_sql: str, gold_sql: str, dialect: str = "sqlite")
     try:
         pred = component_sets(pred_sql, dialect)
         gold = component_sets(gold_sql, dialect)
-    except (sqlglot.errors.ParseError, sqlglot.errors.TokenError):
+    except (sqlglot.errors.ParseError, sqlglot.errors.TokenError, KeyError):
         return 0.0
 
     keys = sorted(set(pred.keys()) | set(gold.keys()))

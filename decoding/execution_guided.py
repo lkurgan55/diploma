@@ -380,11 +380,16 @@ class EGBeamStrategy(BaseStrategy):
                     cand_sql = _decode(cand_ids)
 
                     try:
-                        # якщо в SQL уже з’явився якийсь FROM/JOIN і якась таблиця не існує — знімаємо кандидата
-                        if not self.validator.tables_exist(cand_sql):
-                            next_token_scores[0, j] = -1e9
-                        if not self.validator.columns_exist(cand_sql):
-                            next_token_scores[0, j] = -1e9
+                        # перевірка синтаксису — знімаємо кандидата
+                        # if not self.validator.syntax_ok(cand_sql):
+                        #     next_token_scores[0, j] = -1e9
+                        # # якась таблиця не існує — знімаємо кандидата
+                        # if not self.validator.tables_exist(cand_sql):
+                        #     next_token_scores[0, j] = -1e9
+                        # # якась колонка не існує — знімаємо кандидата
+                        # if not self.validator.columns_exist(cand_sql):
+                        #     next_token_scores[0, j] = -1e9
+                        pass
                     except Exception:
                         # у разі збою валідації — не ріжемо кандидата
                         pass

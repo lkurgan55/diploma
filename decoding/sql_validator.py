@@ -6,16 +6,112 @@ from typing import Optional, Set, Tuple
 
 class SQLValidator:
     """
-    Мінімальний EG-валідатор для перевірки: чи існують усі таблиці з FROM/JOIN у БД (SQLite).
-    Не торкається колонок/типів/операторів — лише існування таблиць.
+    Мінімальний EG-валідатор...
     """
 
     def __init__(self, db_path: Optional[str]):
         self.db_path = db_path
         self._schema_loaded = False
-        self._tables: dict[str, set[str]] = {}   # NEW: table -> set(columns)
-        self._table_names: set[str] = set()      # NEW: швидкий доступ до назв
+        self._tables: dict[str, set[str]] = {}
+        self._table_names: set[str] = set()
+        
+    def syntax_ok(self, sql: str, *, prefix_ok: bool = True) -> bool:
+        import re, sqlite3
+        from contextlib import closing
 
+        def _normalize_sql(s: str) -> str:
+            s = s.strip().lstrip("\ufeff")
+            s = s.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", " ")
+            s = re.sub(r"[\u00A0\u200B\u200E\u200F]", " ", s)
+            s = re.sub(r"\s+", " ", s)
+            return s
+
+        def _outside_quotes_scan(s: str):
+            """Ітеруємо символи поза лапками, повертаємо (chars, has_forbidden, semi_count, paren_depth, paren_below_zero)"""
+            in_s = in_d = False
+            semi = 0
+            depth = 0
+            below_zero = False
+            forbidden = False
+            for i, ch in enumerate(s):
+                if ch == "'" and not in_d:
+                    # '' escape
+                    if in_s and i + 1 < len(s) and s[i+1] == "'":
+                        continue
+                    in_s = not in_s
+                elif ch == '"' and not in_s:
+                    in_d = not in_d
+                elif not in_s and not in_d:
+                    # рахунок дужок
+                    if ch == '(':
+                        depth += 1
+                    elif ch == ')':
+                        depth -= 1
+                        if depth < 0:
+                            below_zero = True
+                    # семікрапки
+                    if ch == ';':
+                        semi += 1
+                    # заборонені символи (мін. білий список)
+                    if not re.match(r"[A-Za-z0-9_\s\.,\*\(\)=<>!\+\-/%']", ch):
+                        forbidden = True
+            return forbidden, semi, depth, below_zero
+
+        s = _normalize_sql(sql)
+        if not s:
+            return True if prefix_ok else False
+
+        # 1) префікс-фільтри «очевидного сміття»
+        forbidden, semi, depth, below_zero = _outside_quotes_scan(s)
+        if prefix_ok:
+            # будь-який ';' у префіксі — не ок
+            if semi > 0:
+                return False
+            # символи на кшталт & | \ ` тощо — не ок
+            if forbidden:
+                return False
+            # більше закривальних, ніж відкривальних дужок — не ок (урізані '(' дозволяємо)
+            if below_zero:
+                return False
+
+        # 2) урізаний SELECT — дозволяємо у префіксі
+        if re.match(r"(?is)^\s*select\s*;?\s*$", s):
+            return True if prefix_ok else False
+
+        # 3) у префіксі не перевіряємо завершеність/EXPLAIN, просто пройшли базові санітарні умови
+        if prefix_ok:
+            # дозволимо також SELECT <expr> без FROM як префікс
+            if re.match(r"(?is)^\s*select\s+.+$", s) and not re.search(r"(?i)\bfrom\b", s):
+                return True
+            # інакше — просто ок (умови 1 вже відсіяли «жесть»)
+            return True
+
+        # --- нижче суворий режим для фінального рядка ---
+        # одна інструкція
+        if semi > 1:
+            return False
+        # має бути щось після SELECT
+        m_sel = re.search(r"(?i)\bselect\b(.*)$", s)
+        if not m_sel or not (m_sel.group(1) or "").strip():
+            return False
+        # завершеність + EXPLAIN
+        stmt = s if s.rstrip().endswith(";") else s + ";"
+        try:
+            if not sqlite3.complete_statement(stmt):
+                return False
+        except Exception:
+            pass
+        try:
+            with closing(sqlite3.connect(":memory:")) as con, closing(con.cursor()) as cur:
+                cur.execute("EXPLAIN " + s)
+        except sqlite3.Error as e:
+            msg = str(e).lower()
+            if ("syntax error" in msg or "unrecognized token" in msg or
+                "incomplete input" in msg or "misuse" in msg or
+                ("parse" in msg and "error" in msg)):
+                return False
+            return True
+        return True
     # ---------- schema loading ----------
     def _maybe_load_schema(self) -> None:
         if self._schema_loaded or not self.db_path:
@@ -228,11 +324,10 @@ class SQLValidator:
 
 
 
-
-
 validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/debit_card_specializing/debit_card_specializing.sqlite")
 
-sql = """select customerid from yearmonth where date like '2012%' and segment = 'lam' group by customerid order by sum(consumption) asc limit 1"""
+sql = """SELECT SUM_CONSUMPTION AS Difference) AS diff\n(SELECT T2 AS CustomerID, SUM CustomerID AS CustomerID, Consumption) AS Consumption\nFROM yearmonth \n         customers)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))&;"""
 
+print("syntax ok:", validator.syntax_ok(sql))
 print("tables ok:", validator.tables_exist(sql))
 print("columns ok:", validator.columns_exist(sql))
