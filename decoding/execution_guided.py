@@ -383,7 +383,7 @@ class EGBeamStrategy(BaseStrategy):
                         # перевірка синтаксису — знімаємо кандидата
                         # if not self.validator.syntax_ok(cand_sql):
                         #     next_token_scores[0, j] = -1e9
-                        # # якась таблиця не існує — знімаємо кандидата
+                        # якась таблиця не існує — знімаємо кандидата
                         # if not self.validator.tables_exist(cand_sql):
                         #     next_token_scores[0, j] = -1e9
                         # # якась колонка не існує — знімаємо кандидата

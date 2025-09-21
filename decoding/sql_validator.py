@@ -15,92 +15,96 @@ class SQLValidator:
         self._tables: dict[str, set[str]] = {}
         self._table_names: set[str] = set()
         
-    def syntax_ok(self, sql: str, *, prefix_ok: bool = True) -> bool:
+    def syntax_ok(self, sql: str) -> bool:
         import re, sqlite3
         from contextlib import closing
 
-        def _normalize_sql(s: str) -> str:
-            s = s.strip().lstrip("\ufeff")
-            s = s.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", " ")
-            s = re.sub(r"[\u00A0\u200B\u200E\u200F]", " ", s)
-            s = re.sub(r"\s+", " ", s)
-            return s
+        # --- normalize & trim one trailing ; ---
+        s = (sql or "").strip().lstrip("\ufeff")
+        s = s.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", " ")
+        s = re.sub(r"[\u00A0\u200B\u200E\u200F]", " ", s)
+        s = re.sub(r"\s+", " ", s)
+        s = re.sub(r";\s*$", "", s)
+        if not s:
+            return True
 
-        def _outside_quotes_scan(s: str):
-            """Ітеруємо символи поза лапками, повертаємо (chars, has_forbidden, semi_count, paren_depth, paren_below_zero)"""
-            in_s = in_d = False
-            semi = 0
-            depth = 0
-            below_zero = False
-            forbidden = False
-            for i, ch in enumerate(s):
+        # --- quick scan outside quotes ---
+        def scan_outside_quotes(t: str):
+            in_s = in_d = False; depth = 0; below_zero = False; forbidden = False
+            for i, ch in enumerate(t):
                 if ch == "'" and not in_d:
-                    # '' escape
-                    if in_s and i + 1 < len(s) and s[i+1] == "'":
+                    if in_s and i+1 < len(t) and t[i+1] == "'":  # ''
                         continue
                     in_s = not in_s
                 elif ch == '"' and not in_s:
                     in_d = not in_d
                 elif not in_s and not in_d:
-                    # рахунок дужок
-                    if ch == '(':
-                        depth += 1
+                    if ch == '(': depth += 1
                     elif ch == ')':
                         depth -= 1
-                        if depth < 0:
-                            below_zero = True
-                    # семікрапки
-                    if ch == ';':
-                        semi += 1
-                    # заборонені символи (мін. білий список)
+                        if depth < 0: below_zero = True
+                    # білий список: все інше вважаємо сміттям
                     if not re.match(r"[A-Za-z0-9_\s\.,\*\(\)=<>!\+\-/%']", ch):
                         forbidden = True
-            return forbidden, semi, depth, below_zero
+            return depth, below_zero, forbidden
 
-        s = _normalize_sql(sql)
-        if not s:
-            return True if prefix_ok else False
+        depth, below_zero, forbidden = scan_outside_quotes(s)
+        if below_zero or forbidden:
+            return False  # явне сміття/лишні ')'
 
-        # 1) префікс-фільтри «очевидного сміття»
-        forbidden, semi, depth, below_zero = _outside_quotes_scan(s)
-        if prefix_ok:
-            # будь-який ';' у префіксі — не ок
-            if semi > 0:
-                return False
-            # символи на кшталт & | \ ` тощо — не ок
-            if forbidden:
-                return False
-            # більше закривальних, ніж відкривальних дужок — не ок (урізані '(' дозволяємо)
-            if below_zero:
-                return False
-
-        # 2) урізаний SELECT — дозволяємо у префіксі
-        if re.match(r"(?is)^\s*select\s*;?\s*$", s):
-            return True if prefix_ok else False
-
-        # 3) у префіксі не перевіряємо завершеність/EXPLAIN, просто пройшли базові санітарні умови
-        if prefix_ok:
-            # дозволимо також SELECT <expr> без FROM як префікс
-            if re.match(r"(?is)^\s*select\s+.+$", s) and not re.search(r"(?i)\bfrom\b", s):
-                return True
-            # інакше — просто ок (умови 1 вже відсіяли «жесть»)
+        # --- incomplete tails that should PASS (return True) ---
+        # висяча кома після SELECT
+        if re.match(r"(?is)^\s*select\b[^;]*,\s*$", s):
+            return True
+        # закінчується на alias. / оператор / відкриту дужку
+        if re.search(r"\.\s*$", s): return True
+        if re.search(r"(?i)(=|<>|<|>|<=|>=|\band\b|\bor\b|\blike\b|\bin\b|\bbetween\b|\+|\-|\*|/)\s*$", s):
+            return True
+        if s.endswith("("): return True
+        # ключові слова без аргументів у хвості: FROM/JOIN/WHERE/ON/GROUP BY/ORDER BY/HAVING/LIMIT/OFFSET
+        if re.search(r"(?i)\b(from|join|where|on|group\s+by|order\s+by|having|limit|offset)\s*$", s):
+            return True
+        # висяча кома у GROUP BY / ORDER BY
+        if re.search(r"(?is)\b(group\s+by|order\s+by)\b[^;]*,\s*$", s):
+            return True
+        # функції, що потребують '(' (CAST/SUM/...) у хвості
+        FUNC_NEED_PAREN = ("cast","count","sum","avg","min","max","coalesce","substr",
+                        "printf","round","abs","upper","lower","length","date",
+                        "datetime","strftime","ifnull","nullif")
+        funcs = "|".join(FUNC_NEED_PAREN)
+        if re.search(rf"(?i)\b({funcs})\s*$", s) or re.search(rf"(?i)\b({funcs})\s*\(\s*$", s):
             return True
 
-        # --- нижче суворий режим для фінального рядка ---
-        # одна інструкція
-        if semi > 1:
-            return False
-        # має бути щось після SELECT
-        m_sel = re.search(r"(?i)\bselect\b(.*)$", s)
-        if not m_sel or not (m_sel.group(1) or "").strip():
-            return False
-        # завершеність + EXPLAIN
-        stmt = s if s.rstrip().endswith(";") else s + ";"
+        # --- if still unbalanced quotes/parens -> let it grow (pass) ---
+        def balanced_quotes(t: str) -> bool:
+            i, in_s = 0, False
+            while i < len(t):
+                ch = t[i]
+                if ch == "'" and not in_s:
+                    in_s = True
+                elif ch == "'" and in_s:
+                    if i+1 < len(t) and t[i+1] == "'": i += 2; continue
+                    in_s = False
+                i += 1
+            if in_s: return False
+            i, in_d = 0, False
+            while i < len(t):
+                ch = t[i]
+                if ch == '"' and not in_d: in_d = True
+                elif ch == '"' and in_d:  in_d = False
+                i += 1
+            return not in_d
+
+        if not balanced_quotes(s) or depth > 0:
+            return True
+
+        # --- completed-looking: do strict check via EXPLAIN ---
         try:
-            if not sqlite3.complete_statement(stmt):
-                return False
+            if not sqlite3.complete_statement(s + ";"):
+                return True  # ще префікс, не валимо
         except Exception:
             pass
+
         try:
             with closing(sqlite3.connect(":memory:")) as con, closing(con.cursor()) as cur:
                 cur.execute("EXPLAIN " + s)
@@ -109,9 +113,10 @@ class SQLValidator:
             if ("syntax error" in msg or "unrecognized token" in msg or
                 "incomplete input" in msg or "misuse" in msg or
                 ("parse" in msg and "error" in msg)):
-                return False
-            return True
+                return False  # реальна синтаксична помилка
+            return True       # семантика (no such table/column) — пропускаємо тут
         return True
+
     # ---------- schema loading ----------
     def _maybe_load_schema(self) -> None:
         if self._schema_loaded or not self.db_path:
@@ -326,7 +331,7 @@ class SQLValidator:
 
 validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/debit_card_specializing/debit_card_specializing.sqlite")
 
-sql = """SELECT SUM_CONSUMPTION AS Difference) AS diff\n(SELECT T2 AS CustomerID, SUM CustomerID AS CustomerID, Consumption) AS Consumption\nFROM yearmonth \n         customers)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))&;"""
+sql = """select casted_consumption as t.customer10.0.customerid from yearmonth.consumption, transactions_1k yearmonth.customerid tconsumption > 4673 t as t0t as transactions.customerid = t4673.customerid and t0.date = t4673.date and t0.consumption > 46.73) / sum(t4673.consumption) * 100 from yearmonth"""
 
 print("syntax ok:", validator.syntax_ok(sql))
 print("tables ok:", validator.tables_exist(sql))

@@ -1248,7 +1248,10 @@
     "difficulty": "challenging",
     "question": "For laboratory examinations take in 1984, list all patients below 50 years old with normal platelet level.",
     "gold_sql": "select distinct t1.id from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.plt between 100 and 400 and strftime('%y', t2.date) - strftime('%y', t1.birthday) < 50 and strftime('%y', t2.date) = '1984'",
-    "pred_sql": "select distinct p.id from patient p join laboratory l on p.id = l.id where l.date between '1984-01-01' and '1984-12-31' and p.plt = 150 and strftime('%y', p.birthday) > '1954'"
+    "pred_sql": "select distinct p.id from patient p join laboratory l on p.id = l.id where l.date between '1984-01-01' and '1984-12-31' and p.plt = 150 and strftime('%y', p.birthday) > '1954'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 114,
@@ -1256,7 +1259,10 @@
     "difficulty": "challenging",
     "question": "For all patients who are older than 55 years old, what is the percentage of female who has abnormal prothrombin time (PT)?",
     "gold_sql": "select cast(sum(case when t2.pt >= 14 and t1.sex = 'f' then 1 else 0 end) as real) * 100 / count(case when t2.pt >= 14 then 1 else 0 end) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where strftime('%y', current_timestamp) - strftime('%y', t1.birthday) > 55",
-    "pred_sql": "select cast(sum(case when t2.sex = 'f' then 1 else 0 end) as real) * 100 / count(t1.id) from examination as t1 inner join patient as t2 on t1.id = t2.id where t2.birthday < date('now','-55 years') and t1.pt > 3.4"
+    "pred_sql": "select cast(sum(case when t2.sex = 'f' then 1 else 0 end) as real) * 100 / count(t1.id) from examination as t1 inner join patient as t2 on t1.id = t2.id where t2.birthday < date('now','-55 years') and t1.pt > 3.4",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 115,
@@ -1264,7 +1270,10 @@
     "difficulty": "challenging",
     "question": "Among the male patients who have a normal level of white blood cells, how many of them have an abnormal fibrinogen level?",
     "gold_sql": "select count(distinct t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.fg <= 150 or t2.fg >= 450 and t2.wbc > 3.5 and t2.wbc < 9.0 and t1.sex = 'm'",
-    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'm' and e.wbc = 4.7 and e.flg = 'n'"
+    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'm' and e.wbc = 4.7 and e.flg = 'n'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 116,
@@ -1272,7 +1281,10 @@
     "difficulty": "simple",
     "question": "How many patients with an Ig G higher than normal?",
     "gold_sql": "select count(distinct t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id inner join examination as t3 on t3.id = t2.id where t2.igg >= 2000",
-    "pred_sql": "select count(*) from laboratory where igg > 1"
+    "pred_sql": "select count(*) from laboratory where igg > 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 117,
@@ -1280,7 +1292,10 @@
     "difficulty": "moderate",
     "question": "Among the patients with a normal Ig G level, how many of them have symptoms?",
     "gold_sql": "select count(t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id inner join examination as t3 on t3.id = t2.id where t2.igg between 900 and 2000 and t3.symptoms is not null",
-    "pred_sql": "select count(*) from patient where id in (select p.id from patient p join examination e on p.id = e.id where e.`acl igg` = 1 and e.symptoms is not null)"
+    "pred_sql": "select count(*) from patient where id in (select p.id from patient p join examination e on p.id = e.id where e.`acl igg` = 1 and e.symptoms is not null)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 118,
@@ -1288,7 +1303,10 @@
     "difficulty": "moderate",
     "question": "How many patients with a normal Ig A level came to the hospital after 1990/1/1?",
     "gold_sql": "select count(t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.iga between 80 and 500 and strftime('%y', t1.`first date`) > '1990'",
-    "pred_sql": "select count(*) from patient where id in (select p where p.id = e.id and e.`acl iga` = 0 and examination.date > '1990-01-01'))"
+    "pred_sql": "select count(*) from patient where id in (select p where p.id = e.id and e.`acl iga` = 0 and examination.date > '1990-01-01'))",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 119,
@@ -1296,7 +1314,10 @@
     "difficulty": "moderate",
     "question": "For the patients with an abnormal Ig M level, what is the most common disease they are diagnosed with?",
     "gold_sql": "select t1.diagnosis from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.igm not between 40 and 400 group by t1.diagnosis order by count(t1.diagnosis) desc limit 1",
-    "pred_sql": "select diagnosis from examination where `acl igm` > 1 group by diagnosis order by count(*) desc limit 1"
+    "pred_sql": "select diagnosis from examination where `acl igm` > 1 group by diagnosis order by count(*) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.5
   },
   {
     "id": 120,
@@ -1304,7 +1325,10 @@
     "difficulty": "moderate",
     "question": "How many patients with a abnormal C-reactive protein don't have their data recorded?",
     "gold_sql": "select count(t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where (t2.crp = '+' ) and t1.description is null",
-    "pred_sql": "select count(*) from laboratory where crp is not null and crp != 'none'"
+    "pred_sql": "select count(*) from laboratory where crp is not null and crp != 'none'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 121,
@@ -1312,7 +1336,10 @@
     "difficulty": "challenging",
     "question": "Among the patients whose creatinine level is abnormal, how many of them aren't 70 yet?",
     "gold_sql": "select count(distinct t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.cre >= 1.5 and strftime('%y', date('now')) - strftime('%y', t1.birthday) < 70",
-    "pred_sql": "select count(*) from patient where id in (select p.id from examination e join laboratory l on e.id = l.id where l.cre > 1.3-0"
+    "pred_sql": "select count(*) from patient where id in (select p.id from examination e join laboratory l on e.id = l.id where l.cre > 1.3-0",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 122,
@@ -1320,7 +1347,10 @@
     "difficulty": "moderate",
     "question": "How many patients have a normal level of anti-ribonuclear protein and have been admitted to the hospital?",
     "gold_sql": "select count(distinct t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.rnp = 'negative' or t2.rnp = '0' and t1.admission = '+'",
-    "pred_sql": "select count(*) from patient where `antirnp` = 0 and admission is not null"
+    "pred_sql": "select count(*) from patient where `antirnp` = 0 and admission is not null",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 123,
@@ -1328,7 +1358,10 @@
     "difficulty": "moderate",
     "question": "Among the patients with normal anti-SM, how many of them does not have thrombosis?",
     "gold_sql": "select count(t1.id) from examination as t1 inner join laboratory as t2 on t1.id = t2.id where t2.sm in ('negative','0') and t1.thrombosis = 0",
-    "pred_sql": "select count(*) from patient where sc170 = 'negative' and id in (select id from examination where thrombosis = 0)"
+    "pred_sql": "select count(*) from patient where sc170 = 'negative' and id in (select id from examination where thrombosis = 0)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 124,
@@ -1336,7 +1369,10 @@
     "difficulty": "challenging",
     "question": "Among the patients who has a normal anti-scl70, how many of them are female and does not have any symptom?",
     "gold_sql": "select count(distinct t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id inner join examination as t3 on t3.id = t2.id where (t2.sc170 = 'negative' or t2.sc170 = '0') and t1.sex = 'f' and t3.symptoms is null",
-    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and e.symptoms is null and e.sc170 = 0"
+    "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and e.symptoms is null and e.sc170 = 0",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 125,
@@ -1344,7 +1380,10 @@
     "difficulty": "moderate",
     "question": "Among the patients who has a normal level of anti-centromere and a normal level of anti-SSB, how many of them are male?",
     "gold_sql": "select count(distinct t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.centromea in ('negative', '0') and t2.ssb in ('negative', '0') and t1.sex = 'm'",
-    "pred_sql": "select count(*) from patient where sex = 'm' and sc170-ssb` = 'negative' and centromea = 'negative'"
+    "pred_sql": "select count(*) from patient where sex = 'm' and sc170-ssb` = 'negative' and centromea = 'negative'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 126,
@@ -1352,7 +1391,10 @@
     "difficulty": "moderate",
     "question": "Among the patients who have an abnormal level of glutamic oxaloacetic transaminase, when was the youngest of them born?",
     "gold_sql": "select t1.birthday from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.got >= 60 order by t1.birthday desc limit 1",
-    "pred_sql": "select min(date) from laboratory where gpt > 30 group by id"
+    "pred_sql": "select min(date) from laboratory where gpt > 30 group by id",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 127,
@@ -1360,7 +1402,10 @@
     "difficulty": "challenging",
     "question": "For the patients with a normal range of creatinine phosphokinase, how many of them have a positive measure of degree of coagulation?",
     "gold_sql": "select count(t1.id) from patient as t1 inner join laboratory as t2 on t1.id = t2.id inner join examination as t3 on t1.id = t3.id where t2.cpk < 250 and (t3.kct = '+' or t3.rvvt = '+' or t3.lac = '+')",
-    "pred_sql": "select count(*) from patientid, laboratory where examinationid.id = laboratory.id and examinationid.cpk < 200 and laboratory.crp = 'normal' and examinationid.thrombosis = 1"
+    "pred_sql": "select count(*) from patientid, laboratory where examinationid.id = laboratory.id and examinationid.cpk < 200 and laboratory.crp = 'normal' and examinationid.thrombosis = 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 128,
@@ -1368,6 +1413,900 @@
     "difficulty": "moderate",
     "question": "Give the name of the league had the most goals in the 2016 season?",
     "gold_sql": "select t2.name from match as t1 inner join league as t2 on t1.league_id = t2.id where t1.season = '2015/2016' group by t2.name order by sum(t1.home_team_goal + t1.away_team_goal) desc limit 1",
-    "pred_sql": "select t as (select id from league where name = 'belgium jupiler league') from match where season = '2016' group by league_id order by sum(home_team_goal) desc limit 1)"
+    "pred_sql": "select t as (select id from league where name = 'belgium jupiler league') from match where season = '2016' group by league_id order by sum(home_team_goal) desc limit 1)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 129,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "In Scotland Premier League, which away team won the most during the 2010 season?",
+    "gold_sql": "select teaminfo.team_long_name from league as leaguedata inner join match as matchdata on leaguedata.id = matchdata.league_id inner join team as teaminfo on matchdata.away_team_api_id = teaminfo.team_api_id where leaguedata.name = 'scotland premier league' and matchdata.season = '2009/2010' and matchdata.away_team_goal - matchdata.home_team_goal > 0 group by matchdata.away_team_api_id order by count(*) desc limit 1",
+    "pred_sql": "select away_team_api_id from match where season = '2010' and away_team_goal > home_team_goal group by away_team_api_id order by count(*) desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.5
+  },
+  {
+    "id": 130,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "What are the speed in which attacks are put together of the top 4 teams with the highest build Up Play Speed?",
+    "gold_sql": "select t1.buildupplayspeed from team_attributes as t1 inner join team as t2 on t1.team_api_id = t2.team_api_id order by t1.buildupplayspeed asc limit 4",
+    "pred_sql": "select t.team_long_name, ta.team_fifa_api_id, ta_fpa.buildupplayspeed from team as t join team_attributes as t_fpa on t.team_api_id = t_fpa.team_api_id order by t_fpa.buildupplayspeed desc limit 4",
+    "ex": false,
+    "sm": false,
+    "cm": 0.5
+  },
+  {
+    "id": 131,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Give the name of the league had the most matches end as draw in the 2016 season?",
+    "gold_sql": "select t2.name from match as t1 inner join league as t2 on t1.league_id = t2.id where t1.season = '2015/2016' and t1.home_team_goal = t1.away_team_goal group by t2.name order by count(t1.id) desc limit 1",
+    "pred_sql": "select t as (select league_id ) from match where season = '2016' and card = 'd' group by league_id order by count(*) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 132,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "At present, calculate for the player's age who have a sprint speed of no less than 97 between 2013 to 2015.",
+    "gold_sql": "select distinct datetime() - t2.birthday age from player_attributes as t1 inner join player as t2 on t1.player_api_id = t2.player_api_id where strftime('%y',t1.`date`) >= '2013' and strftime('%y',t1.`date`) <= '2015' and t1.sprint_speed >= 97",
+    "pred_sql": "select t2.player_name from player as t1 join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.sprint_speed >= 97 and t1.birthday like '2013-%' or t1.birthday like '2014-%' or t1.birthday like '2015-%'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 133,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Give the name of the league with the highest matches of all time and how many matches were played in the said league.",
+    "gold_sql": "select t2.name, t1.max_count from league as t2 join (select league_id, max(cnt) as max_count from (select league_id, count(id) as cnt from match group by league_id) as subquery) as t1 on t1.league_id = t2.id",
+    "pred_sql": "select name, count(*) from match join league on match.league_id = league.id group by name order by count(*) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.2
+  },
+  {
+    "id": 134,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Give the team_fifa_api_id of teams with more than 50 but less than 60 build-up play speed.",
+    "gold_sql": "select distinct team_fifa_api_id from team_attributes where buildupplayspeed > 50 and buildupplayspeed < 60",
+    "pred_sql": "select team_fifa_api_id from team_attributes where buildupplayspeed between 50 and 60 group by team_fifa_api_id having count(*) > 50",
+    "ex": false,
+    "sm": false,
+    "cm": 0.5
+  },
+  {
+    "id": 135,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "List the long name of teams with above-average build-up play passing in 2012.",
+    "gold_sql": "select distinct t4.team_long_name from team_attributes as t3 inner join team as t4 on t3.team_api_id = t4.team_api_id where substr(t3.`date`, 1, 4) = '2012' and t3.buildupplaypassing > ( select cast(sum(t2.buildupplaypassing) as real) / count(t1.id) from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where strftime('%y',t2.`date`) = '2012')",
+    "pred_sql": "select t2.team_long_name from team_attributes as t1 join team as t2 on t1.team_api_id = t2.team_api_id where t1.buildup like '2012%' and t1.buildupplaypassing > (select avg(buildupplaypassing) from team_attributes) group by t2.team_long_name",
+    "ex": false,
+    "sm": false,
+    "cm": 0.5
+  },
+  {
+    "id": 136,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "Calculate the percentage of players who prefer left foot, who were born between 1987 and 1992.",
+    "gold_sql": "select cast(count(case when t2.preferred_foot = 'left' then t1.id else null end) as real) * 100 / count(t1.id) percent from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where substr(t1.birthday, 1, 4) between '1987' and '1992'",
+    "pred_sql": "select cast(sum(case when t2.preferred_foot = 'left' then 1 else 0 end) as real) * 100 / count(t1.player_api_id) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.birthday between '1987-01-01' and '1992-12-31'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 137,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Find the average number of long-shot done by Ahmed Samir Farag.",
+    "gold_sql": "select cast(sum(t2.long_shots) as real) / count(t2.`date`) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'ahmed samir farag'",
+    "pred_sql": "select avg(t2) as (select player_api_id as t join team_attributes as ta on t.id = \"ahmed samir farag_api_id\"') as t1 on t.team_api_id = ta1.team_api_id join player as p on ta1.player_api_id = p.player_api_id where p.player_name = 'ahmed samir farag'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 138,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "List the top 10 players' names whose heights are above 180 in descending order of average heading accuracy.",
+    "gold_sql": "select t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height > 180 group by t1.id order by cast(sum(t2.heading_accuracy) as real) / count(t2.`player_fifa_api_id`) desc limit 10",
+    "pred_sql": "select t2.player_name from player as t1 join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height > 180 group by t2.player_api_id order by avg(t2.heading_accuracy) desc limit 10",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 139,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "List the name of leagues in which the average goals by the home team is higher than the away team in the 2009/2010 season.",
+    "gold_sql": "select t1.name from league as t1 inner join match as t2 on t1.id = t2.league_id where t2.season = '2009/2010' group by t1.name having (cast(sum(t2.home_team_goal) as real) / count(distinct t2.id)) - (cast(sum(t2.away_team_goal) as real) / count(distinct t2.id)) > 0",
+    "pred_sql": "select t2.name from match as m join league as t2 on m.league_id = t2.id where m.season = '2009/2010' and m.home_team_goal > m.away_team_goal group by t2.name",
+    "ex": true,
+    "sm": false,
+    "cm": 1.0
+  },
+  {
+    "id": 140,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "List the football players with a birthyear of 1970 and a birthmonth of October.",
+    "gold_sql": "select player_name from player where substr(birthday, 1, 7) = '1970-10'",
+    "pred_sql": "select player_name from player where birthday like '1970-10%'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 141,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "What is the overall rating of the football player Gabriel Tamas in year 2011?",
+    "gold_sql": "select t2.overall_rating from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'gabriel tamas' and strftime('%y', t2.date) = '2011'",
+    "pred_sql": "select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'gabriel tamas') and date like '2011%'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 142,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Calculate the average home team goal in the 2010/2011 season in the country of Poland.",
+    "gold_sql": "select cast(sum(t2.home_team_goal) as real) / count(t2.id) from country as t1 inner join match as t2 on t1.id = t2.country_id where t1.name = 'poland' and t2.season = '2010/2011'",
+    "pred_sql": "select avg(home_team_goal) from match where season='2010/2011' and country_id=(select id country_id league_id season stage date match_api_id home_team_api_id away_team_api_id home_team_goal away_team_goal home_player_x1 home_player_x2 home_player_x3 home_player_x4 home_player_x5 home_player_x6 home_player_x7 home_player_x8 home_player_x9 home_player_x10 home_player_x11 away",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 143,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "Who has the highest average finishing rate between the highest and shortest football player?",
+    "gold_sql": "select a from ( select avg(finishing) result, 'max' a from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height = ( select max(height) from player ) union select avg(finishing) result, 'min' a from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height = ( select min(height) from player ) ) order by result desc limit 1",
+    "pred_sql": "select avg(t2.finishing) from player_attributes as t1 join player as t2 on t1.player_api_id = t2.player_api_id where t2.height in (select min(height) from player) and t2.height in (select max(height) from player) group by t1.player_api_id order by avg(t1.finishing) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 144,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "From 2010 to 2015, what was the average overall rating of players who are higher than 170?",
+    "gold_sql": "select cast(sum(t2.overall_rating) as real) / count(t2.id) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.height > 170 and strftime('%y',t2.`date`) >= '2010' and strftime('%y',t2.`date`) <= '2015'",
+    "pred_sql": "select avg(overall_rating) from player_attributes where player_api_id in (select player_api_id from player where height > 170) avg(`overall_rating`) from player",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 145,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "What is the difference of the average ball control score between Abdou Diallo and Aaron Appindangoye\n?",
+    "gold_sql": "select cast(sum(case when t1.player_name = 'abdou diallo' then t2.ball_control else 0 end) as real) / count(case when t1.player_name = 'abdou diallo' then t2.id else null end) - cast(sum(case when t1.player_name = 'aaron appindangoye' then t2.ball_control else 0 end) as real) / count(case when t1.player_name = 'aaron appindangoye' then t2.id else null end) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id",
+    "pred_sql": "select avg(`ball_control`) - (select avg(`ball_control`) from player_attributes where player_api_id in (select player_api_id from player where player_name = 'abdou diallo') or player_api_id in (select player_api_id from player where player_name = 'aaron appindangoye')) as difference_ball_control from player_attributes",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 146,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Which player is older, Aaron Lennon or Abdelaziz Barrada?",
+    "gold_sql": "select player_name from player where player_name in ('aaron lennon', 'abdelaziz barrada') order by birthday asc limit 1",
+    "pred_sql": "select player_name from player where player_name in ('aaron lennon', 'abdelaziz barrada') order by birthday asc limit 1",
+    "ex": true,
+    "sm": true,
+    "cm": 1.0
+  },
+  {
+    "id": 147,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Which player is the tallest?",
+    "gold_sql": "select player_name from player order by height desc limit 1",
+    "pred_sql": "select player_name from player order by height desc limit 1",
+    "ex": true,
+    "sm": true,
+    "cm": 1.0
+  },
+  {
+    "id": 148,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Among the players whose preferred foot was the left foot when attacking, how many of them would remain in his position when the team attacked?",
+    "gold_sql": "select count(player_api_id) from player_attributes where preferred_foot = 'left' and attacking_work_rate = 'low'",
+    "pred_sql": "select count(*) from player_attributes where preferred_foot = 'left'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 149,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "Among the players born before the year 1986, how many of them would remain in his position and defense while the team attacked?",
+    "gold_sql": "select count(distinct t1.player_name) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where strftime('%y',t1.birthday) < '1986' and t2.defensive_work_rate = 'high'",
+    "pred_sql": "select count(*) from player_attributes pa join player p on pa.player_api_id = p.player_api_id join team_attributes ta on pa.team_fifa_api_id = ta.team_fifa_api_id where p.birthday < '1986-01-01' and ta.defencepressureclass = 'balanced' and ta.defenceaggressionclass = 'balanced'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 150,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Please list the names of the players whose volley score and dribbling score are over 70.",
+    "gold_sql": "select distinct t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t2.volleys > 70 and t2.dribbling > 70",
+    "pred_sql": "select t2.player_name from player_attributes as t1 join player as t2 on t1.player_api_id = t2.player_api_id where t1.volley > 70 and t1.dribbling > 70",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 151,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "How many matches were held in the Belgium Jupiler League in April, 2009?",
+    "gold_sql": "select count(t2.id) from league as t1 inner join match as t2 on t1.id = t2.league_id where t1.name = 'belgium jupiler league' and substr(t2.`date`, 1, 7) = '2009-04'",
+    "pred_sql": "select count(*) from match where league_id instr(`date('2001-04-2009', '-01') and league_id = (select id from league where name = 'belgium jupiler league')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 152,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Give the name of the league had the most matches in the 2008/2009 season?",
+    "gold_sql": "select t1.name from league as t1 join match as t2 on t1.id = t2.league_id where t2.season = '2008/2009' group by t1.name having count(t2.id) = (select max(match_count) from (select count(t2.id) as match_count from match as t2 where t2.season = '2008/2009' group by t2.league_id))",
+    "pred_sql": "select league_id, count(*) as match_count from match where season = '2008/2009' group by league_id order by match_count desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.16666666666666666
+  },
+  {
+    "id": 153,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "How much higher in percentage is Ariel Borysiuk's overall rating than that of Paulin Puel?",
+    "gold_sql": "select (sum(case when t1.player_name = 'ariel borysiuk' then t2.overall_rating else 0 end) * 1.0 - sum(case when t1.player_name = 'paulin puel' then t2.overall_rating else 0 end)) * 100 / sum(case when t1.player_name = 'paulin puel' then t2.overall_rating else 0 end) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id",
+    "pred_sql": "with b.overall as ariel from (select overall_rating from player_attributes` where player_api_id = 2_id then t2.overall_rating else 0 end) - sum(case when t1.player_id = 2_id then t2.overall_rating else 0 end) as diff from (select player_api_id as _id, 2_api_id as 1_id from player where player_name = 'ariel borysiuk') t1 join player_attributes",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 154,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Calculate the average overall rating of Pietro Marino.",
+    "gold_sql": "select cast(sum(t2.overall_rating) as real) / count(t2.id) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'pietro marino'",
+    "pred_sql": "select avg(overall_rating) from player_attributes where player_api_id = (select player_api_id from player where player_name = 'pietro marino')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 155,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "What is Ajax's highest chance creation passing score and what is it classified as?",
+    "gold_sql": "select t2.chancecreationpassing, t2.chancecreationpassingclass from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t1.team_long_name = 'ajax' order by t2.chancecreationpassing desc limit 1",
+    "pred_sql": "select max(chancecreationpassing), max(chancecreationpassingclass) from team_attributes where team_api_id = (select team_api_id from team where name = 'ajax')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.2
+  },
+  {
+    "id": 156,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "For the players who had a 77 points overall rating on 2016/6/23, who was the oldest? Give the name of the player.",
+    "gold_sql": "select t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where substr(t2.`date`, 1, 10) = '2016-06-23' and t2.overall_rating = 77 order by t1.birthday asc limit 1",
+    "pred_sql": "select t.player as (select t2.player_name from player as t1 join player_attributes as t1 join player t1 on t2 on t1.player_api_id = t2.player_api_id where overall_rating = 77 and date = '2016-06-23' group by player_api_id) player11 join player player12 on player11.player_api_id = player12.player_api_id order by player12.birthday asc limit",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 157,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "What was the overall rating for Aaron Mooy on 2016/2/4?",
+    "gold_sql": "select t2.overall_rating from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where substr(t2.`date`, 1, 10) = '2016-02-04' and t1.player_name = 'aaron mooy'",
+    "pred_sql": "select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'aaron mooy') and date = '2016-02-04 00:00:00'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 158,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "How was Francesco Migliore's attacking work rate on 2015/5/1?",
+    "gold_sql": "select t2.attacking_work_rate from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t2.`date` like '2015-05-01%' and t1.player_name = 'francesco migliore'",
+    "pred_sql": "select attacking_work_rate from player_attributes where player_api_id = (select player_api_id from player where player_name = 'francesco migliore') and date = '2015-05-01'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 159,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "When was the first time did Kevin Constant have his highest crossing score? Give the date.",
+    "gold_sql": "select `date` from ( select t2.crossing, t2.`date` from player as t1 inner join player_attributes as t2 on t1.player_fifa_api_id = t2.player_fifa_api_id where t1.player_name = 'kevin constant' order by t2.crossing desc) order by date desc limit 1",
+    "pred_sql": "select t2.date from player as t1 join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'kevin constant' order by t2.crossing desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.8
+  },
+  {
+    "id": 160,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Tell the build Up play passing class for \"FC Lorient\" on 2010/2/22.",
+    "gold_sql": "select t2.buildupplaypassingclass from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t1.team_long_name = 'fc lorient' and t2.`date` like '2010-02-22%'",
+    "pred_sql": "select buildupplaypassingclass from team_attributes where date '20 = 'fc lorient' and date = '2010-02-22 00:00:00'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 161,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "For the team \"Hannover 96\", what was its defence aggression class on 2015/9/10?",
+    "gold_sql": "select t2.defenceaggressionclass from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t1.team_long_name = 'hannover 96' and t2.`date` like '2015-09-10%'",
+    "pred_sql": "select defenceaggressionclass from team_attributes where team_api_id in (select team_api_id from team where team_long_name like 'hannover 96') and date like '2015/9/10'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 162,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "What was the average overall rating for Marko Arnautovic from 2007/2/22 to 2016/4/21?",
+    "gold_sql": "select cast(sum(t2.overall_rating) as real) / count(t2.id) from player as t1 inner join player_attributes as t2 on t1.player_fifa_api_id = t2.player_fifa_api_id where t1.player_name = 'marko arnautovic' and substr(t2.`date`, 1, 10) between '2007-02-22' and '2016-04-21'",
+    "pred_sql": "select avg(overall_rating) from player_attributes where player_api_id = (select player_api_id from player where player_name = 'marko arnautovic') and date between '2007-02-22' and '2016-04-21'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 163,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "What percentage is Landon Donovan's overall rating higher than Jordan Bowery on 2013/7/12?",
+    "gold_sql": "select (sum(case when t1.player_name = 'landon donovan' then t2.overall_rating else 0 end) * 1.0 - sum(case when t1.player_name = 'jordan bowery' then t2.overall_rating else 0 end)) * 100 / sum(case when t1.player_name = 'landon donovan' then t2.overall_rating else 0 end) lvsj_percent from player as t1 inner join player_attributes as t2 on t1.player_fifa_api_id = t2.player_fifa_api_id where substr(t2.`date`, 1, 10) = '2013-07-12'",
+    "pred_sql": "select cast((select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'landon donovan') and date = '2013-07-12' - (select seq from sqlite_sequence where name = 'player_attributes') / 1000000000000) as real) / cast((select overall_rating from player_attributes where player_api_id = (select player_api_id",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 164,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "List down most tallest players' name.",
+    "gold_sql": "select player_name from (select player_name, height, dense_rank() over (order by height desc) as rank from player) where rank = 1",
+    "pred_sql": "select player_name from player order by height desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6
+  },
+  {
+    "id": 165,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "State the name of the most strongest player.",
+    "gold_sql": "select distinct t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t2.overall_rating = (select max(overall_rating) from player_attributes)",
+    "pred_sql": "select player_name from player where overall_rating = (select max(overall_rating) from player_attributes join player on player_attributes.player_api_id = player.player_api_id)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 166,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Who are the players that tend to be attacking when their mates were doing attack moves? List down their name.",
+    "gold_sql": "select distinct t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t2.attacking_work_rate = 'high'",
+    "pred_sql": "select t2.player_name from team_attributes as t1 join player as t2 on t1.team_fifa_api_id = t2.player_fifa_api_id where t1.buildupplayspeedclass = 'balanced' and t1.buildupplaydribblingclass = 'little' and t2.player_fifa_api_id in (select player_fifa_api_id from player_attributes where attacking_work_rate = 'medium')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 167,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "What are the short name of team who played safe while creating chance of passing?",
+    "gold_sql": "select distinct t1.team_short_name from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t2.chancecreationpassingclass = 'safe'",
+    "pred_sql": "select t2.team_short_name from team_attributes as t1 join team as t2 on t1.team_api_id = t2.team_api_id where t1.chancecreationpassing = 1' and t1.defenceteamwidthclass = 'cover'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 168,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "How many football players born after the 1990s have the first name \"Aaron\"?",
+    "gold_sql": "select count(id) from player where birthday > '1990' and player_name like 'aaron%'",
+    "pred_sql": "select count(*) from player where player_name like 'aaron%' and strftime('%y', birthday) > '1990'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 169,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "What is the difference between players 6 and 23's jumping scores?",
+    "gold_sql": "select sum(case when t1.id = 6 then t1.jumping else 0 end) - sum(case when t1.id = 23 then t1.jumping else 0 end) from player_attributes as t1",
+    "pred_sql": "select `jumping` from player where player_api_id in (6, 23)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 170,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Please provide top four football players' IDs who are among the lowest potential players and prefer to use the right foot when attacking.",
+    "gold_sql": "select id from player_attributes where preferred_foot = 'right' order by potential asc limit 4",
+    "pred_sql": "select player_api_id from player where preferred_foot = 'right' and attacking_work_rate = 'medium' order by potential asc limit 4",
+    "ex": false,
+    "sm": false,
+    "cm": 0.4
+  },
+  {
+    "id": 171,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "How many players had the highest potential score for crossing that preferred to use their left foots while attacking?",
+    "gold_sql": "select count(t1.id) from player_attributes as t1 where t1.preferred_foot = 'left' and t1.crossing = ( select max(crossing) from player_attributes)",
+    "pred_sql": "select count(t.player_api_id, p.player_api_id) from player as p join player_attributes as pa on p.player_api_id = pa.player_api_id join team_attributes as ta on p.player_api_id = ta.team_fifa_api_id where pa.preferred_foot = 'left' and pa.crossing = (select max(crossing) from player_attributes where preferred_foot = 'left')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 172,
+    "db_id": "european_football_2",
+    "difficulty": "challenging",
+    "question": "What was the final score for the match on September 24, 2008, in the Belgian Jupiler League between the home team and the away team?",
+    "gold_sql": "select t2.home_team_goal, t2.away_team_goal from league as t1 inner join match as t2 on t1.id = t2.league_id where t1.name = 'belgium jupiler league' and t2.`date` like '2008-09-24%'",
+    "pred_sql": "select home_team_goal, away_team_goal from match where date=\"2008-09-24 00:00:00\" and league_id=1 and season=\"2008/2009\" and stage=1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 173,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Does the KSV Cercle Brugge team have a slow, balanced or fast speed class?",
+    "gold_sql": "select distinct t1.buildupplayspeedclass from team_attributes as t1 inner join team as t2 on t1.team_api_id = t2.team_api_id where t2.team_long_name = 'ksv cercle brugge'",
+    "pred_sql": "select t2.buildupplayspeedclass from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t1.team_long_name = 'ksv cercle brugge'",
+    "ex": true,
+    "sm": false,
+    "cm": 1.0
+  },
+  {
+    "id": 174,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Please state the finishing rate and curve score of the player who has the heaviest weight.",
+    "gold_sql": "select id, finishing, curve from player_attributes where player_api_id = ( select player_api_id from player order by weight desc limit 1 ) limit 1",
+    "pred_sql": "select t3 as player_api_id , t3.finishing , t4 asurve from player_attributes as t1 join player as t2 on t1.player_api_id = t2.player_api_id join team as t3 on t2.player_fifa_api_id = t3.player_fifa_api_id join league as t4 on t3.league_id = t4.id where t2.weight = (select max(weight) from player)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 175,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Which top 4 leagues had the most games in the 2015-2016 season?",
+    "gold_sql": "select t1.name from league as t1 inner join match as t2 on t1.id = t2.league_id where t2.season = '2015/2016' group by t1.name order by count(t2.id) desc limit 4",
+    "pred_sql": "select league_id, count(*) as game_count from match where season = '2015/2016' group by league_id order by game_count desc limit 4",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 176,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "Please provide the full name of the away team that scored the most goals.",
+    "gold_sql": "select t2.team_long_name from match as t1 inner join team as t2 on t1.away_team_api_id = t2.team_api_id order by t1.away_team_goal desc limit 1",
+    "pred_sql": "select t2.team_long_name from match as m join team as t2 on m.away_team_api_id = t2.team_api_id group by t2.team_long_name order by count(*)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.4
+  },
+  {
+    "id": 177,
+    "db_id": "european_football_2",
+    "difficulty": "simple",
+    "question": "Please name one player whose overall strength is the greatest.",
+    "gold_sql": "select distinct t1.player_name from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t2.overall_rating = ( select max(overall_rating) from player_attributes)",
+    "pred_sql": "select player_name from player where player_api_id = (select player_api_id from player_attributes where overall_rating = (select max(overall_rating) from player_attributes))",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 178,
+    "db_id": "european_football_2",
+    "difficulty": "moderate",
+    "question": "What is the percentage of players that are under 180 cm who have an overall strength of more than 70?",
+    "gold_sql": "select cast(count(case when t2.overall_rating > 70 and t1.height < 180 then t1.id else null end) as real) * 100 / count(t1.id) percent from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id",
+    "pred_sql": "select cast(sum(case when t2.height < 180 then 1 else 0 end) as real) * 100 / count(*) from player as t1 inner join `player_attributes` as t2 on t1.player_api_id = t2.player_api_id where t2.strength > 70",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 179,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "Please list the reference names of the drivers who are eliminated in the first period in race number 20.",
+    "gold_sql": "select t2.driverref from qualifying as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 20 order by t1.q1 desc limit 5",
+    "pred_sql": "select t2.driverref from results as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.raceid = 20 and t1.positionorder from distinct1 join",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 180,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "What is the surname of the driver with the best lap time in race number 19 in the second qualifying period?",
+    "gold_sql": "select t2.surname from qualifying as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 19 order by t1.q2 asc limit 1",
+    "pred_sql": "select t3.surname from qualifying as t1 join drivers as t3 on t1.driverid = t3.driverid join races as t2 on t1.raceid = t2.raceid where t1.number = 2 and t2.round = 19 order by t1.q2 asc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6
+  },
+  {
+    "id": 181,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "Please give the name of the race held on the circuits in Germany.",
+    "gold_sql": "select distinct t2.name from circuits as t1 inner join races as t2 on t2.circuitid = t1.circuitid where t1.country = 'germany'",
+    "pred_sql": "select name_raceid from races where circuitid in (select circuitid from circuits where country = 'germany",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 182,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "What is the coordinates location of the circuits for Australian grand prix?",
+    "gold_sql": "select distinct t1.lat, t1.lng from circuits as t1 inner join races as t2 on t2.circuitid = t1.circuitid where t2.name = 'australian grand prix'",
+    "pred_sql": "select t1.location, t1.lat, t1.lng from circuits as t1 join races as t2 on t1.circuitid = t2.circuitid where t2.name = 'australian grand prix'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 183,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "Give the coordinate position for Abu Dhabi Grand Prix.",
+    "gold_sql": "select distinct t1.lat, t1.lng from circuits as t1 inner join races as t2 on t2.circuitid = t1.circuitid where t2.name = 'abu dhabi grand prix'",
+    "pred_sql": "select lat, lng from circuits where name = 'abu dhabi grand prix'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 184,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "What's Bruno Senna's Q1 result in the qualifying race No. 354?",
+    "gold_sql": "select t1.q1 from qualifying as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 354 and t2.forename = 'bruno' and t2.surname = 'senna'",
+    "pred_sql": "select q1 from qualifying where raceid = 354 and driverid = (select driverid from drivers where forename = 'bruno' and surname = 'senna')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 185,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "What is his number of the driver who finished 0:01:54 in the Q3 of qualifying race No.903?",
+    "gold_sql": "select t2.number from qualifying as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 903 and t1.q3 like '1:54%'",
+    "pred_sql": "select t2.number from qualifying as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.qualifyid = 903 and t1.position = 3 and t1.q3 = '01:54.000'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 186,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "For the Bahrain Grand Prix in 2007, how many drivers not finished the game?",
+    "gold_sql": "select count(t3.driverid) from races as t1 inner join results as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t1.year = 2007 and t1.name = 'bahrain grand prix' and t2.time is null",
+    "pred_sql": "select count(driverid) as (select driverid from results where raceid = (select raceid from races where name = 'bahrain grand prix' and year = 2007 and statusid is not null",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 187,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "For all the drivers who finished the game in race No. 592, who is the oldest?",
+    "gold_sql": "select t1.forename, t1.surname from drivers as t1 inner join results as t2 on t2.driverid = t1.driverid where t2.raceid = 592 and t2.time is not null and t1.dob is not null order by t1.dob asc limit 1",
+    "pred_sql": "select min(surname) from drivers where driverid in (select driverid from results where resultid = 1 and raceid = 592)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.2
+  },
+  {
+    "id": 188,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "Who was the player that got the lap time of 0:01:27 in the race No. 161? Show his introduction website.",
+    "gold_sql": "select distinct t2.forename, t2.surname, t2.url from laptimes as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 161 and t1.time like '1:27%'",
+    "pred_sql": "select url from drivers where driverid = (select driverid from laptimes where raceid = 161 and time = '0:01:27')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 189,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "Where is Malaysian Grand Prix held? Give the location coordinates.",
+    "gold_sql": "select distinct t1.lat, t1.lng from circuits as t1 inner join races as t2 on t2.circuitid = t1.circuitid where t2.name = 'malaysian grand prix'",
+    "pred_sql": "select location, lat, lng from circuits where name = 'malaysian grand prix'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 190,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "For the constructor which got the highest point in the race No. 9 , what is its introduction website?",
+    "gold_sql": "select t2.url from constructorresults as t1 inner join constructors as t2 on t2.constructorid = t1.constructorid where t1.raceid = 9 order by t1.points desc limit 1",
+    "pred_sql": "select url from constructors where constructorid = (select constructorid from constructorresults where raceid = 9 order by points desc limit 1)",
+    "ex": true,
+    "sm": false,
+    "cm": 0.8
+  },
+  {
+    "id": 191,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "In the race No. 45, for the driver who had the Q3 time as 0:01:33, what is his abbreviated code?",
+    "gold_sql": "select t2.code from qualifying as t1 inner join drivers as t2 on t2.driverid = t1.driverid where t1.raceid = 45 and t1.q3 like '1:33%'",
+    "pred_sql": "select t2.code from qualifying as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.raceid = 45 and t1.q3 = '0:01:33' limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.5
+  },
+  {
+    "id": 192,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "Show me the season page of year when the race No. 901 took place.",
+    "gold_sql": "select t2.url from races as t1 inner join seasons as t2 on t2.year = t1.year where t1.raceid = 901",
+    "pred_sql": "select t as (select year from races where raceid from races where raceid = 901)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 193,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "For all the drivers who finished the game in race No. 872, who is the youngest?",
+    "gold_sql": "select t1.forename, t1.surname from drivers as t1 inner join results as t2 on t2.driverid = t1.driverid where t2.raceid = 872 and t2.time is not null order by t1.dob desc limit 1",
+    "pred_sql": "select min(surname) from drivers where driverid in (select driverid from results where raceid = 872 and position in (1,2,3))",
+    "ex": false,
+    "sm": false,
+    "cm": 0.2
+  },
+  {
+    "id": 194,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "For the driver who set the fastest lap speed, what is his nationality?",
+    "gold_sql": "select t1.nationality from drivers as t1 inner join results as t2 on t2.driverid = t1.driverid order by t2.fastestlapspeed desc limit 1",
+    "pred_sql": "select nationality from drivers where driverid = (select driverid from results where statusid = (select statusid from status where status = 'finished') order by fastestlapspeed desc limit 1)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6
+  },
+  {
+    "id": 195,
+    "db_id": "formula_1",
+    "difficulty": "challenging",
+    "question": "Paul di Resta was in the No. 853 race, what percent faster did he finish in the 853rd race than the next race for the fastest lap speed?",
+    "gold_sql": "select (sum(iif(t2.raceid = 853, t2.fastestlapspeed, 0)) - sum(iif(t2.raceid = 854, t2.fastestlapspeed, 0))) * 100 / sum(iif(t2.raceid = 853, t2.fastestlapspeed, 0)) from drivers as t1 inner join results as t2 on t2.driverid = t1.driverid where t1.forename = 'paul' and t1.surname = 'di resta'",
+    "pred_sql": "select cast((select fastestlapspeed from results where resultid = (select max(resultid) from results where raceid = (select raceid from results where resultid = (select max(resultid) from results where raceid = (select raceid from results where driverid = (select driverid from drivers where driverref = 'diresta') and number = 853) and statusid = (select min(id) from results where raceid = (select raceid",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 196,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "For the drivers who took part in the race in 1983/7/16, what's their race completion rate?",
+    "gold_sql": "select cast(count(case when t2.time is not null then t2.driverid end) as real) * 100 / count(t2.driverid) from races as t1 inner join results as t2 on t2.raceid = t1.raceid where t1.date = '1983-07-16'",
+    "pred_sql": "select cast(s.driverid as real) * 100 / count(distinct raceid) from (select raceid, count(distinct driverid) as countid from results where date = '1983-07-16' group by raceid)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
+  },
+  {
+    "id": 197,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "List the names of all races that occurred in the earliest recorded year and month.",
+    "gold_sql": "select name from races where strftime('%y', date) = ( select strftime('%y', date) from races order by date asc limit 1 ) and strftime('%m', date) = ( select strftime('%m', date) from races order by date asc limit 1 )",
+    "pred_sql": "select name from races where year, min(minstr(date,' ') order by date limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 198,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "State the driver with the most points scored. Find his full name with that points.",
+    "gold_sql": "select t3.forename, t3.surname, t2.points from races as t1 inner join driverstandings as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid order by t2.points desc limit 1",
+    "pred_sql": "select t3.forename , t3.surname from drivers as t3 join fore2 as t1 on t3.driverid = t1.driverid where points = (select max(points) from driverstandings)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 199,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "What is the best lap time recorded? List the driver and race with such recorded lap time.",
+    "gold_sql": "select t2.milliseconds, t1.forename, t1.surname, t3.name from drivers as t1 inner join laptimes as t2 on t1.driverid = t2.driverid inner join races as t3 on t2.raceid = t3.raceid order by t2.milliseconds asc limit 1",
+    "pred_sql": "select t1.driverid, t1.raceid, min(t1.time) from laptimes as t1 join races as t2 on t1.raceid = t2.raceid where t1.time = (select min(time) from laptimes) group by t1.driverid, t1.raceid",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 200,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "What is the average lap time for Lewis Hamilton in the 2009 Malaysian Grand Prix?",
+    "gold_sql": "select avg(t2.milliseconds) from races as t1 inner join laptimes as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t3.forename = 'lewis' and t3.surname = 'hamilton' and t1.year = 2009 and t1.name = 'malaysian grand prix'",
+    "pred_sql": "select avg(milliseconds) from laptimes where raceid = (select raceid from races where name = 'malaysian grand prix' and year = 2009) and driverid = (select driverid from drivers where forename = 'lewis' and surname = 'hamilton')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 201,
+    "db_id": "formula_1",
+    "difficulty": "challenging",
+    "question": "Calculate the percentage whereby Hamilton was not at the 1st track of the the f1 circuit since 2010.",
+    "gold_sql": "select cast(count(case when t2.position <> 1 then t2.position end) as real) * 100 / count(t2.driverstandingsid) from races as t1 inner join driverstandings as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t3.surname = 'hamilton' and t1.year >= 2010",
+    "pred_sql": "select cast(sum(case when t2.position = 1 then 1 else 0 end) as real) * 100 / count(*) from races as t1 inner join results as t2 on t1.raceid = t2.raceid where t2.driverid = (select driverid from drivers where forename = 'lewis' and surname = 'hamilton') and t1.year >= 2010",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 202,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "Name the driver with the most winning. Mention his nationality and what is his maximum point scores.",
+    "gold_sql": "select t1.forename, t1.surname, t1.nationality, max(t2.points) from drivers as t1 inner join driverstandings as t2 on t2.driverid = t1.driverid where t2.wins >= 1 group by t1.forename, t1.surname, t1.nationality order by count(t2.wins) desc limit 1",
+    "pred_sql": "select t3.nationality, max(t1.points) from driverstandings as t1 join drivers as t3 on t1.driverid = t3.driverid where t1.position = 1 group by t3.nationality order by max(t1.points) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 203,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "How old is the youngest Japanese driver? What is his name?",
+    "gold_sql": "select strftime('%y', current_timestamp) - strftime('%y', dob), forename , surname from drivers where nationality = 'japanese' order by dob desc limit 1",
+    "pred_sql": "select min(dob), surname from drivers where nationality = 'japanese'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.4
+  },
+  {
+    "id": 204,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "Name the races along with its circuit name and location for f1 races hosted in September 2005.",
+    "gold_sql": "select distinct t2.name, t1.name, t1.location from circuits as t1 inner join races as t2 on t2.circuitid = t1.circuitid where t2.year = 2005 and strftime('%m', t2.date) = '09'",
+    "pred_sql": "select t1.name, t1.location from races as t1 join circuits as t2 on t1.circuitid = t2.circuitid where t1.year = 2005 and month(t1.date) = 9",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 205,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "Which race was Alex Yoong in when he was in track number less than 20?",
+    "gold_sql": "select t1.name from races as t1 inner join driverstandings as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t3.forename = 'alex' and t3.surname = 'yoong' and t2.position < 20",
+    "pred_sql": "select t1 as (select r.year, r from drivers as 'alex yoong = and t1 and number < 20)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 206,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "State the race and year of race in which Michael Schumacher had his fastest lap.",
+    "gold_sql": "select t1.name, t1.year from races as t1 inner join laptimes as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t3.forename = 'michael' and t3.surname = 'schumacher' order by t2.milliseconds asc limit 1",
+    "pred_sql": "select t2.year from drivers as t1 join results as t2 on t1.driverid = t2.driverid where t1.forename = 'michael' and t1.surname = 'schumacher' and t2.fastestlap = 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 207,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "Which was Lewis Hamilton first race? What was his points recorded for his first race event?",
+    "gold_sql": "select t1.name, t2.points from races as t1 inner join driverstandings as t2 on t2.raceid = t1.raceid inner join drivers as t3 on t3.driverid = t2.driverid where t3.forename = 'lewis' and t3.surname = 'hamilton' order by t1.year asc limit 1",
+    "pred_sql": "select t2.positiontext from driverstandings as points_for where race.driverid = points_for.driverstandings as t1 join races as t2 on t1.raceid = t2.raceid join drivers as t3 on t1.driverid = t3.driverid where t3.forename = 'lewis' and t3.surname = 'hamilton' order by t2.year asc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 208,
+    "db_id": "formula_1",
+    "difficulty": "moderate",
+    "question": "Among all European Grand Prix races, what is the percentage of the races were hosted in Germany?",
+    "gold_sql": "select cast(count(case when t1.country = 'germany' then t2.circuitid end) as real) * 100 / count(t2.circuitid) from circuits as t1 inner join races as t2 on t2.circuitid = t1.circuitid where t2.name = 'european grand prix'",
+    "pred_sql": "select cast(sum(case when t2.country = 'germany' then 1 else 0 end) as real) * 100 / count(*) from races as t1 inner join circuits as t2 on t1.circuitid = t2.circuitid inner join seasons as t3 on t1.year = t3.year where t3.url like '%european grand prix%'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 209,
+    "db_id": "formula_1",
+    "difficulty": "simple",
+    "question": "What's the location coordinates of Silverstone Circuit?",
+    "gold_sql": "select lat, lng from circuits where name = 'silverstone circuit'",
+    "pred_sql": "select location, lng, lat from circuits where name = 'silverstone circuit'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
   }
 ]
