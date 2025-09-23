@@ -384,11 +384,11 @@ class EGBeamStrategy(BaseStrategy):
                         # if not self.validator.syntax_ok(cand_sql):
                         #     next_token_scores[0, j] = -1e9
                         # якась таблиця не існує — знімаємо кандидата
-                        # if not self.validator.tables_exist(cand_sql):
-                        #     next_token_scores[0, j] = -1e9
+                        if not self.validator.tables_exist(cand_sql):
+                            next_token_scores[0, j] = -1e9
                         # # якась колонка не існує — знімаємо кандидата
-                        # if not self.validator.columns_exist(cand_sql):
-                        #     next_token_scores[0, j] = -1e9
+                        if not self.validator.columns_exist(cand_sql):
+                            next_token_scores[0, j] = -1e9
                         pass
                     except Exception:
                         # у разі збою валідації — не ріжемо кандидата

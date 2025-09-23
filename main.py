@@ -77,7 +77,7 @@ def main():
     args = ap.parse_args()
     
     model_path = f'./models/{args.model}'
-    save_file_path = f'outputs/mini_dev_sqlite_{args.strategy}_{args.model}_test.json'
+    save_file_path = f'outputs/mini_dev_sqlite_{args.strategy}_{args.model}.json'
     os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
 
 
