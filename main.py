@@ -36,6 +36,8 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
         out = GreedyStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "beam":
         out = BeamStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
+    elif strategy == "custom_beam":
+        out = BeamStrategy(model=model, tokenizer=tokenizer).custom_generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_k":
         out = TopKStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_p":
@@ -67,8 +69,8 @@ def main():
     ap.add_argument("--model", type=str, default="qwen2.5-3B-Instruct")
     ap.add_argument("--data_json", type=str, default="./datasets/data_minidev/mini_dev_sqlite.json")
     ap.add_argument("--db_root", type=str, default="./datasets/data_minidev/dev_databases")
-    ap.add_argument("--strategy", type=str, default="eg_beam",
-                    choices=["greedy", "beam", "top_k", "top_p", "eg_beam"])
+    ap.add_argument("--strategy", type=str, default="custom_beam",
+                    choices=["greedy", "beam", "top_k", "top_p", "custom_beam", "eg_beam"])
     ap.add_argument("--max_new_tokens", type=int, default=100)
     ap.add_argument("--limit", type=int, default=0, help="0 = всі; >0 = перші N")
     ap.add_argument("--save_csv", type=str, default="./outputs/mini_dev_sqlite_eval.csv")
