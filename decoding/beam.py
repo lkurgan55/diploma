@@ -85,7 +85,6 @@ class EGLogitsProcessor(LogitsProcessor):
 
         for i in range(input_ids.size(0)):
             ids = input_ids[i].tolist()
-            # Декодуємо тільки "нову" частину — зазвичай дешево на коротких контекстах
             full_text = self.tok.decode(ids, skip_special_tokens=True)
             cand_sql = full_text.split("assistant", 1)[-1].strip()
             cand_sql = cand_sql.strip().strip("`")
@@ -93,7 +92,7 @@ class EGLogitsProcessor(LogitsProcessor):
             try:
                 # перевірка синтаксису — знімаємо кандидата
                 # if not self.validator.syntax_ok(cand_sql):
-                #     next_token_scores[0, j] = -1e9
+                #     scores[i, :] = float('-inf')
 
                 # якась таблиця не існує — знімаємо кандидата
                 if not self.validator.tables_exist(cand_sql):
