@@ -3998,7 +3998,10 @@
     "difficulty": "moderate",
     "question": "What is the mana cost of cards with a normal layout, a 2003 frame version, with a black border color, and available in paper and mtgo?",
     "gold_sql": "select manacost from cards where availability = 'mtgo,paper' and bordercolor = 'black' and frameversion = 2003 and layout = 'normal'",
-    "pred_sql": "select manacost from cards where layout = 'normal' and frameversion = '2003' and bordercolor = 'black' and availability like '%paper%' and availability like '%mtgo%'"
+    "pred_sql": "select manacost from cards where layout = 'normal' and frameversion = '2003' and bordercolor = 'black' and availability like '%paper%' and availability like '%mtgo%'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 364,
@@ -4006,7 +4009,10 @@
     "difficulty": "moderate",
     "question": "What is the percentage of Story Spotlight cards that do not have a text box? List them by their ID.",
     "gold_sql": "select cast(sum(case when istextless = 0 and isstoryspotlight = 1 then 1 else 0 end) as real) * 100 / count(id) from cards",
-    "pred_sql": "select id from cards where isstoryspotlight = 1 and text = '' group by id"
+    "pred_sql": "select id from cards where isstoryspotlight = 1 and text = '' group by id",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
   },
   {
     "id": 365,
@@ -4014,7 +4020,10 @@
     "difficulty": "moderate",
     "question": "How many Brazilian Portuguese translated sets are inside the Commander block?",
     "gold_sql": "select count(t1.id) from sets as t1 inner join set_translations as t2 on t1.code = t2.setcode where t2.language = 'portuguese (brazil)' and t1.block = 'commander'",
-    "pred_sql": "select count(*) from set_translations where language = 'brazilian portuguese' and setcode in (select code from sets where block = 'commander')"
+    "pred_sql": "select count(*) from set_translations where language = 'brazilian portuguese' and setcode in (select code from sets where block = 'commander')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 366,
@@ -4022,7 +4031,10 @@
     "difficulty": "moderate",
     "question": "Lists all types of cards in German.",
     "gold_sql": "select t1.subtypes, t1.supertypes from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t2.language = 'german' and t1.subtypes is not null and t1.supertypes is not null",
-    "pred_sql": "select distinct type from cards where uuid in (select uuid from foreign_data where language='german')"
+    "pred_sql": "select distinct type from cards where uuid in (select uuid from foreign_data where language='german')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 367,
@@ -4030,7 +4042,10 @@
     "difficulty": "moderate",
     "question": "How many unknown power cards contain info about the triggered ability",
     "gold_sql": "select count(distinct t1.id) from cards as t1 inner join rulings as t2 on t1.uuid = t2.uuid where (t1.power is null or t1.power = '*') and t2.text like '%triggered ability%'",
-    "pred_sql": "select count(*) from cards where power is null and keywords like '%triggered%'"
+    "pred_sql": "select count(*) from cards where power is null and keywords like '%triggered%'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 368,
@@ -4038,7 +4053,10 @@
     "difficulty": "moderate",
     "question": "Indicates the number of cards with pre-modern format, ruling text \"This is a triggered mana ability.\" that do not have multiple faces.",
     "gold_sql": "select count(t1.id) from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid inner join rulings as t3 on t1.uuid = t3.uuid where t2.format = 'premodern' and t3.text = 'this is a triggered mana ability.' and t1.side is null",
-    "pred_sql": "select count(*) from cards as t1 inner join rulings as t2 on t1.uuid = t2.uuid where t1.types like '%creature%' and t2.text like '%this is a triggered mana ability.%' and t1.facename is null"
+    "pred_sql": "select count(*) from cards as t1 inner join rulings as t2 on t1.uuid = t2.uuid where t1.types like '%creature%' and t2.text like '%this is a triggered mana ability.%' and t1.facename is null",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 369,
@@ -4046,7 +4064,10 @@
     "difficulty": "moderate",
     "question": "What is the foreign name of the card in French of type Creature, normal layout and black border color, by artist Matthew D. Wilson?",
     "gold_sql": "select name from foreign_data where uuid in ( select uuid from cards where types = 'creature' and layout = 'normal' and bordercolor = 'black' and artist = 'matthew d. wilson' ) and language = 'french'",
-    "pred_sql": "select t2.flavortext from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.layout = 'creature' and t1.type = 'normal' and t1.bordercolor = 'black' and t1.artist = 'matthew d. wilson' and t2.language = 'french'"
+    "pred_sql": "select t2.flavortext from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.layout = 'creature' and t1.type = 'normal' and t1.bordercolor = 'black' and t1.artist = 'matthew d. wilson' and t2.language = 'french'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 370,
@@ -4054,7 +4075,10 @@
     "difficulty": "simple",
     "question": "What language is the set of 180 cards that belongs to the Ravnica block translated into?",
     "gold_sql": "select t2.language from sets as t1 inner join set_translations as t2 on t1.code = t2.setcode where t1.block = 'ravnica' and t1.basesetsize = 180",
-    "pred_sql": "select t2.language from sets as t1 join set_translations as t2 on t1.code = t2.setcode where t1.block = 'ravnica' and t1.totalsetsize = 180"
+    "pred_sql": "select t2.language from sets as t1 join set_translations as t2 on t1.code = t2.setcode where t1.block = 'ravnica' and t1.totalsetsize = 180",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 371,
@@ -4062,7 +4086,10 @@
     "difficulty": "challenging",
     "question": "What percentage of cards with format commander and legal status do not have a content warning?",
     "gold_sql": "select cast(sum(case when t1.hascontentwarning = 0 then 1 else 0 end) as real) * 100 / count(t1.id) from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.format = 'commander' and t2.status = 'legal'",
-    "pred_sql": "select cast(sum(case when hascontentwarning = 0 then 1 else 0 end) as real) * 100 / count(*) from cards where uuid in (select uuid from legalities where format = 'commander' and status = 'legal')"
+    "pred_sql": "select cast(sum(case when hascontentwarning = 0 then 1 else 0 end) as real) * 100 / count(*) from cards where uuid in (select uuid from legalities where format = 'commander' and status = 'legal')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 372,
@@ -4070,7 +4097,10 @@
     "difficulty": "challenging",
     "question": "What percentage of cards without power are in French?",
     "gold_sql": "select cast(sum(case when t2.language = 'french' then 1 else 0 end) as real) * 100 / count(t1.id) from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.power is null or t1.power = '*'",
-    "pred_sql": "select cast(count(*) as real) * 100 / count(distinct uuid) from cards where power is null and uuid in (select uuid from foreign_data where language = 'french')"
+    "pred_sql": "select cast(count(*) as real) * 100 / count(distinct uuid) from cards where power is null and uuid in (select uuid from foreign_data where language = 'french')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 373,
@@ -4078,7 +4108,10 @@
     "difficulty": "simple",
     "question": "What is the language of the card with the multiverse number 149934?",
     "gold_sql": "select language from foreign_data where multiverseid = 149934",
-    "pred_sql": "select t2.language from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.multiverseid = 149934"
+    "pred_sql": "select t2.language from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.multiverseid = 149934",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 374,
@@ -4086,7 +4119,10 @@
     "difficulty": "simple",
     "question": "What proportion of cards do not have a text box with a normal layout?",
     "gold_sql": "select cast(sum(case when istextless = 1 and layout = 'normal' then 1 else 0 end) as real) * 100 / count(*) from cards",
-    "pred_sql": "select cast(count(*) as real) * 100 / (select count(*) from cards) from cards where layout != 'normal'"
+    "pred_sql": "select cast(count(*) as real) * 100 / (select count(*) from cards) from cards where layout != 'normal'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 375,
@@ -4094,7 +4130,10 @@
     "difficulty": "moderate",
     "question": "What languages are available in the set known as Archenemy on the magic card market and having the code ARC?",
     "gold_sql": "select t2.language from sets as t1 inner join set_translations as t2 on t1.code = t2.setcode where t1.mcmname = 'archenemy' and t2.setcode = 'arc'",
-    "pred_sql": "select distinct t1.language from set_translations as t1 inner join sets as t2 on t1.setcode = t2.code where t2.code = 'arc' and t1.language in (select t3.language from foreign_data as t3 where t3.uuid in (select uuid from cards where multiverseid = (select multiverseid from legalities where format = 'archenemy')))"
+    "pred_sql": "select distinct t1.language from set_translations as t1 inner join sets as t2 on t1.setcode = t2.code where t2.code = 'arc' and t1.language in (select t3.language from foreign_data as t3 where t3.uuid in (select uuid from cards where multiverseid = (select multiverseid from legalities where format = 'archenemy')))",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 376,
@@ -4102,7 +4141,10 @@
     "difficulty": "simple",
     "question": "Which foreign language used by \"A Pedra Fellwar\"?",
     "gold_sql": "select distinct language from foreign_data where name = 'a pedra fellwar'",
-    "pred_sql": "select t2.language from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.name = 'a pedra fellwar'"
+    "pred_sql": "select t2.language from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.name = 'a pedra fellwar'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 377,
@@ -4110,7 +4152,10 @@
     "difficulty": "moderate",
     "question": "Which card costs more converted mana, \"Serra Angel\" or \"Shrine Keeper\"?",
     "gold_sql": "select name from cards where name in ('serra angel', 'shrine keeper') order by convertedmanacost desc limit 1",
-    "pred_sql": "select name, convertedmanacost from cards where name = 'serra angel' or name = 'shrine keeper' order by convertedmanacost desc limit 1"
+    "pred_sql": "select name, convertedmanacost from cards where name = 'serra angel' or name = 'shrine keeper' order by convertedmanacost desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6
   },
   {
     "id": 378,
@@ -4118,7 +4163,10 @@
     "difficulty": "moderate",
     "question": "What's the Italian name of the set of cards with \"Ancestor's Chosen\" is in?",
     "gold_sql": "select translation from set_translations where setcode in ( select setcode from cards where name = 'ancestor''s chosen' ) and language = 'italian'",
-    "pred_sql": "select t2.translation from cards as t1 inner join set_translations as t2 on t1.uuid = t2.setcode where t1.name = 'ancestor\\'s chosen' and t2.language = 'italian'"
+    "pred_sql": "select t2.translation from cards as t1 inner join set_translations as t2 on t1.uuid = t2.setcode where t1.name = 'ancestor\\'s chosen' and t2.language = 'italian'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 379,
@@ -4126,7 +4174,10 @@
     "difficulty": "moderate",
     "question": "For the set of cards with \"Ancestor's Chosen\" in it, is there a Korean version of it?",
     "gold_sql": "select iif(sum(case when t2.language = 'korean' and t2.translation is not null then 1 else 0 end) > 0, 'yes', 'no') from cards as t1 inner join set_translations as t2 on t2.setcode = t1.setcode where t1.name = 'ancestor''s chosen'",
-    "pred_sql": "select t3.translation from cards as t1 inner join set_translations as t2 on t1.setcode = t2.setcode inner join foreign_data as t3 on t1.uuid = t3.uuid where t1.name = 'ancestor\\'s chosen' and t2.language = 'korean'"
+    "pred_sql": "select t3.translation from cards as t1 inner join set_translations as t2 on t1.setcode = t2.setcode inner join foreign_data as t3 on t1.uuid = t3.uuid where t1.name = 'ancestor\\'s chosen' and t2.language = 'korean'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 380,
@@ -4134,7 +4185,10 @@
     "difficulty": "moderate",
     "question": "Among the cards in the set \"Hauptset Zehnte Edition\", how many of them are designed by Adam Rex?",
     "gold_sql": "select count(t1.id) from cards as t1 inner join set_translations as t2 on t2.setcode = t1.setcode where t2.translation = 'hauptset zehnte edition' and t1.artist = 'adam rex'",
-    "pred_sql": "select count(*) from cards join foreign_data on cards.uuid = foreign_data.uuid where foreign_data.name like '%adam rex%' and cards.setcode = '10e'"
+    "pred_sql": "select count(*) from cards join foreign_data on cards.uuid = foreign_data.uuid where foreign_data.name like '%adam rex%' and cards.setcode = '10e'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 381,
@@ -4142,7 +4196,10 @@
     "difficulty": "moderate",
     "question": "What is the Simplified Chinese translation of the name of the set \"Eighth Edition\"?",
     "gold_sql": "select t2.translation from sets as t1 inner join set_translations as t2 on t2.setcode = t1.code where t1.name = 'eighth edition' and t2.language = 'chinese simplified'",
-    "pred_sql": "select translation from set_translations where setcode = '8ed' and language = 'chinese simplified'"
+    "pred_sql": "select translation from set_translations where setcode = '8ed' and language = 'chinese simplified'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 382,
@@ -4150,7 +4207,10 @@
     "difficulty": "moderate",
     "question": "Did the set of cards with \"Angel of Mercy\" appear on Magic: The Gathering Online?",
     "gold_sql": "select iif(t2.mtgocode is not null, 'yes', 'no') from cards as t1 inner join sets as t2 on t2.code = t1.setcode where t1.name = 'angel of mercy'",
-    "pred_sql": "select t2.name from cards as t1 inner join sets as t2 on t1.setcode = t2.code where t1.name = 'angel of mercy' and t2.isonlineonly = 1"
+    "pred_sql": "select t2.name from cards as t1 inner join sets as t2 on t1.setcode = t2.code where t1.name = 'angel of mercy' and t2.isonlineonly = 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 383,
@@ -4158,7 +4218,10 @@
     "difficulty": "moderate",
     "question": "Among the sets in the block \"Ice Age\", how many of them have an Italian translation?",
     "gold_sql": "select count(distinct t1.id) from sets as t1 inner join set_translations as t2 on t2.setcode = t1.code where t1.block = 'ice age' and t2.language = 'italian' and t2.translation is not null",
-    "pred_sql": "select count(*) from set_translations join sets on set_translations.setcode = sets.code where set_translations.language = 'italian' and sets.block = 'ice age'"
+    "pred_sql": "select count(*) from set_translations join sets on set_translations.setcode = sets.code where set_translations.language = 'italian' and sets.block = 'ice age'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 384,
@@ -4166,7 +4229,10 @@
     "difficulty": "moderate",
     "question": "Is the set of cards with Adarkar Valkyrie only available outside the United States?",
     "gold_sql": "select iif(isforeignonly = 1, 'yes', 'no') from cards as t1 inner join sets as t2 on t2.code = t1.setcode where t1.name = 'adarkar valkyrie'",
-    "pred_sql": "select s.code from cards c join sets s on c.setcode = s.code where c.name = 'adarkar valkyrie' and s.isforeignonly = 1 and s.isnonfoilonly = 0 and s.isonlineonly = 0 and s.ispartialpreview = 0"
+    "pred_sql": "select s.code from cards c join sets s on c.setcode = s.code where c.name = 'adarkar valkyrie' and s.isforeignonly = 1 and s.isnonfoilonly = 0 and s.isonlineonly = 0 and s.ispartialpreview = 0",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 385,
@@ -4174,7 +4240,10 @@
     "difficulty": "moderate",
     "question": "Among the sets of cards that have an Italian translation, how many of them have a base set number of under 100?",
     "gold_sql": "select count(t1.id) from sets as t1 inner join set_translations as t2 on t2.setcode = t1.code where t2.translation is not null and t1.basesetsize < 100 and t2.language = 'italian'",
-    "pred_sql": "select count(*) from sets where isforeignonly = 0 and basesetsize < 100 and code in (select setcode from set_translations where language = 'italian')"
+    "pred_sql": "select count(*) from sets where isforeignonly = 0 and basesetsize < 100 and code in (select setcode from set_translations where language = 'italian')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 386,
@@ -4182,7 +4251,10 @@
     "difficulty": "challenging",
     "question": "Which of these artists have designed a card in the set Coldsnap, Jeremy Jarvis, Aaron Miller or Chippy?",
     "gold_sql": "select t1.artist from cards as t1 inner join sets as t2 on t2.code = t1.setcode where (t2.name = 'coldsnap' and t1.artist = 'chippy') or (t2.name = 'coldsnap' and t1.artist = 'aaron miller') or (t2.name = 'coldsnap' and t1.artist = 'jeremy jarvis') group by t1.artist",
-    "pred_sql": "select artist from cards where artist in ('jeremy jarvis', 'aaron miller', 'chippy') and multiverseid in (select multiverseid from sets where name = 'coldsnap')"
+    "pred_sql": "select artist from cards where artist in ('jeremy jarvis', 'aaron miller', 'chippy') and multiverseid in (select multiverseid from sets where name = 'coldsnap')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.5
   },
   {
     "id": 387,
@@ -4190,7 +4262,10 @@
     "difficulty": "moderate",
     "question": "Among the cards with converted mana cost higher than 5 in the set Coldsnap, how many of them have unknown power?",
     "gold_sql": "select sum(case when t1.power = '*' or t1.power is null then 1 else 0 end) from cards as t1 inner join sets as t2 on t2.code = t1.setcode where t2.name = 'coldsnap' and t1.convertedmanacost > 5",
-    "pred_sql": "select count(*) from cards where convertedmanacost > 5 and power is null and multiverseid in (select multiverseid from sets where name = 'coldsnap')"
+    "pred_sql": "select count(*) from cards where convertedmanacost > 5 and power is null and multiverseid in (select multiverseid from sets where name = 'coldsnap')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 388,
@@ -4198,7 +4273,10 @@
     "difficulty": "moderate",
     "question": "What is the Italian flavor text of the card \"Ancestor's Chosen\"?",
     "gold_sql": "select t2.flavortext from cards as t1 inner join foreign_data as t2 on t2.uuid = t1.uuid where t1.name = 'ancestor''s chosen' and t2.language = 'italian'",
-    "pred_sql": "select flavortext from foreign_data where name = 'ancestor\\'s chosen' and language = 'italian'"
+    "pred_sql": "select flavortext from foreign_data where name = 'ancestor\\'s chosen' and language = 'italian'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 389,
@@ -4206,7 +4284,10 @@
     "difficulty": "moderate",
     "question": "Please list the Italian text ruling of all the cards in the set Coldsnap.",
     "gold_sql": "select distinct t1.text from foreign_data as t1 inner join cards as t2 on t2.uuid = t1.uuid inner join sets as t3 on t3.code = t2.setcode where t3.name = 'coldsnap' and t1.language = 'italian'",
-    "pred_sql": "select t3.text from cards as t1 inner join rulings as t3 on t1.uuid = t3.uuid inner join sets as t2 on t1.setcode = t2.code where t2.name = 'coldsnap' and t3.date = (select max(date) from rulings where uuid = t3.uuid) and t3.text like '%italian%'"
+    "pred_sql": "select t3.text from cards as t1 inner join rulings as t3 on t1.uuid = t3.uuid inner join sets as t2 on t1.setcode = t2.code where t2.name = 'coldsnap' and t3.date = (select max(date) from rulings where uuid = t3.uuid) and t3.text like '%italian%'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 390,
@@ -4214,7 +4295,10 @@
     "difficulty": "moderate",
     "question": "Please list the Italian names of the cards in the set Coldsnap with the highest converted mana cost.",
     "gold_sql": "select t2.name from foreign_data as t1 inner join cards as t2 on t2.uuid = t1.uuid inner join sets as t3 on t3.code = t2.setcode where t3.name = 'coldsnap' and t1.language = 'italian' order by t2.convertedmanacost desc",
-    "pred_sql": "select t1.asciiname from cards as t1 inner join sets as t2 on t1.setcode = t2.setcode where t2.name = 'coldsnap' order by t1.convertedmanacost desc limit 1"
+    "pred_sql": "select t1.asciiname from cards as t1 inner join sets as t2 on t1.setcode = t2.setcode where t2.name = 'coldsnap' order by t1.convertedmanacost desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.2
   },
   {
     "id": 391,
@@ -4222,7 +4306,10 @@
     "difficulty": "moderate",
     "question": "What is the percentage of the cards with a converted mana cost of 7 in the set Coldsnap?",
     "gold_sql": "select cast(sum(case when t1.convertedmanacost = 7 then 1 else 0 end) as real) * 100 / count(t1.id) from cards as t1 inner join sets as t2 on t2.code = t1.setcode where t2.name = 'coldsnap'",
-    "pred_sql": "select cast(sum(case when convertedmanacost = 7 then 1 else 0 end) as real) * 100 / count(*) from cards where multiverseid in (select multiverseid from sets where name = 'coldsnap')"
+    "pred_sql": "select cast(sum(case when convertedmanacost = 7 then 1 else 0 end) as real) * 100 / count(*) from cards where multiverseid in (select multiverseid from sets where name = 'coldsnap')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 392,
@@ -4230,7 +4317,10 @@
     "difficulty": "challenging",
     "question": "What is the percentage of incredibly powerful cards in the set Coldsnap?",
     "gold_sql": "select cast(sum(case when t1.cardkingdomfoilid is not null and t1.cardkingdomid is not null then 1 else 0 end) as real) * 100 / count(t1.id) from cards as t1 inner join sets as t2 on t2.code = t1.setcode where t2.name = 'coldsnap'",
-    "pred_sql": "select cast(sum(case when rarity = 'legendary' then 1 else 0 end) as real) * 100 / count(*) from cards where multiverseid in (select multiverseid from sets where name = 'coldsnap')"
+    "pred_sql": "select cast(sum(case when rarity = 'legendary' then 1 else 0 end) as real) * 100 / count(*) from cards where multiverseid in (select multiverseid from sets where name = 'coldsnap')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 393,
@@ -4238,7 +4328,10 @@
     "difficulty": "moderate",
     "question": "Which of the play format has the highest number of banned status? Indicate the play format and the names of all the card meet the condition.",
     "gold_sql": "with maxbanned as (select format, count(*) as count_banned from legalities where status = 'banned' group by format order by count(*) desc limit 1) select t2.format, t1.name from cards as t1 inner join legalities as t2 on t2.uuid = t1.uuid inner join maxbanned mb on mb.format = t2.format where t2.status = 'banned'",
-    "pred_sql": "select format from legalities group by format order by count(status) desc limit 1"
+    "pred_sql": "select format from legalities group by format order by count(status) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 394,
@@ -4246,7 +4339,10 @@
     "difficulty": "moderate",
     "question": "Which cards are ranked 1st on EDHRec? List all of the cards name and its banned play format.",
     "gold_sql": "select t1.name, t2.format from cards as t1 inner join legalities as t2 on t2.uuid = t1.uuid where t1.edhrecrank = 1 and t2.status = 'banned' group by t1.name, t2.format",
-    "pred_sql": "select t1.name from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.status = 'banned' and t2.format = 'edhrec' order by t1.edhrecrank asc limit 1"
+    "pred_sql": "select t1.name from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.status = 'banned' and t2.format = 'edhrec' order by t1.edhrecrank asc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.16666666666666666
   },
   {
     "id": 395,
@@ -4254,7 +4350,10 @@
     "difficulty": "challenging",
     "question": "List the names of all the cards in the set Hour of Devastation and find the formats in which these cards are legal.",
     "gold_sql": "select distinct t2.name , case when t1.status = 'legal' then t1.format else null end from legalities as t1 inner join cards as t2 on t2.uuid = t1.uuid where t2.setcode in ( select code from sets where name = 'hour of devastation' )",
-    "pred_sql": "select t1.name from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.format = 'hour of devastation' ';'"
+    "pred_sql": "select t1.name from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.format = 'hour of devastation' ';'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 396,
@@ -4262,7 +4361,10 @@
     "difficulty": "moderate",
     "question": "Find and list the names of sets which doesn't have Japanese translation but have Korean translation.",
     "gold_sql": "select name from sets where code in ( select setcode from set_translations where language = 'korean' and language not like '%japanese%' )",
-    "pred_sql": "select setcode from set_translations where language = 'japanese' intersect select setcode from set_translations where language = 'korean' except select setcode from set_translations where language = 'japanese' and setcode in (select setcode from set_translations where language = 'korean')"
+    "pred_sql": "select setcode from set_translations where language = 'japanese' intersect select setcode from set_translations where language = 'korean' except select setcode from set_translations where language = 'japanese' and setcode in (select setcode from set_translations where language = 'korean')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 397,
@@ -4270,7 +4372,10 @@
     "difficulty": "moderate",
     "question": "List all the frame styles and cards Allen Williams worked on and find any banned cards if there are any.",
     "gold_sql": "select distinct t1.frameversion, t1.name , iif(t2.status = 'banned', t1.name, 'no') from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t1.artist = 'allen williams'",
-    "pred_sql": "select distinct frameeffects, name from cards where artist = 'allen williams' and status = 'banned'"
+    "pred_sql": "select distinct frameeffects, name from cards where artist = 'allen williams' and status = 'banned'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 398,
@@ -4278,7 +4383,10 @@
     "difficulty": "simple",
     "question": "What is the most common bond type?",
     "gold_sql": "select t.bond_type from ( select bond_type, count(bond_id) from bond group by bond_type order by count(bond_id) desc limit 1 ) as t",
-    "pred_sql": "select bond_type from bond group by bond_type order by count(*) desc limit 1"
+    "pred_sql": "select bond_type from bond group by bond_type order by count(*) desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.8
   },
   {
     "id": 399,
@@ -4286,7 +4394,10 @@
     "difficulty": "moderate",
     "question": "Calculate the average number of oxygen atoms in single-bonded molecules.",
     "gold_sql": "select avg(oxygen_count) from (select t1.molecule_id, count(t1.element) as oxygen_count from atom as t1 inner join bond as t2 on t1.molecule_id = t2.molecule_id where t2.bond_type = '-' and t1.element = 'o' group by t1.molecule_id) as oxygen_counts",
-    "pred_sql": "select avg(a.atom_id2_count) from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = '- ' group by m.molecule_id having count(case when a.element = 'oxygen' then a.atom_id else null end) > 0"
+    "pred_sql": "select avg(a.atom_id2_count) from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = '- ' group by m.molecule_id having count(case when a.element = 'oxygen' then a.atom_id else null end) > 0",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
   },
   {
     "id": 400,
@@ -4294,7 +4405,10 @@
     "difficulty": "challenging",
     "question": "On average how many carcinogenic molecules are single bonded?",
     "gold_sql": "select avg(single_bond_count) from (select t3.molecule_id, count(t1.bond_type) as single_bond_count from bond as t1 inner join atom as t2 on t1.molecule_id = t2.molecule_id inner join molecule as t3 on t3.molecule_id = t2.molecule_id where t1.bond_type = '-' and t3.label = '+' group by t3.molecule_id) as subquery",
-    "pred_sql": "select avg(case when t2.bond_type = 'single' then 1 else 0 end) as avg_single_bonded from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t1.atom_id in (select atom_id from atom where element = 'carcinogenic')"
+    "pred_sql": "select avg(case when t2.bond_type = 'single' then 1 else 0 end) as avg_single_bonded from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t1.atom_id in (select atom_id from atom where element = 'carcinogenic')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 401,
@@ -4302,7 +4416,10 @@
     "difficulty": "simple",
     "question": "Find the triple-bonded molecules which are carcinogenic.",
     "gold_sql": "select distinct t2.molecule_id from bond as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.bond_type = '#' and t2.label = '+'",
-    "pred_sql": "select m.molecule_id, m.label from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = 'triple' and m.label = 'carcinogenic'"
+    "pred_sql": "select m.molecule_id, m.label from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = 'triple' and m.label = 'carcinogenic'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 402,
@@ -4310,7 +4427,10 @@
     "difficulty": "moderate",
     "question": "What is the percentage of carbon in double-bond molecules?",
     "gold_sql": "select cast(count(distinct case when t1.element = 'c' then t1.atom_id else null end) as real) * 100 / count(distinct t1.atom_id) from atom as t1 inner join bond as t2 on t1.molecule_id = t2.molecule_id where t2.bond_type = '='",
-    "pred_sql": "select cast(sum(case when t1.element = 'c' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'double'"
+    "pred_sql": "select cast(sum(case when t1.element = 'c' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'double'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 403,
@@ -4318,7 +4438,10 @@
     "difficulty": "challenging",
     "question": "What elements are in the TR004_8_9 bond atoms?",
     "gold_sql": "select distinct t1.element from atom as t1 inner join connected as t2 on t1.atom_id = t2.atom_id where t2.bond_id = 'tr004_8_9'",
-    "pred_sql": "select t1.element , t2.element from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join atom as t2 on t3.atom_id2 = t2.atom_id where t3.bond_id = (select bond_id from bond where molecule_id = 'tr004_8_9')"
+    "pred_sql": "select t1.element , t2.element from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join atom as t2 on t3.atom_id2 = t2.atom_id where t3.bond_id = (select bond_id from bond where molecule_id = 'tr004_8_9')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 404,
@@ -4326,7 +4449,10 @@
     "difficulty": "challenging",
     "question": "What elements are in a double type bond?",
     "gold_sql": "select distinct t1.element from atom as t1 inner join bond as t2 on t1.molecule_id = t2.molecule_id inner join connected as t3 on t1.atom_id = t3.atom_id where t2.bond_type = '='",
-    "pred_sql": "select distinct t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'double'"
+    "pred_sql": "select distinct t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'double'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 405,
@@ -4334,7 +4460,10 @@
     "difficulty": "moderate",
     "question": "Which type of label is the most numerous in atoms with hydrogen?",
     "gold_sql": "select t.label from ( select t2.label, count(t2.molecule_id) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.element = 'h' group by t2.label order by count(t2.molecule_id) desc limit 1 ) t",
-    "pred_sql": "select bond_type from bond where molecule_id in (select molecule_id from atom where element = 'h') group by bond_type order by count(*) desc limit 1"
+    "pred_sql": "select bond_type from bond where molecule_id in (select molecule_id from atom where element = 'h') group by bond_type order by count(*) desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.16666666666666666
   },
   {
     "id": 406,
@@ -4342,7 +4471,10 @@
     "difficulty": "challenging",
     "question": "Which element is the least numerous in non-carcinogenic molecules?",
     "gold_sql": "select t.element from (select t1.element, count(distinct t1.molecule_id) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '-' group by t1.element order by count(distinct t1.molecule_id) asc limit 1) t",
-    "pred_sql": "select element from atom where molecule_id not in (select molecule_id from molecule where label = '-') group by element order by count(*) limit 1"
+    "pred_sql": "select element from atom where molecule_id not in (select molecule_id from molecule where label = '-') group by element order by count(*) limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 407,
@@ -4350,7 +4482,10 @@
     "difficulty": "moderate",
     "question": "What type of bond is there between the atoms TR004_8 and TR004_20?",
     "gold_sql": "select t1.bond_type from bond as t1 inner join connected as t2 on t1.bond_id = t2.bond_id where t2.atom_id = 'tr004_8' and t2.atom_id2 = 'tr004_20' or t2.atom_id2 = 'tr004_8' and t2.atom_id = 'tr004_20'",
-    "pred_sql": "select bond.bond_type from bond join connected on bond.bond_id = connected.bond_id where connected.atom_id = 'tr004_8' and connected.atom_id2 = 'tr004_20'"
+    "pred_sql": "select bond.bond_type from bond join connected on bond.bond_id = connected.bond_id where connected.atom_id = 'tr004_8' and connected.atom_id2 = 'tr004_20'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 408,
@@ -4358,7 +4493,10 @@
     "difficulty": "challenging",
     "question": "How many atoms with iodine and with sulfur type elements are there in single bond molecules?",
     "gold_sql": "select count(distinct case when t1.element = 'i' then t1.atom_id else null end) as iodine_nums , count(distinct case when t1.element = 's' then t1.atom_id else null end) as sulfur_nums from atom as t1 inner join connected as t2 on t1.atom_id = t2.atom_id inner join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = '-'",
-    "pred_sql": "select count(distinct atom_id) from atom where element in ('iodine', 'sulfur') and atom_id in (select atom_id from connected where bond_id in (select bond_id from bond where bond_type = '-'))"
+    "pred_sql": "select count(distinct atom_id) from atom where element in ('iodine', 'sulfur') and atom_id in (select atom_id from connected where bond_id in (select bond_id from bond where bond_type = '-'))",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 409,
@@ -4366,7 +4504,10 @@
     "difficulty": "challenging",
     "question": "What percentage of carcinogenic-type molecules does not contain fluorine?",
     "gold_sql": "select cast(count(distinct case when t1.element <> 'f' then t2.molecule_id else null end) as real) * 100 / count(distinct t2.molecule_id) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '+'",
-    "pred_sql": "select cast(count(*) as real) * 100 / (select count(*) from molecule where label = '-') from atom where element = 'f' and molecule_id in (select molecule_id from bond where bond_type = 'carcinogenic')"
+    "pred_sql": "select cast(count(*) as real) * 100 / (select count(*) from molecule where label = '-') from atom where element = 'f' and molecule_id in (select molecule_id from bond where bond_type = 'carcinogenic')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 410,
@@ -4374,7 +4515,10 @@
     "difficulty": "challenging",
     "question": "What is the percentage of carcinogenic molecules in triple type bonds?",
     "gold_sql": "select cast(count(distinct case when t2.label = '+' then t2.molecule_id else null end) as real) * 100 / count(distinct t2.molecule_id) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id inner join bond as t3 on t2.molecule_id = t3.molecule_id where t3.bond_type = '#'",
-    "pred_sql": "select cast(sum(case when t2.bond_type = 'triple' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join atom as t4 on t3.atom_id2 = t4.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t2.bond_type = 'triple'"
+    "pred_sql": "select cast(sum(case when t2.bond_type = 'triple' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join atom as t4 on t3.atom_id2 = t4.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t2.bond_type = 'triple'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 411,
@@ -4382,7 +4526,10 @@
     "difficulty": "challenging",
     "question": "Please list top three elements of the toxicology of the molecule TR000 in alphabetical order.",
     "gold_sql": "select distinct t.element from atom as t where t.molecule_id = 'tr000' order by t.element limit 3",
-    "pred_sql": "select element from atom where molecule_id = 'tr000' order by element limit 3"
+    "pred_sql": "select element from atom where molecule_id = 'tr000' order by element limit 3",
+    "ex": true,
+    "sm": false,
+    "cm": 1.0
   },
   {
     "id": 412,
@@ -4390,7 +4537,10 @@
     "difficulty": "moderate",
     "question": "What is the percentage of double bonds in the molecule TR008? Please provide your answer as a percentage with five decimal places.",
     "gold_sql": "select round(cast(count(case when t.bond_type = '=' then t.bond_id else null end) as real) * 100 / count(t.bond_id),5) from bond as t where t.molecule_id = 'tr008'",
-    "pred_sql": "select cast(sum(case when t2.bond_type = 'double' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t1.molecule_id = 'tr008'"
+    "pred_sql": "select cast(sum(case when t2.bond_type = 'double' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t1.molecule_id = 'tr008'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 413,
@@ -4398,7 +4548,10 @@
     "difficulty": "simple",
     "question": "What is the percentage of molecules that are carcinogenic? Please provide your answer as a percentage with three decimal places.",
     "gold_sql": "select round(cast(count(case when t.label = '+' then t.molecule_id else null end) as real) * 100 / count(t.molecule_id),3) from molecule t",
-    "pred_sql": "select cast(sum(case when t2.label = '+' then 1 else 0 end) as real) * 100 / count(*) from atom join connected on atom.atom_id = connected.atom_id join molecule t2 on atom.molecule_id = t2.molecule_id"
+    "pred_sql": "select cast(sum(case when t2.label = '+' then 1 else 0 end) as real) * 100 / count(*) from atom join connected on atom.atom_id = connected.atom_id join molecule t2 on atom.molecule_id = t2.molecule_id",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 414,
@@ -4406,7 +4559,10 @@
     "difficulty": "moderate",
     "question": "How much of the hydrogen in molecule TR206 is accounted for? Please provide your answer as a percentage with four decimal places.",
     "gold_sql": "select round(cast(count(case when t.element = 'h' then t.atom_id else null end) as real) * 100 / count(t.atom_id),4) from atom as t where t.molecule_id = 'tr206'",
-    "pred_sql": "select cast(sum(case when t1.element = 'h' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.element = 'h' and t2.molecule_id = 'tr206'"
+    "pred_sql": "select cast(sum(case when t1.element = 'h' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.element = 'h' and t2.molecule_id = 'tr206'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 415,
@@ -4414,7 +4570,10 @@
     "difficulty": "challenging",
     "question": "What are the elements of the toxicology and label of molecule TR060?",
     "gold_sql": "select distinct t1.element, t2.label from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.molecule_id = 'tr060'",
-    "pred_sql": "select t1.element , t3.label from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t2.atom_id2 = t3.atom_id where t3.molecule_id = 'tr060'"
+    "pred_sql": "select t1.element , t3.label from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t2.atom_id2 = t3.atom_id where t3.molecule_id = 'tr060'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 416,
@@ -4422,7 +4581,10 @@
     "difficulty": "challenging",
     "question": "Which bond type accounted for the majority of the bonds found in molecule TR010 and state whether or not this molecule is carcinogenic?",
     "gold_sql": "select t.bond_type from ( select t1.bond_type, count(t1.molecule_id) from bond as t1 where t1.molecule_id = 'tr010' group by t1.bond_type order by count(t1.molecule_id) desc limit 1 ) as t",
-    "pred_sql": "select bond_type from bond where molecule_id = 'tr010' group by bond_type order by count(*) desc limit 1"
+    "pred_sql": "select bond_type from bond where molecule_id = 'tr010' group by bond_type order by count(*) desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.8333333333333334
   },
   {
     "id": 417,
@@ -4430,7 +4592,10 @@
     "difficulty": "moderate",
     "question": "Please list top three molecules that have single bonds between two atoms and are not carcinogenic in alphabetical order.",
     "gold_sql": "select distinct t2.molecule_id from bond as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.bond_type = '-' and t2.label = '-' order by t2.molecule_id limit 3",
-    "pred_sql": "select molecule_id from bond where bond_type = 'single' except select molecule_id from molecule where label = 'carcinogenic' order by molecule_id asc limit 3"
+    "pred_sql": "select molecule_id from bond where bond_type = 'single' except select molecule_id from molecule where label = 'carcinogenic' order by molecule_id asc limit 3",
+    "ex": false,
+    "sm": false,
+    "cm": 0.8
   },
   {
     "id": 418,
@@ -4438,7 +4603,10 @@
     "difficulty": "moderate",
     "question": "How many bonds which involved atom 12 does molecule TR009 have?",
     "gold_sql": "select count(t2.bond_id) from bond as t1 inner join connected as t2 on t1.bond_id = t2.bond_id where t1.molecule_id = 'tr009' and t2.atom_id = t1.molecule_id || '_1' or t2.atom_id2 = t1.molecule_id || '_2'",
-    "pred_sql": "select count(*) from connected as t1 join atom as t2 on t1.atom_id = t2.atom_id join bond as t3 on t1.bond_id = t3.bond_id where t2.atom_id = '12' and t3.molecule_id = 'tr009'"
+    "pred_sql": "select count(*) from connected as t1 join atom as t2 on t1.atom_id = t2.atom_id join bond as t3 on t1.bond_id = t3.bond_id where t2.atom_id = '12' and t3.molecule_id = 'tr009'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 419,
@@ -4446,7 +4614,10 @@
     "difficulty": "moderate",
     "question": "What are the bond type and the atoms of the bond ID of TR001_6_9?",
     "gold_sql": "select t1.bond_type, t2.atom_id, t2.atom_id2 from bond as t1 inner join connected as t2 on t1.bond_id = t2.bond_id where t2.bond_id = 'tr001_6_9'",
-    "pred_sql": "select t2.bond_type, t1.element from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t3.atom_id2 = 'tr001_6' and t2.bond_id = 'tr001_6_9'"
+    "pred_sql": "select t2.bond_type, t1.element from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t3.atom_id2 = 'tr001_6' and t2.bond_id = 'tr001_6_9'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 420,
@@ -4454,7 +4625,10 @@
     "difficulty": "simple",
     "question": "How many connections does the atom 19 have?",
     "gold_sql": "select count(t.bond_id) from connected as t where substr(t.atom_id, -2) = '19'",
-    "pred_sql": "select count(*) from connected where atom_id = '19'"
+    "pred_sql": "select count(*) from connected where atom_id = '19'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 421,
@@ -4462,7 +4636,10 @@
     "difficulty": "challenging",
     "question": "List all the elements of the toxicology of the molecule \"TR004\".",
     "gold_sql": "select distinct t.element from atom as t where t.molecule_id = 'tr004'",
-    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id1 join molecule as t4 on t4.molecule_id = t2.molecule_id where t4.label = 'tr004' group by t1.element"
+    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id1 join molecule as t4 on t4.molecule_id = t2.molecule_id where t4.label = 'tr004' group by t1.element",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
   },
   {
     "id": 422,
@@ -4470,7 +4647,10 @@
     "difficulty": "moderate",
     "question": "Among all the atoms from 21 to 25, list all the molecules that are carcinogenic.",
     "gold_sql": "select distinct t2.molecule_id from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where substr(t1.atom_id, -2) between '21' and '25' and t2.label = '+'",
-    "pred_sql": "select molecule_id from molecule where label = '+' and molecule_id in (select molecule_id from atom where atom_id between 'tr000_21' and 'tr000_25')"
+    "pred_sql": "select molecule_id from molecule where label = '+' and molecule_id in (select molecule_id from atom where atom_id between 'tr000_21' and 'tr000_25')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 423,
@@ -4478,7 +4658,10 @@
     "difficulty": "moderate",
     "question": "What are the bonds that have phosphorus and nitrogen as their atom elements?",
     "gold_sql": "select t2.bond_id from atom as t1 inner join connected as t2 on t1.atom_id = t2.atom_id where t2.bond_id in ( select t3.bond_id from connected as t3 inner join atom as t4 on t3.atom_id = t4.atom_id where t4.element = 'p' ) and t1.element = 'n'",
-    "pred_sql": "select b.bond_id from bond b join atom a on b.bond_id = a.atom_id join atom a2 on b.bond_id = a2.atom_id where a.element = 'phosphorus', where a2.element = 'nitrogen'"
+    "pred_sql": "select b.bond_id from bond b join atom a on b.bond_id = a.atom_id join atom a2 on b.bond_id = a2.atom_id where a.element = 'phosphorus', where a2.element = 'nitrogen'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 424,
@@ -4486,7 +4669,10 @@
     "difficulty": "moderate",
     "question": "Is the molecule with the most double bonds carcinogenic?",
     "gold_sql": "select t1.label from molecule as t1 inner join ( select t.molecule_id, count(t.bond_type) from bond as t where t.bond_type = '=' group by t.molecule_id order by count(t.bond_type) desc limit 1 ) as t2 on t1.molecule_id = t2.molecule_id",
-    "pred_sql": "select m.label from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = 'double' group by m.molecule_id order by count(*) desc limit 1"
+    "pred_sql": "select m.label from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = 'double' group by m.molecule_id order by count(*) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 425,
@@ -4494,7 +4680,10 @@
     "difficulty": "moderate",
     "question": "What is the average number of bonds the atoms with the element iodine have?",
     "gold_sql": "select cast(count(t2.bond_id) as real) / count(t1.atom_id) from atom as t1 inner join connected as t2 on t1.atom_id = t2.atom_id where t1.element = 'i'",
-    "pred_sql": "select avg(t1.bond_id_count) from (select atom_id, count(bond_id) as bond_id_count from atom join connected on atom.atom_id = connected.atom_id where element = 'iodine' group by atom_id) t1"
+    "pred_sql": "select avg(t1.bond_id_count) from (select atom_id, count(bond_id) as bond_id_count from atom join connected on atom.atom_id = connected.atom_id where element = 'iodine' group by atom_id) t1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
   },
   {
     "id": 426,
@@ -4502,7 +4691,10 @@
     "difficulty": "challenging",
     "question": "List all the elements of atoms that can not bond with any other atoms.",
     "gold_sql": "select distinct t.element from atom as t where t.element not in ( select distinct t1.element from atom as t1 inner join connected as t2 on t1.atom_id = t2.atom_id )",
-    "pred_sql": "select element from atom where atom_id not in (select atom_id from connected)"
+    "pred_sql": "select element from atom where atom_id not in (select atom_id from connected)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 427,
@@ -4510,7 +4702,10 @@
     "difficulty": "simple",
     "question": "What are the atoms of the triple bond with the molecule \"TR041\"?",
     "gold_sql": "select t2.atom_id, t2.atom_id2 from atom as t1 inner join connected as t2 on t1.atom_id = t2.atom_id inner join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = '#' and t3.molecule_id = 'tr041'",
-    "pred_sql": "select a.atom_id from atom a join connected c on a.atom_id = c.atom_id2 join bond b on c.bond_id = b.bond_id where b.bond_type = 'triple' and a.molecule_id = 'tr041'"
+    "pred_sql": "select a.atom_id from atom a join connected c on a.atom_id = c.atom_id2 join bond b on c.bond_id = b.bond_id where b.bond_type = 'triple' and a.molecule_id = 'tr041'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 428,
@@ -4518,7 +4713,10 @@
     "difficulty": "challenging",
     "question": "What are the elements of the atoms of TR144_8_19?",
     "gold_sql": "select t2.element from connected as t1 inner join atom as t2 on t1.atom_id = t2.atom_id where t1.bond_id = 'tr144_8_19'",
-    "pred_sql": "select element from atom where atom_id = 'tr144_8_19'"
+    "pred_sql": "select element from atom where atom_id = 'tr144_8_19'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 429,
@@ -4526,7 +4724,10 @@
     "difficulty": "challenging",
     "question": "List the elements of all the triple bonds.",
     "gold_sql": "select distinct t3.element from bond as t1 inner join connected as t2 on t1.bond_id = t2.bond_id inner join atom as t3 on t2.atom_id = t3.atom_id where t1.bond_type = '#'",
-    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id3 where t2.bond_id in (select bond_id from bond where bond_type = '-');"
+    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id3 where t2.bond_id in (select bond_id from bond where bond_type = '-');",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
   },
   {
     "id": 430,
@@ -4534,7 +4735,10 @@
     "difficulty": "moderate",
     "question": "What proportion of single bonds are carcinogenic? Please provide your answer as a percentage with five decimal places.",
     "gold_sql": "select round(cast(count(case when t2.label = '+' then t1.bond_id else null end) as real) * 100 / count(t1.bond_id),5) from bond as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.bond_type = '-'",
-    "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(t1.bond_id) from connected as t1 join bond as t2 on t1.bond_id = t2.bond_id where t2.bond_type = 'single'"
+    "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(t1.bond_id) from connected as t1 join bond as t2 on t1.bond_id = t2.bond_id where t2.bond_type = 'single'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 431,
@@ -4542,7 +4746,10 @@
     "difficulty": "moderate",
     "question": "Calculate the total atoms with triple-bond molecules containing the element phosphorus or bromine.",
     "gold_sql": "select count(t1.atom_id) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id inner join bond as t3 on t2.molecule_id = t3.molecule_id where t3.bond_type = '#' and t1.element in ('p', 'br')",
-    "pred_sql": "select count(distinct t1.atom_id) from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'triple' and (t1.element = 'phosphorus' or t1.element = 'bromine')"
+    "pred_sql": "select count(distinct t1.atom_id) from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'triple' and (t1.element = 'phosphorus' or t1.element = 'bromine')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 432,
@@ -4550,7 +4757,10 @@
     "difficulty": "challenging",
     "question": "What is the composition of element chlorine in percentage among the single bond molecules?",
     "gold_sql": "select cast(count(case when t.element = 'cl' then t.atom_id else null end) as real) * 100 / count(t.atom_id) from ( select t1.atom_id, t1.element from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id inner join bond as t3 on t2.molecule_id = t3.molecule_id where t3.bond_type = '-' ) as t",
-    "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join connected as t3 on t1.atom_id = t3.atom_id2 inner join bond as t2 on t3.bond_id = t2.bond_id where t1.element = 'cl' and t2.bond_type = 'single' inner join molecule as t4 on"
+    "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join connected as t3 on t1.atom_id = t3.atom_id2 inner join bond as t2 on t3.bond_id = t2.bond_id where t1.element = 'cl' and t2.bond_type = 'single' inner join molecule as t4 on",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 433,
@@ -4558,7 +4768,10 @@
     "difficulty": "challenging",
     "question": "What are the elements for bond id TR001_10_11?",
     "gold_sql": "select t2.element from connected as t1 inner join atom as t2 on t1.atom_id = t2.atom_id where t1.bond_id = 'tr001_10_11'",
-    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id1 where t2.bond_id = 'tr001_10_11'"
+    "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id1 where t2.bond_id = 'tr001_10_11'",
+    "ex": false,
+    "sm": false,
+    "cm": 1.0
   },
   {
     "id": 434,
@@ -4566,7 +4779,10 @@
     "difficulty": "moderate",
     "question": "What is the percentage of element chlorine in carcinogenic molecules?",
     "gold_sql": "select cast(count( case when t1.element = 'cl' then t1.element else null end) as real) * 100 / count(t1.element) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '+'",
-    "pred_sql": "select cast(sum(case when t1.element = 'cl' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '-'"
+    "pred_sql": "select cast(sum(case when t1.element = 'cl' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '-'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 435,
@@ -4574,7 +4790,10 @@
     "difficulty": "challenging",
     "question": "Tally the toxicology element of the 4th atom of each molecule that was carcinogenic.",
     "gold_sql": "select distinct t1.element from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '+' and substr(t1.atom_id, -1) = '4' and length(t1.atom_id) = 7",
-    "pred_sql": "select count(t1.element) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.atom_id = (select atom_id from atom where molecule_id = t2.molecule_id order by atom_id limit 3 offset 3) and t2.label = '-'"
+    "pred_sql": "select count(t1.element) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.atom_id = (select atom_id from atom where molecule_id = t2.molecule_id order by atom_id limit 3 offset 3) and t2.label = '-'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.2
   },
   {
     "id": 436,
@@ -4582,7 +4801,10 @@
     "difficulty": "challenging",
     "question": "What is the ratio of Hydrogen elements in molecule ID TR006? List the ratio with its label.",
     "gold_sql": "with subquery as (select distinct t1.atom_id, t1.element, t1.molecule_id, t2.label from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.molecule_id = 'tr006') select cast(count(case when element = 'h' then atom_id else null end) as real) / (case when count(atom_id) = 0 then null else count(atom_id) end) as ratio, label from subquery group by label",
-    "pred_sql": "select cast(sum(case when t1.element = 'hydrogen' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.molecule_id = 'tr006'"
+    "pred_sql": "select cast(sum(case when t1.element = 'hydrogen' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.molecule_id = 'tr006'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
   },
   {
     "id": 437,
@@ -4590,7 +4812,10 @@
     "difficulty": "moderate",
     "question": "Which non-carcinogenic molecules consisted more than 5 atoms?",
     "gold_sql": "select t.molecule_id from ( select t1.molecule_id, count(t2.atom_id) from molecule as t1 inner join atom as t2 on t1.molecule_id = t2.molecule_id where t1.label = '-' group by t1.molecule_id having count(t2.atom_id) > 5 ) t",
-    "pred_sql": "select molecule_id from molecule where label = '-' group by molecule_id having count(distinct atom_id) > 5"
+    "pred_sql": "select molecule_id from molecule where label = '-' group by molecule_id having count(distinct atom_id) > 5",
+    "ex": false,
+    "sm": false,
+    "cm": 0.75
   },
   {
     "id": 438,
@@ -4598,7 +4823,10 @@
     "difficulty": "simple",
     "question": "How many schools with an average score in Math greater than 400 in the SAT test are exclusively virtual?",
     "gold_sql": "select count(distinct t2.school) from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode where t2.virtual = 'f' and t1.avgscrmath > 400",
-    "pred_sql": "select count(*) from satscores join schools on satscores.cds = schools.cdscode where satscores.avgscrmath > 400 and satscores.rtype = 's' and schools.virtual = 'y'"
+    "pred_sql": "select count(*) from satscores join schools on satscores.cds = schools.cdscode where satscores.avgscrmath > 400 and satscores.rtype = 's' and schools.virtual = 'y'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 439,
@@ -4606,7 +4834,10 @@
     "difficulty": "simple",
     "question": "Please list the codes of the schools with a total enrollment of over 500.",
     "gold_sql": "select t2.cdscode from schools as t1 inner join frpm as t2 on t1.cdscode = t2.cdscode where t2.`enrollment (k-12)` + t2.`enrollment (ages 5-17)` > 500",
-    "pred_sql": "select cdscode from schools where enroll12 > 500"
+    "pred_sql": "select cdscode from schools where enroll12 > 500",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
   },
   {
     "id": 440,
@@ -4614,7 +4845,10 @@
     "difficulty": "moderate",
     "question": "Among the schools with an SAT excellence rate of over 0.3, what is the highest eligible free rate for students aged 5-17?",
     "gold_sql": "select max(cast(t1.`free meal count (ages 5-17)` as real) / t1.`enrollment (ages 5-17)`) from frpm as t1 inner join satscores as t2 on t1.cdscode = t2.cds where cast(t2.numge1500 as real) / t2.numtsttakr > 0.3",
-    "pred_sql": ""
+    "pred_sql": "",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   },
   {
     "id": 441,
@@ -4622,7 +4856,10 @@
     "difficulty": "simple",
     "question": "Rank schools by their average score in Writing where the score is greater than 499, showing their charter numbers.",
     "gold_sql": "select charternum, avgscrwrite, rank() over (order by avgscrwrite desc) as writingscorerank from schools as t1 inner join satscores as t2 on t1.cdscode = t2.cds where t2.avgscrwrite > 499 and charternum is not null",
-    "pred_sql": "with ranked_schools as (select s.cdscode, s.charternum, avg(ss.avgscrwrite) as avgscrwrite from schools s join satscores ss on s.cdscode = ss.cds where ss.avgscrwrite > 499 group by s.cdscode, s.charternum order by avgscrwrite desc) select * from ranked_schools"
+    "pred_sql": "with ranked_schools as (select s.cdscode, s.charternum, avg(ss.avgscrwrite) as avgscrwrite from schools s join satscores ss on s.cdscode = ss.cds where ss.avgscrwrite > 499 group by s.cdscode, s.charternum order by avgscrwrite desc) select * from ranked_schools",
+    "ex": false,
+    "sm": false,
+    "cm": 0.2
   },
   {
     "id": 442,
@@ -4630,6 +4867,636 @@
     "difficulty": "moderate",
     "question": "List the names of schools with more than 30 difference in enrollements between K-12 and ages 5-17? Please also give the full street adress of the schools.",
     "gold_sql": "select t1.school, t1.street from schools as t1 inner join frpm as t2 on t1.cdscode = t2.cdscode where t2.`enrollment (k-12)` - t2.`enrollment (ages 5-17)` > 30",
-    "pred_sql": "select school, street from schools where cdscode in (select cds from satscores where enroll12 - (select enrollment (ages 5-17) from frpm where cds = satscores.cds) > 30)"
+    "pred_sql": "select school, street from schools where cdscode in (select cds from satscores where enroll12 - (select enrollment (ages 5-17) from frpm where cds = satscores.cds) > 30)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 443,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "Give the names of the schools with the percent eligible for free meals in K-12 is more than 0.1 and test takers whose test score is greater than or equal to 1500?",
+    "gold_sql": "select t2.`school name` from satscores as t1 inner join frpm as t2 on t1.cds = t2.cdscode where cast(t2.`free meal count (k-12)` as real) / t2.`enrollment (k-12)` > 0.1 and t1.numge1500 > 0",
+    "pred_sql": "select distinct t1.school from frpm as t1 inner join satscores as t2 on t1.cdscode = t2.cds where t1.`percent (%) eligible free (k-12)` > 0.1 and t2.numge1500 > 0",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 444,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "Name schools in Riverside which the average of average math score for SAT is grater than 400, what is the funding type of these schools?",
+    "gold_sql": "select t1.sname, t2.`charter funding type` from satscores as t1 inner join frpm as t2 on t1.cds = t2.cdscode where t2.`district name` like 'riverside%' group by t1.sname, t2.`charter funding type` having cast(sum(t1.avgscrmath) as real) / count(t1.cds) > 400",
+    "pred_sql": "select t1.fundingtype from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.county = 'riverside' and t2.avgscrmath > 400",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 445,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "State the names and full communication address of high schools in Monterey which has more than 800 free or reduced price meals for ages 15-17?",
+    "gold_sql": "select t1.`school name`, t2.street, t2.city, t2.state, t2.zip from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.county = 'monterey' and t1.`free meal count (ages 5-17)` > 800 and t1.`school type` = 'high schools (public)'",
+    "pred_sql": "select school, street, streetabr, city, zip, state, mailstreet, mailstrabr, mailcity, mailzip, mailstate from schools where magnet = 1 and county = 'monterey' and school in (select school from frpm where `ages 5-17` > 800)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 446,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the average score in writing for the schools that were opened after 1991 or closed before 2000? List the school names along with the score. Also, list the communication number of the schools if there is any.",
+    "gold_sql": "select t2.school, t1.avgscrwrite, t2.phone from schools as t2 left join satscores as t1 on t2.cdscode = t1.cds where strftime('%y', t2.opendate) > '1991' or strftime('%y', t2.closeddate) < '2000'",
+    "pred_sql": "select s.school, ss.avgscrwrite, s.phone from schools s join satscores ss on s.cdscode = ss.cds where s.opendate > '1991-12-31' or s.closeddate < '2000-01-01'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 447,
+    "db_id": "california_schools",
+    "difficulty": "challenging",
+    "question": "Consider the average difference between K-12 enrollment and 15-17 enrollment of schools that are locally funded, list the names and DOC type of schools which has a difference above this average.",
+    "gold_sql": "select t2.school, t2.doc from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.fundingtype = 'locally funded' and (t1.`enrollment (k-12)` - t1.`enrollment (ages 5-17)`) > (select avg(t3.`enrollment (k-12)` - t3.`enrollment (ages 5-17)`) from frpm as t3 inner join schools as t4 on t3.cdscode = t4.cdscode where t4.fundingtype = 'locally funded')",
+    "pred_sql": "select s.doc, s.doctype from schools s join frpm f on s.cdscode = f.cdscode where f.nslp provision status = 'local' and f.enrollment (k-12) - f.enrollment (ages 5-17) > (select avg(enrollment (k-12) - enrollment (ages 5-17)) from frpm where nslp provision status = 'local') group by s",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 448,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the eligible free rate of the 10th and 11th schools with the highest enrolment for students in grades 1 through 12?",
+    "gold_sql": "select cast(`free meal count (k-12)` as real) / `enrollment (k-12)` from frpm order by `enrollment (k-12)` desc limit 9, 2",
+    "pred_sql": "select t1.cdscode, t1.`enrollment (k-12)`, t1.`percent (%) eligible free (k-12)`, t1.`percent (%) eligible frpm (k-12)`, t1.`enrollment (ages 5-17)`, t1.`percent (%) eligible free (ages 5-17)`, t1.`percent (%) eligible frpm (ages 5-17",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 449,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the eligible free or reduced price meal rate for the top 5 schools in grades 1-12 with the highest free or reduced price meal count of the schools with the ownership code 66?",
+    "gold_sql": "select cast(t1.`frpm count (k-12)` as real) / t1.`enrollment (k-12)` from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.soc = 66 order by t1.`frpm count (k-12)` desc limit 5",
+    "pred_sql": "select cdscode, school, `percent (%) eligible free (k-12)`, `percent (%) eligible frpm (k-12)`, `enrollment (k-12)`, `free meal count (k-12)`, `frpm count (k-12)`, `percent (%) eligible free (ages 5-17)`, `percent (%) eligible frpm (ages 5-17)`,",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 450,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the complete address of the school with the lowest excellence rate? Indicate the Street, City, Zip and State.",
+    "gold_sql": "select t2.street, t2.city, t2.state, t2.zip from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode order by cast(t1.numge1500 as real) / t1.numtsttakr asc limit 1",
+    "pred_sql": "select t1.street, t1.city, t1.zip, t1.state from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode order by t2.percent (%) eligible free (k-12) limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 451,
+    "db_id": "california_schools",
+    "difficulty": "challenging",
+    "question": "Under whose administration is the school with the highest number of students scoring 1500 or more on the SAT? Indicate their full names.",
+    "gold_sql": "select t2.admfname1, t2.admlname1, t2.admfname2, t2.admlname2, t2.admfname3, t2.admlname3 from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode order by t1.numge1500 desc limit 1",
+    "pred_sql": "select admfname1, admfname2, admfname3, admlname1, admlname2, admlname3 from schools join satscores on schools.cdscode = satscores.cds where numge1500 > 0 order by numge1500 desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.8
+  },
+  {
+    "id": 452,
+    "db_id": "california_schools",
+    "difficulty": "simple",
+    "question": "What is the average number of test takers from Fresno schools that opened between 1/1/1980 and 12/31/1980?",
+    "gold_sql": "select avg(t1.numtsttakr) from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode where strftime('%y', t2.opendate) = '1980' and t2.county = 'fresno'",
+    "pred_sql": "select avg(numtsttakr) from satscores inner join schools on satscores.cds = schools.cdscode where schools.opendate between '1980-01-01' and '1980-12-31' and schools.county = 'fresno'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 453,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the telephone number for the school with the lowest average score in reading in Fresno Unified?",
+    "gold_sql": "select t2.phone from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode where t2.district = 'fresno unified' and t1.avgscrread is not null order by t1.avgscrread asc limit 1",
+    "pred_sql": "select t1.phone from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode join satscores as t3 on t1.cdscode = t3.cds where t3.cname = 'fresno unified' and t3.rtype = 'd' order by t3.avgscrread asc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6
+  },
+  {
+    "id": 454,
+    "db_id": "california_schools",
+    "difficulty": "simple",
+    "question": "List the names of virtual schools that are among the top 5 in their respective counties based on average reading scores.",
+    "gold_sql": "select school from (select t2.school,t1.avgscrread, rank() over (partition by t2.county order by t1.avgscrread desc) as rnk from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode where t2.virtual = 'f' ) ranked_schools where rnk <= 5",
+    "pred_sql": "select t1.school from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.virtual = 1 group by t1.school order by avg(t2.avgscrread) desc limit 5",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 455,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the average writing score of each of the schools managed by Ricci Ulrich? List the schools and the corresponding average writing scores.",
+    "gold_sql": "select t2.school, t1.avgscrwrite from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode where t2.admfname1 = 'ricci' and t2.admlname1 = 'ulrich'",
+    "pred_sql": "select t1.school,t2.avgscrwrite from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.admfname1 = 'ricci' and t1.admlname1 = 'ulrich' group by t1.school",
+    "ex": true,
+    "sm": false,
+    "cm": 0.75
+  },
+  {
+    "id": 456,
+    "db_id": "california_schools",
+    "difficulty": "simple",
+    "question": "Which state special schools have the highest number of enrollees from grades 1 through 12?",
+    "gold_sql": "select t2.school from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.doc = 31 order by t1.`enrollment (k-12)` desc limit 1",
+    "pred_sql": "select state from schools where magnet = 1 group by state order by count(*) desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.16666666666666666
+  },
+  {
+    "id": 457,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the monthly average number of schools that opened in Alameda County under the jurisdiction of the Elementary School District in 1980?",
+    "gold_sql": "select cast(count(school) as real) / 12 from schools where doc = 52 and county = 'alameda' and strftime('%y', opendate) = '1980'",
+    "pred_sql": "select avg(enroll12 / 12) as monthlyaverage from satscores inner join schools on satscores.cds = schools.cdscode where schools.county = 'alameda' and schools.doctype = 'elementary school district' and year(opendate) = 1980",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 458,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the ratio of merged Unified School District schools in Orange County to merged Elementary School District schools?",
+    "gold_sql": "select cast(sum(case when doc = 54 then 1 else 0 end) as real) / sum(case when doc = 52 then 1 else 0 end) from schools where statustype = 'merged' and county = 'orange'",
+    "pred_sql": "select cast(sum(case when t2.county = 'orange' then 1 else 0 end) as real) * 100 / count(*) from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.statustype = 'merged unified school district' or t2.statustype = 'merged elementary school district'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 459,
+    "db_id": "california_schools",
+    "difficulty": "simple",
+    "question": "What is the postal street address for the school with the 7th highest Math average? Indicate the school's name.",
+    "gold_sql": "select t2.mailstreet, t2.school from satscores as t1 inner join schools as t2 on t1.cds = t2.cdscode order by t1.avgscrmath desc limit 6, 1",
+    "pred_sql": "select t1.school from schools as t1 join satscores as t2 on t1.cdscode = t2.cds order by t2.avgscrmath desc limit 6, 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.75
+  },
+  {
+    "id": 460,
+    "db_id": "california_schools",
+    "difficulty": "challenging",
+    "question": "What is the total number of non-chartered schools in the county of Los Angeles with a percent (%) of eligible free meals for grades 1 through 12 that is less than 0.18%?",
+    "gold_sql": "select count(t2.school) from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.county = 'los angeles' and t2.charter = 0 and cast(t1.`free meal count (k-12)` as real) * 100 / t1.`enrollment (k-12)` < 0.18",
+    "pred_sql": "select count(*) from frpm join schools on frpm.cdscode = schools.cdscode where schools.county = 'los angeles' and frpm.`percent (%) eligible free (k-12)` < 0.18 and schools.charter = 0",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 461,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "How many students from the ages of 5 to 17 are enrolled at the State Special School school in Fremont for the 2014-2015 academic year?",
+    "gold_sql": "select t1.`enrollment (ages 5-17)` from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.edopscode = 'sss' and t2.city = 'fremont' and t1.`academic year` between 2014 and 2015",
+    "pred_sql": "",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 462,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "Which schools served a grade span of Kindergarten to 9th grade in the county of Los Angeles and what is its Percent (%) Eligible FRPM (Ages 5-17)?",
+    "gold_sql": "select t2.school, t1.`frpm count (ages 5-17)` * 100 / t1.`enrollment (ages 5-17)` from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.county = 'los angeles' and t2.gsserved = 'k-9'",
+    "pred_sql": "select t1.cdscode from schools as t1 inner join frpm as t2 on t1.cdscode = t2.cdscode where t1.county = 'los angeles' and t2.`low grade` = 'k' and t2.`high grade` = '9' and t2.`enrollment (ages 5-17)` > 0 group by t1.cdscode",
+    "ex": true,
+    "sm": false,
+    "cm": 0.25
+  },
+  {
+    "id": 463,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "Between San Diego and Santa Barbara, which county offers the most number of schools that does not offer physical building? Indicate the amount.",
+    "gold_sql": "select county, count(virtual) from schools where (county = 'san diego' or county = 'santa barbara') and virtual = 'f' group by county order by count(virtual) desc limit 1",
+    "pred_sql": "select count(*) from schools where magnet = 1 and county in ('san diego', 'santa barbara')",
+    "ex": false,
+    "sm": false,
+    "cm": 0.16666666666666666
+  },
+  {
+    "id": 464,
+    "db_id": "california_schools",
+    "difficulty": "simple",
+    "question": "What is the grade span offered in the school with the highest longitude?",
+    "gold_sql": "select gsoffered from schools order by abs(longitude) desc limit 1",
+    "pred_sql": "select distinct gsoffered from schools order by longitude desc limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.75
+  },
+  {
+    "id": 465,
+    "db_id": "california_schools",
+    "difficulty": "challenging",
+    "question": "Of the schools that offers a magnet program serving a grade span of Kindergarten to 8th grade, how many offers Multiple Provision Types? List the number of cities that offers a Kindergarten to 8th grade span and indicate how many schools are there serving such grade span for each city.",
+    "gold_sql": "select t2.city, count(t2.cdscode) from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.magnet = 1 and t2.gsoffered = 'k-8' and t1.`nslp provision status` = 'multiple provision types' group by t2.city",
+    "pred_sql": "select count(t1.cdscode), t2.city from schools as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t1.magnet = 1 and t1.gsoffered = 'k-8' group by t2.city",
+    "ex": true,
+    "sm": false,
+    "cm": 0.5
+  },
+  {
+    "id": 466,
+    "db_id": "california_schools",
+    "difficulty": "moderate",
+    "question": "What is the Percent (%) Eligible Free (K-12) in the school administered by an administrator whose first name is Alusine. List the district code of the school.",
+    "gold_sql": "select t1.`free meal count (k-12)` * 100 / t1.`enrollment (k-12)`, t1.`district code` from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.admfname1 = 'alusine'",
+    "pred_sql": "select t1.districtcode from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.admfname1 = 'alusine'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.6666666666666666
+  },
+  {
+    "id": 467,
+    "db_id": "california_schools",
+    "difficulty": "challenging",
+    "question": "What are the valid e-mail addresses of the administrator of the school located in the San Bernardino county, City of San Bernardino City Unified that opened between 1/1/2009 to 12/31/2010 whose school types are public Intermediate/Middle Schools and Unified Schools?",
+    "gold_sql": "select t2.admemail1, t2.admemail2 from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.county = 'san bernardino' and t2.city = 'san bernardino' and t2.doc = 54 and strftime('%y', t2.opendate) between '2009' and '2010' and t2.soc = 62",
+    "pred_sql": "select admemail1, admemail2, admemail3 from schools where county = 'san bernardino' and city = 'san bernardino city unified' and opendate between '2009-01-01' and '2010-12-31' and school like '%public intermediate/middle schools%' or school like '%unified schools%' and statustype = 'active'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 468,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "How many accounts who choose issuance after transaction are staying in East Bohemia region?",
+    "gold_sql": "select count(t2.account_id) from district as t1 inner join account as t2 on t1.district_id = t2.district_id where t1.a3 = 'east bohemia' and t2.frequency = 'poplatek po obratu'",
+    "pred_sql": "select count(distinct t1.account_id) from trans as t1 inner join account as t2 on t1.account_id = t2.account_id inner join district as t3 on t2.district_id = t3.district_id where t1.date > (select max(date) from trans as t4 inner join account as t5 on t4.account_id = t5.account_id inner join district as t6 on t5.district_id = t6.district_id where t",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 469,
+    "db_id": "financial",
+    "difficulty": "simple",
+    "question": "List out the no. of districts that have female average salary is more than 6000 but less than 10000?",
+    "gold_sql": "select count(distinct t2.district_id) from client as t1 inner join district as t2 on t1.district_id = t2.district_id where t1.gender = 'f' and t2.a11 between 6000 and 10000",
+    "pred_sql": "select count(*) from district where a10 > 6000 and a10 < 10000 and a16 in (select district_id from client where gender = 'f')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 470,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "How many male customers who are living in North Bohemia have average salary greater than 8000?",
+    "gold_sql": "select count(t1.client_id) from client as t1 inner join district as t2 on t1.district_id = t2.district_id where t1.gender = 'm' and t2.a3 = 'north bohemia' and t2.a11 > 8000",
+    "pred_sql": "select count(*) from client where gender = 'm' and district_id in (select district_id from district where a3 = 'north bohemia') and district_id in (select district_id from client group by district_id having avg(a10) > 8000)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
+  },
+  {
+    "id": 471,
+    "db_id": "financial",
+    "difficulty": "challenging",
+    "question": "List out the account numbers of female clients who are oldest and has lowest average salary, calculate the gap between this lowest average salary with the highest average salary?",
+    "gold_sql": "select t1.account_id , ( select max(a11) - min(a11) from district ) from account as t1 inner join district as t2 on t1.district_id = t2.district_id inner join disp as t3 on t1.account_id = t3.account_id inner join client as t4 on t3.client_id = t4.client_id where t2.district_id = ( select district_id from client where gender = 'f' order by birth_date asc limit 1 ) order by t2.a11 desc limit 1",
+    "pred_sql": "select min(t1.account_id) from account as t1 inner join client as t2 on t1.district_id = t2.district_id inner join district as t3 on t2.district_id = t3.district_id where t2.gender = 'f' group by t3.a10 order by avg(t3.a10) limit 1 union all select max(t1.account_id) from account as t1 inner join client as t2 on t1.district",
+    "ex": false,
+    "sm": false,
+    "cm": 0.16666666666666666
+  },
+  {
+    "id": 472,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "List out the account numbers of clients who are youngest and have highest average salary?",
+    "gold_sql": "select t1.account_id from account as t1 inner join disp as t2 on t1.account_id = t2.account_id inner join client as t3 on t2.client_id = t3.client_id inner join district as t4 on t4.district_id = t1.district_id where t2.client_id = ( select client_id from client order by birth_date desc limit 1) group by t4.a11, t1.account_id",
+    "pred_sql": "",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 473,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Among the accounts who have approved loan date in 1997, list out the accounts that have the lowest approved amount and choose weekly issuance statement.",
+    "gold_sql": "select t2.account_id from loan as t1 inner join account as t2 on t1.account_id = t2.account_id where strftime('%y', t1.date) = '1997' and t2.frequency = 'poplatek tydne' order by t1.amount limit 1",
+    "pred_sql": "select account_id from loan where status = 'a' and year(date) = 1997 group by account_id order by sum(amount) limit 1",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 474,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Among the accounts who have loan validity more than 12 months, list out the accounts that have the highest approved amount and have account opening date in 1993.",
+    "gold_sql": "select t1.account_id from loan as t1 inner join account as t2 on t1.account_id = t2.account_id where strftime('%y', t2.date) = '1993' and t1.duration > 12 order by t1.amount desc limit 1",
+    "pred_sql": "select account_id from loan where status = 'a' and duration > 12 and date between '1993-01-01' and '1993-12-31' order by amount desc limit 1",
+    "ex": true,
+    "sm": false,
+    "cm": 0.6
+  },
+  {
+    "id": 475,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Among the account opened, how many female customers who were born before 1950 and stayed in Sokolov?",
+    "gold_sql": "select count(t2.client_id) from district as t1 inner join client as t2 on t1.district_id = t2.district_id where t2.gender = 'f' and strftime('%y', t2.birth_date) < '1950' and t1.a2 = 'sokolov'",
+    "pred_sql": "select count(*) from client where gender = 'f' and birth_date < '1950-01-01' and district_id in (select district_id from district where a2 = 'sokolov')",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 476,
+    "db_id": "financial",
+    "difficulty": "simple",
+    "question": "For the female client who was born in 1976/1/29, which district did she opened her account?",
+    "gold_sql": "select t1.a2 from district as t1 inner join client as t2 on t1.district_id = t2.district_id where t2.birth_date = '1976-01-29' and t2.gender = 'f'",
+    "pred_sql": "select t3.district_id from client as t1 inner join disp as t2 on t1.client_id = t2.client_id inner join account as t3 on t2.account_id = t3.account_id where t1.birth_date = '1976-01-29' and t1.gender = 'f'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 477,
+    "db_id": "financial",
+    "difficulty": "challenging",
+    "question": "For the branch which located in the south Bohemia with biggest number of inhabitants, what is the percentage of the male clients?",
+    "gold_sql": "select cast(sum(t1.gender = 'm') as real) * 100 / count(t1.client_id) from client as t1 inner join district as t2 on t1.district_id = t2.district_id where t2.a3 = 'south bohemia' group by t2.a4 order by t2.a4 desc limit 1",
+    "pred_sql": "select cast(sum(case when t2.gender = 'm' then 1 else 0 end) as real) * 100 / count(*) from district as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.a8 = (select a8 from district order by a8 desc limit 1)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 478,
+    "db_id": "financial",
+    "difficulty": "challenging",
+    "question": "For the client whose loan was approved first in 1993/7/5, what is the increase rate of his/her account balance from 1993/3/22 to 1998/12/27?",
+    "gold_sql": "select cast((sum(iif(t3.date = '1998-12-27', t3.balance, 0)) - sum(iif(t3.date = '1993-03-22', t3.balance, 0))) as real) * 100 / sum(iif(t3.date = '1993-03-22', t3.balance, 0)) from loan as t1 inner join account as t2 on t1.account_id = t2.account_id inner join trans as t3 on t3.account_id = t2.account_id where t1.date = '1993-07-05'",
+    "pred_sql": "select (select max(date) from loan where account_id = account.account_id and status = 'a' and date between '1993-03-22' and '1998-12-27') as first_loan_date, (select balance from trans where account_id = account.account_id and date = '1998-12-27') - (select balance from trans where account_id = account.account_id and date",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 479,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "What is the percentage of loan amount that has been fully paid with no issue.",
+    "gold_sql": "select (cast(sum(case when status = 'a' then amount else 0 end) as real) * 100) / sum(amount) from loan",
+    "pred_sql": "select sum(case when t.status = 'a' then t.amount else 0 end) / sum(t.amount) * 100 as percentage from loan as t where t.status = 'a' and t.payments = t.amount",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 480,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "For loan amount less than USD100,000, what is the percentage of accounts that is still running with no issue.",
+    "gold_sql": "select cast(sum(status = 'c') as real) * 100 / count(account_id) from loan where amount < 100000",
+    "pred_sql": "select cast(count(*) as real) * 100 / (select count(*) from loan where amount < 100000) from loan where status = 'a' and amount < 100000",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 481,
+    "db_id": "financial",
+    "difficulty": "challenging",
+    "question": "For loans contracts which are still running where client are in debt, list the district of the and the state the percentage unemployment rate increment from year 1995 to 1996.",
+    "gold_sql": "select cast((t3.a13 - t3.a12) as real) * 100 / t3.a12 from loan as t1 inner join account as t2 on t1.account_id = t2.account_id inner join district as t3 on t2.district_id = t3.district_id where t1.status = 'd'",
+    "pred_sql": "select t1.district_id, t1.a16, (t1.a10 - t2.a10) * 100 / t2.a10 as unemployment_increase from district as t1 join district as t2 on t1.district_id = t2.district_id where t1.a5 = '1996' and t2.a5 = '1995' and t1.a16 > 0 and t",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 482,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "List the top nine districts, by descending order, from the highest to the lowest, the number of female account holders.",
+    "gold_sql": "select t2.a2, count(t1.client_id) from client as t1 inner join district as t2 on t1.district_id = t2.district_id where t1.gender = 'f' group by t2.district_id, t2.a2 order by count(t1.client_id) desc limit 9",
+    "pred_sql": "select district_id, count(*) from client where gender = 'f' group by district_id order by count(*) desc limit 9",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 483,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Between 1/1/1995 and 12/31/1997, how many loans in the amount of at least 250,000 per account that chose monthly statement issuance were approved?",
+    "gold_sql": "select count(t1.account_id) from account as t1 inner join loan as t2 on t1.account_id = t2.account_id where t2.date between '1995-01-01' and '1997-12-31' and t1.frequency = 'poplatek mesicne' and t2.amount >= 250000",
+    "pred_sql": "select count(*) from loan where account_id in (select account_id from account where date between '1995-01-01' and '1997-12-31' and frequency = 'poplatek mesicne') and amount >= 250000 and status = 'a'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 484,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "How many accounts have running contracts in Branch location 1?",
+    "gold_sql": "select count(t1.account_id) from account as t1 inner join district as t2 on t1.district_id = t2.district_id inner join loan as t3 on t1.account_id = t3.account_id where t1.district_id = 1 and (t3.status = 'c' or t3.status = 'd')",
+    "pred_sql": "select count(*) from account where district_id = 1 and status = 'running'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 485,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "In the branch where the second-highest number of crimes were committed in 1995 occurred, how many male clients are there?",
+    "gold_sql": "select count(t1.client_id) from client as t1 inner join district as t2 on t1.district_id = t2.district_id where t1.gender = 'm' and t2.a15 = (select t3.a15 from district as t3 order by t3.a15 desc limit 1, 1)",
+    "pred_sql": "select count(*) from client where gender = 'm' and district_id in (select district_id from loan where strftime('%y', date) = '1995' group by district_id order by count(*) desc limit 2 offset 1)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 486,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Which are the top ten withdrawals (non-credit card) by district names for the month of January 1996?",
+    "gold_sql": "select distinct t1.a2 from district as t1 inner join account as t2 on t1.district_id = t2.district_id inner join trans as t3 on t2.account_id = t3.account_id where t3.type = 'vydaj' and t3.date like '1996-01%' order by a2 asc limit 10",
+    "pred_sql": "select district.a2, sum(trans.amount) as total_withdrawals from trans join account on trans.account_id = account.account_id join district on account.district_id = district.district_id where trans.type = 'prijem' and strftime('%y-%m', trans.date) = '1996-01' group by district.a2 order by total_withdrawals desc limit 10",
+    "ex": true,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 487,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "How many accounts have running contracts in Branch location 1?",
+    "gold_sql": "select count(t1.account_id) from account as t1 inner join district as t2 on t1.district_id = t2.district_id inner join loan as t3 on t1.account_id = t3.account_id where t1.district_id = 1 and (t3.status = 'c' or t3.status = 'd')",
+    "pred_sql": "select count(*) from account where district_id = 1 and status = 'running'",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 488,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "In the branch where the second-highest number of crimes were committed in 1995 occurred, how many male clients are there?",
+    "gold_sql": "select count(t1.client_id) from client as t1 inner join district as t2 on t1.district_id = t2.district_id where t1.gender = 'm' and t2.a15 = (select t3.a15 from district as t3 order by t3.a15 desc limit 1, 1)",
+    "pred_sql": "select count(*) from client where gender = 'm' and district_id in (select district_id from loan where strftime('%y', date) = '1995' group by district_id order by count(*) desc limit 2 offset 1)",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 489,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Who are the account holder identification numbers whose who have transactions on the credit card with the amount is less than the average, in 1998?",
+    "gold_sql": "select t1.account_id from trans as t1 inner join account as t2 on t1.account_id = t2.account_id where strftime('%y', t1.date) = '1998' and t1.operation = 'vyber kartou' and t1.amount < (select avg(amount) from trans where strftime('%y', date) = '1998')",
+    "pred_sql": "select account_id from trans where account_id in (select account_id from trans where type = 'prijem' and amount < (select avg(amount) from trans where date between '1998-01-01' and '1998-12-31' and type = 'prijem')) and date between '1998-01-01' and '1998-12-31' and type =",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 490,
+    "db_id": "financial",
+    "difficulty": "challenging",
+    "question": "Please list the account types that are not eligible for loans, and the average income of residents in the district where the account is located exceeds $8000 but is no more than $9000.",
+    "gold_sql": "select t3.type from district as t1 inner join account as t2 on t1.district_id = t2.district_id inner join disp as t3 on t2.account_id = t3.account_id where t3.type != 'owner' and t1.a11 between 8000 and 9000",
+    "pred_sql": "select type from disp where account_id not in (select account_id from account where account_id in (select account_id from loan)) group by type having avg(a10) between 8000 and 9000",
+    "ex": false,
+    "sm": false,
+    "cm": 0.25
+  },
+  {
+    "id": 491,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "What is the average number of crimes committed in 1995 in regions where the number exceeds 4000 and the region has accounts that are opened starting from the year 1997?",
+    "gold_sql": "select avg(t1.a15) from district as t1 inner join account as t2 on t1.district_id = t2.district_id where strftime('%y', t2.date) >= '1997' and t1.a15 > 4000",
+    "pred_sql": "select avg(t2.num_crimes) from trans as t1 inner join (select district_id, count(*) as num_crimes from account where year(date) >= 1997 group by district_id having count(*) > 4000) as t2 on t1.account_id = t2.district_id where year(t1.date) = 1995",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 492,
+    "db_id": "financial",
+    "difficulty": "simple",
+    "question": "List all the withdrawals in cash transactions that the client with the id 3356 makes.",
+    "gold_sql": "select t4.trans_id from client as t1 inner join disp as t2 on t1.client_id = t2.client_id inner join account as t3 on t2.account_id = t3.account_id inner join trans as t4 on t3.account_id = t4.account_id where t1.client_id = 3356 and t4.operation = 'vyber'",
+    "pred_sql": "select trans_id, account_id, date, type, operation, amount, balance, k_symbol, bank, account from trans where account_id = 3356 and type = 'prijem' and operation = 'prevod z uctu'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 493,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "What percentage of clients who opened their accounts in the district with an average salary of over 10000 are women?",
+    "gold_sql": "select cast(sum(t2.gender = 'f') as real) * 100 / count(t2.client_id) from district as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.a11 > 10000",
+    "pred_sql": "select cast(sum(case when t1.gender = 'f' then 1 else 0 end) as real) * 100 / count(*) from client as t1 inner join account as t2 on t1.client_id = t2.client_id inner join district as t3 on t2.district_id = t3.district_id where t3.a10 > 10000",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 494,
+    "db_id": "financial",
+    "difficulty": "challenging",
+    "question": "What was the growth rate of the total amount of loans across all accounts for a male client between 1996 and 1997?",
+    "gold_sql": "select cast((sum(case when strftime('%y', t1.date) = '1997' then t1.amount else 0 end) - sum(case when strftime('%y', t1.date) = '1996' then t1.amount else 0 end)) as real) * 100 / sum(case when strftime('%y', t1.date) = '1996' then t1.amount else 0 end) from loan as t1 inner join account as t2 on t1.account_id = t2.account_id inner join disp as t3 on t3.account_id = t2.account_id inner join client as t4 on t4.client_id = t3.client_id where t4.gender = 'm' and t3.type = 'owner'",
+    "pred_sql": "select sum(amount) * 100 / nullif((select sum(amount) from loan where account_id in (select account_id from disp where client_id in (select client_id from client where gender = 'm' and date between '1996-01-01' and '1997-12-31'))), 0) as growth_rate from loan where account_id in (select account_id from disp where client_id in (select client_id",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 495,
+    "db_id": "financial",
+    "difficulty": "challenging",
+    "question": "How often does account number 3 request an account statement to be released? What was the aim of debiting 3539 in total?",
+    "gold_sql": "select t1.frequency, t2.k_symbol from account as t1 inner join (select account_id, k_symbol, sum(amount) as total_amount from `order` group by account_id, k_symbol) as t2 on t1.account_id = t2.account_id where t1.account_id = 3 and t2.total_amount = 3539",
+    "pred_sql": "select count(*) from trans where account_id = 3 and type = 'vydaj' and amount = 3539",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 496,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "What percentage of male clients request for weekly statements to be issued?",
+    "gold_sql": "select cast(sum(t1.gender = 'm') as real) * 100 / count(t1.client_id) from client as t1 inner join district as t3 on t1.district_id = t3.district_id inner join account as t2 on t2.district_id = t3.district_id inner join disp as t4 on t1.client_id = t4.client_id and t2.account_id = t4.account_id where t2.frequency = 'poplatek tydne'",
+    "pred_sql": "select cast(sum(case when t2.gender = 'm' then 1 else 0 end) as real) * 100 / count(*) from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.frequency = 'poplatek mesicne'",
+    "ex": true,
+    "sm": false,
+    "cm": 0.0
+  },
+  {
+    "id": 497,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Name the account numbers of female clients who are oldest and have lowest average salary?",
+    "gold_sql": "select t3.account_id from client as t1 inner join district as t2 on t1.district_id = t2.district_id inner join account as t3 on t2.district_id = t3.district_id inner join disp as t4 on t1.client_id = t4.client_id and t4.account_id = t3.account_id where t1.gender = 'f' order by t1.birth_date asc, t2.a11 asc limit 1",
+    "pred_sql": "select t1.account_id from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t2.gender = 'f' group by t1.account_id order by max(t2.birth_date) limit 1 union all select t1.account_id from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t2.gender = 'f' group by t1.account_id order by avg",
+    "ex": false,
+    "sm": false,
+    "cm": 0.5
+  },
+  {
+    "id": 498,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "What is the average amount of loan which are still on running contract with statement issuance after each transaction?",
+    "gold_sql": "select avg(t2.amount) from account as t1 inner join loan as t2 on t1.account_id = t2.account_id where t2.status in ('c', 'd') and t1.frequency = 'poplatek po obratu'",
+    "pred_sql": "select avg(t.amount) from trans t join loan l on t.account_id = l.account_id where l.status = 'a' and t.date between l.date and l.date + interval l.duration month",
+    "ex": false,
+    "sm": false,
+    "cm": 0.3333333333333333
+  },
+  {
+    "id": 499,
+    "db_id": "financial",
+    "difficulty": "moderate",
+    "question": "Provide the IDs and age of the client with high level credit card, which is eligible for loans.",
+    "gold_sql": "select t1.client_id, strftime('%y', current_timestamp) - strftime('%y', t3.birth_date) from disp as t1 inner join card as t2 on t2.disp_id = t1.disp_id inner join client as t3 on t1.client_id = t3.client_id where t2.type = 'gold' and t1.type = 'owner'",
+    "pred_sql": "select client_id, datediff(curdate(), birth_date) / 365 as age from client where district_id in (select district_id from account where account_id in (select account_id from disp where type = 'disponent')) and district_id in (select district_id from card where type = 'gold') and client_id in (select client_id from disp where account_id in (select account_id from account where district_id in (select district_id from card where type =",
+    "ex": false,
+    "sm": false,
+    "cm": 0.0
   }
 ]

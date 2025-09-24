@@ -1,42 +1,29 @@
-# diploma
-Master diploma
+# Diploma Project
+**Topic:** *Impact of Token Decoding Strategies in Large Language Models on Text-to-SQL Quality*
 
-decoding - folder for decoding strategy
+This repository contains code and experiments for a master’s thesis exploring how decoding strategies (greedy, beam, top-k, top-p, execution-guided beam) affect Text-to-SQL generation quality.
 
-outputs - generated results
+---
 
-src - source code, schema, prompt
+## Repository Structure
+```
+.
+├─ decoding/ # Decoding strategies (greedy, beam, top-k, top-p, EG-beam)
+├─ outputs/ # Generated predictions, metrics
+├─ src/ # Source code: schema utils, prompts, helpers
+├─ main.py # Run experiments on a dataset
+├─ test_query_model.py # Quick model test on a single prompt
+├─ run_metrics.py # Compute metrics for predictions (JSON)
+└─ README.md
+```
+## Results
 
-main.py - run dataset
+### Current Results (Model: qwen2.5-3B-Instruct)
 
-test_query_model.py - test model
-
-run_metrics - calculate metrics for strategy 
-
-
-Metrics
-
-Model: qwen
-
-gready - 
-Execution Accuracy: 174/500 = 0.3480
-String Match Accuracy: 11/500 = 0.0220
-Component Match Accuracy: 185.41666666666697/500 = 0.3708
-
-beam -
-Execution Accuracy: 196/500 = 0.3920
-String Match Accuracy: 11/500 = 0.0220
-Component Match Accuracy: 186.71666666666695/500 = 0.3734
-
-top_k - 
-Execution Accuracy: 171/500 = 0.3420
-String Match Accuracy: 11/500 = 0.0220
-Component Match Accuracy: 180.13333333333364/500 = 0.3603
-
-top_p -
-Execution Accuracy: 176/500 = 0.3520
-String Match Accuracy: 11/500 = 0.0220
-Component Match Accuracy: 180.05000000000032/500 = 0.3601
-
-EG beam (table, column check) -
-
+| Strategy | Execution Accuracy     | String Match Accuracy | Component Match Accuracy |
+|----------|------------------------|-----------------------|--------------------------|
+| Greedy   | 174/500 = **0.3480**   | 11/500 = **0.0220**   | 185.4167/500 = **0.3708** |
+| Beam     | 196/500 = **0.3920**   | 11/500 = **0.0220**   | 186.7167/500 = **0.3734** |
+| Top-k    | 171/500 = **0.3420**   | 11/500 = **0.0220**   | 180.1333/500 = **0.3603** |
+| Top-p    | 176/500 = **0.3520**   | 11/500 = **0.0220**   | 180.0500/500 = **0.3601** |
+| **EG-Beam** (table/column check) | 209/500 = **0.4180** | 11/500 = **0.0220** | 188.03/500 = **0.3761** |
