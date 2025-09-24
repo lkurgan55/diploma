@@ -330,9 +330,9 @@ class SQLValidator:
 
 
 if __name__ == "__main__":
-    validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/codebase_community/codebase_community.sqlite")
+    validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/card_games/card_games.sqlite")
 
-    sql = """select userdisplayname from comments where text = 'thank you user93"""
+    sql = """select format , group_concat(name) from legalities join cards on legalities.uuid = cards.uuid where status = 'banned' group by format order by count(*) desc limit 1"""
 
     print("syntax ok:", validator.syntax_ok(sql))
     print("tables ok:", validator.tables_exist(sql))
