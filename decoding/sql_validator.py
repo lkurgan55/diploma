@@ -329,10 +329,11 @@ class SQLValidator:
 
 
 
-validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/debit_card_specializing/debit_card_specializing.sqlite")
+if __name__ == "__main__":
+    validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/codebase_community/codebase_community.sqlite")
 
-sql = """select casted_consumption as t.customer10.0.customerid from yearmonth.consumption, transactions_1k yearmonth.customerid tconsumption > 4673 t as t0t as transactions.customerid = t4673.customerid and t0.date = t4673.date and t0.consumption > 46.73) / sum(t4673.consumption) * 100 from yearmonth"""
+    sql = """select userdisplayname from comments where text = 'thank you user93"""
 
-print("syntax ok:", validator.syntax_ok(sql))
-print("tables ok:", validator.tables_exist(sql))
-print("columns ok:", validator.columns_exist(sql))
+    print("syntax ok:", validator.syntax_ok(sql))
+    print("tables ok:", validator.tables_exist(sql))
+    print("columns ok:", validator.columns_exist(sql))
