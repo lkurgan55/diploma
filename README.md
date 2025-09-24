@@ -38,13 +38,5 @@ Execution Accuracy: 176/500 = 0.3520
 String Match Accuracy: 11/500 = 0.0220
 Component Match Accuracy: 180.05000000000032/500 = 0.3601
 
-Custom beam -
-Execution Accuracy: 139/500 = 0.2780
-String Match Accuracy: 13/500 = 0.0260
-Component Match Accuracy: 147.98333333333343/500 = 0.2960
-
 EG beam (table, column check) -
 
-Execution Accuracy: 144/500 = 0.2880
-String Match Accuracy: 13/500 = 0.0260
-Component Match Accuracy: 132.84999999999994/500 = 0.2657
