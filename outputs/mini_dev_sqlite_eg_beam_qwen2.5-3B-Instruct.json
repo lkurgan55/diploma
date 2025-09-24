@@ -313,7 +313,7 @@
     "difficulty": "moderate",
     "question": "Who is the top spending customer and how much is the average price per single item purchased by this customer? What currency was being used?",
     "gold_sql": "select t2.customerid, sum(t2.price / t2.amount), t1.currency from customers as t1 inner join transactions_1k as t2 on t1.customerid = t2.customerid where t2.customerid = ( select customerid from yearmonth order by consumption desc limit 1 ) group by t2.customerid, t1.currency",
-    "pred_sql": "",
+    "pred_sql": "None",
     "ex": false,
     "sm": false,
     "cm": 0.0
@@ -577,8 +577,8 @@
     "difficulty": "moderate",
     "question": "Among all the closed events, which event has the highest spend-to-budget ratio?",
     "gold_sql": "select t2.event_name from budget as t1 inner join event as t2 on t1.link_to_event = t2.event_id where t2.status = 'closed' order by t1.spent / t1.amount desc limit 1",
-    "pred_sql": "",
-    "ex": true,
+    "pred_sql": "None",
+    "ex": false,
     "sm": false,
     "cm": 0.0
   },
@@ -1017,8 +1017,8 @@
     "difficulty": "moderate",
     "question": "For the patient who was diagnosed with SLE on 1994/2/19, what was his/her anti-Cardiolipin antibody concentration status on 1993/11/12?",
     "gold_sql": "select `acl iga`, `acl igg`, `acl igm` from examination where id in ( select id from patient where diagnosis = 'sle' and description = '1994-02-19' ) and `examination date` = '1993-11-12'",
-    "pred_sql": "",
-    "ex": true,
+    "pred_sql": "None",
+    "ex": false,
     "sm": false,
     "cm": 0.0
   },
@@ -1149,7 +1149,7 @@
     "difficulty": "moderate",
     "question": "List and group all patients by sex for total bilirubin (T-BIL) level not within the normal range.",
     "gold_sql": "select t1.id,t1.sex from patient as t1 inner join laboratory as t2 on t1.id = t2.id where t2.`t-bil` >= 2.0 group by t1.sex,t1.id",
-    "pred_sql": "",
+    "pred_sql": "None",
     "ex": false,
     "sm": false,
     "cm": 0.0
@@ -4845,7 +4845,7 @@
     "difficulty": "moderate",
     "question": "Among the schools with an SAT excellence rate of over 0.3, what is the highest eligible free rate for students aged 5-17?",
     "gold_sql": "select max(cast(t1.`free meal count (ages 5-17)` as real) / t1.`enrollment (ages 5-17)`) from frpm as t1 inner join satscores as t2 on t1.cdscode = t2.cds where cast(t2.numge1500 as real) / t2.numtsttakr > 0.3",
-    "pred_sql": "",
+    "pred_sql": "None",
     "ex": false,
     "sm": false,
     "cm": 0.0
@@ -5076,8 +5076,8 @@
     "difficulty": "moderate",
     "question": "How many students from the ages of 5 to 17 are enrolled at the State Special School school in Fremont for the 2014-2015 academic year?",
     "gold_sql": "select t1.`enrollment (ages 5-17)` from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.edopscode = 'sss' and t2.city = 'fremont' and t1.`academic year` between 2014 and 2015",
-    "pred_sql": "",
-    "ex": true,
+    "pred_sql": "None",
+    "ex": false,
     "sm": false,
     "cm": 0.0
   },
@@ -5197,7 +5197,7 @@
     "difficulty": "moderate",
     "question": "List out the account numbers of clients who are youngest and have highest average salary?",
     "gold_sql": "select t1.account_id from account as t1 inner join disp as t2 on t1.account_id = t2.account_id inner join client as t3 on t2.client_id = t3.client_id inner join district as t4 on t4.district_id = t1.district_id where t2.client_id = ( select client_id from client order by birth_date desc limit 1) group by t4.a11, t1.account_id",
-    "pred_sql": "",
+    "pred_sql": "None",
     "ex": false,
     "sm": false,
     "cm": 0.0

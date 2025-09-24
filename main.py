@@ -45,7 +45,7 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
     else:
         raise ValueError(f"Unknown strategy: {strategy}")
 
-    return out
+    return out if out else "None"
 
 # ---------- Post-process model output ----------
 def extract_sql_from_text(full_text: str) -> str:

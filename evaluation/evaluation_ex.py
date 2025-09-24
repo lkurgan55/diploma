@@ -43,7 +43,7 @@ def execute_sql_on_db(db_path: str, sql: str, timeout_s: float = 60.5, ops_step:
         if "interrupted" in msg:
             print(f"[TIMEOUT] >{timeout_s}s: {sql}")
             return None
-        print(f"[SQL GOLD ERROR] {e} | Query: {sql}")
+        print(f"[SQL ERROR] {e} | Query: {sql}")
         return None
     finally:
         try:
