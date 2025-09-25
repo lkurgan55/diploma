@@ -32,7 +32,7 @@ class BeamStrategy(BaseStrategy):
         return self.tokenizer.decode(gen_ids, skip_special_tokens=True)
 
 
-    def custom_generate(
+    def eg_generate(
         self,
         prompt: str,
         max_new_tokens: int = 120,

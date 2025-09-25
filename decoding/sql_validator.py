@@ -330,10 +330,9 @@ class SQLValidator:
 
 
 if __name__ == "__main__":
-    validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/debit_card_specializing/debit_card_specializing.sqlite")
+    validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/card_games/card_games.sqlite")
 
     sql = """select format , group_concat(name) from legalities join cards on legalities.uuid = cards.uuid where status = 'banned' group by format order by count(*) desc limit 1"""
-    sql = "select cast(sum(iif(t2.consumption > 528.3, 1, 0)) as real) * 100 / count(distinct t1.customerid) from yearmonth as t1 inner join customers as t2 on t1.customerid = t2.customerid where t1.date = '201202'"
 
     print("syntax ok:", validator.syntax_ok(sql))
     print("tables ok:", validator.tables_exist(sql))

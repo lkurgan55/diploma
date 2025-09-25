@@ -37,7 +37,7 @@ def gen_with_strategy(model, tokenizer, prompt: str, strategy: str, max_new_toke
     elif strategy == "beam":
         out = BeamStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "eg_beam":
-        out = BeamStrategy(model=model, tokenizer=tokenizer).custom_generate(prompt, max_new_tokens=max_new_tokens, db_path=db_path)
+        out = BeamStrategy(model=model, tokenizer=tokenizer).eg_generate(prompt, max_new_tokens=max_new_tokens, db_path=db_path)
     elif strategy == "top_k":
         out = TopKStrategy(model=model, tokenizer=tokenizer).generate(prompt, max_new_tokens=max_new_tokens)
     elif strategy == "top_p":
