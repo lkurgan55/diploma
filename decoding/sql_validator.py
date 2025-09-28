@@ -16,105 +16,93 @@ class SQLValidator:
         self._table_names: set[str] = set()
         
     def syntax_ok(self, sql: str) -> bool:
-        import re, sqlite3
-        from contextlib import closing
+        """
+        Інкрементальна перевірка:
+        True  -> синтаксично можливий префікс (можна продовжувати/залишати гілку).
+        False -> безнадійна помилка, гілку слід відкинути.
 
-        # --- normalize & trim one trailing ; ---
-        s = (sql or "").strip().lstrip("\ufeff")
-        s = s.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", " ")
-        s = re.sub(r"[\u00A0\u200B\u200E\u200F]", " ", s)
-        s = re.sub(r"\s+", " ", s)
-        s = re.sub(r";\s*$", "", s)
-        if not s:
-            return True
+        Ми вважаємо BAD лише такі випадки:
+        - None / порожній рядок із non-whitespace символами відсутній? -> допустимо як префікс (True)
+        - негативна глибина дужок (зайва ')')
+        - наявність ';' не наприкінці (кілька інструкцій)
+        Все інше (відкриті лапки/дужки, «хвости» на ключових словах/операторах) -> True (ще можна дописати).
+        """
+        if sql is None:
+            return False  # зовсім нічого перевіряти
 
-        # --- quick scan outside quotes ---
-        def scan_outside_quotes(t: str):
-            in_s = in_d = False; depth = 0; below_zero = False; forbidden = False
-            for i, ch in enumerate(t):
-                if ch == "'" and not in_d:
-                    if in_s and i+1 < len(t) and t[i+1] == "'":  # ''
+        s = str(sql)
+        if not s.strip():
+            return True  # пуста/пробільна префікс-рядок: ок для продовження
+
+        # BAD #1: ';' у середині -> кілька інструкцій/розрив
+        if ";" in s[:-1]:
+            return False
+
+        # Прохід по символах для виявлення ЗАЙВОЇ закриваючої дужки ')'
+        depth = 0
+        in_single = False  # '
+        in_double = False  # "
+        in_backt  = False  # `
+
+        i, n = 0, len(s)
+
+        def at(j: int) -> str:
+            return s[j] if 0 <= j < n else ""
+
+        while i < n:
+            ch = s[i]
+
+            # керуємо лапками (усередині лапок дужки не рахуємо)
+            if not (in_double or in_backt):
+                if ch == "'":
+                    if in_single:
+                        if at(i+1) == "'":  # екранована '
+                            i += 2
+                            continue
+                        else:
+                            in_single = False
+                            i += 1
+                            continue
+                    else:
+                        in_single = True
+                        i += 1
                         continue
-                    in_s = not in_s
-                elif ch == '"' and not in_s:
-                    in_d = not in_d
-                elif not in_s and not in_d:
-                    if ch == '(': depth += 1
-                    elif ch == ')':
-                        depth -= 1
-                        if depth < 0: below_zero = True
-                    # білий список: все інше вважаємо сміттям
-                    if not re.match(r"[A-Za-z0-9_\s\.,\*\(\)=<>!\+\-/%']", ch):
-                        forbidden = True
-            return depth, below_zero, forbidden
 
-        depth, below_zero, forbidden = scan_outside_quotes(s)
-        if below_zero or forbidden:
-            return False  # явне сміття/лишні ')'
+            if not (in_single or in_backt):
+                if ch == '"':
+                    if in_double:
+                        if at(i+1) == '"':  # екранована "
+                            i += 2
+                            continue
+                        else:
+                            in_double = False
+                            i += 1
+                            continue
+                    else:
+                        in_double = True
+                        i += 1
+                        continue
 
-        # --- incomplete tails that should PASS (return True) ---
-        # висяча кома після SELECT
-        if re.match(r"(?is)^\s*select\b[^;]*,\s*$", s):
-            return True
-        # закінчується на alias. / оператор / відкриту дужку
-        if re.search(r"\.\s*$", s): return True
-        if re.search(r"(?i)(=|<>|<|>|<=|>=|\band\b|\bor\b|\blike\b|\bin\b|\bbetween\b|\+|\-|\*|/)\s*$", s):
-            return True
-        if s.endswith("("): return True
-        # ключові слова без аргументів у хвості: FROM/JOIN/WHERE/ON/GROUP BY/ORDER BY/HAVING/LIMIT/OFFSET
-        if re.search(r"(?i)\b(from|join|where|on|group\s+by|order\s+by|having|limit|offset)\s*$", s):
-            return True
-        # висяча кома у GROUP BY / ORDER BY
-        if re.search(r"(?is)\b(group\s+by|order\s+by)\b[^;]*,\s*$", s):
-            return True
-        # функції, що потребують '(' (CAST/SUM/...) у хвості
-        FUNC_NEED_PAREN = ("cast","count","sum","avg","min","max","coalesce","substr",
-                        "printf","round","abs","upper","lower","length","date",
-                        "datetime","strftime","ifnull","nullif")
-        funcs = "|".join(FUNC_NEED_PAREN)
-        if re.search(rf"(?i)\b({funcs})\s*$", s) or re.search(rf"(?i)\b({funcs})\s*\(\s*$", s):
-            return True
+            if not (in_single or in_double):
+                if ch == '`':
+                    in_backt = not in_backt
+                    i += 1
+                    continue
 
-        # --- if still unbalanced quotes/parens -> let it grow (pass) ---
-        def balanced_quotes(t: str) -> bool:
-            i, in_s = 0, False
-            while i < len(t):
-                ch = t[i]
-                if ch == "'" and not in_s:
-                    in_s = True
-                elif ch == "'" and in_s:
-                    if i+1 < len(t) and t[i+1] == "'": i += 2; continue
-                    in_s = False
-                i += 1
-            if in_s: return False
-            i, in_d = 0, False
-            while i < len(t):
-                ch = t[i]
-                if ch == '"' and not in_d: in_d = True
-                elif ch == '"' and in_d:  in_d = False
-                i += 1
-            return not in_d
+            # поза лапками — рахуємо дужки
+            if not (in_single or in_double or in_backt):
+                if ch == '(':
+                    depth += 1
+                elif ch == ')':
+                    depth -= 1
+                    if depth < 0:
+                        # BAD #2: зайва закриваюча дужка — це не виправити додаванням токенів
+                        return False
 
-        if not balanced_quotes(s) or depth > 0:
-            return True
+            i += 1
 
-        # --- completed-looking: do strict check via EXPLAIN ---
-        try:
-            if not sqlite3.complete_statement(s + ";"):
-                return True  # ще префікс, не валимо
-        except Exception:
-            pass
-
-        try:
-            with closing(sqlite3.connect(":memory:")) as con, closing(con.cursor()) as cur:
-                cur.execute("EXPLAIN " + s)
-        except sqlite3.Error as e:
-            msg = str(e).lower()
-            if ("syntax error" in msg or "unrecognized token" in msg or
-                "incomplete input" in msg or "misuse" in msg or
-                ("parse" in msg and "error" in msg)):
-                return False  # реальна синтаксична помилка
-            return True       # семантика (no such table/column) — пропускаємо тут
+        # Всі інші стани (відкриті лапки, незакриті дужки, хвости на ключових словах/операторах) — це валідний префікс:
+        # їх можна завершити подальшою генерацією, отже True.
         return True
 
     # ---------- schema loading ----------
@@ -136,6 +124,76 @@ class SQLValidator:
         self._tables = tables
         self._table_names = set(tables.keys())
 
+    def _from_clause_open(self, sql: str) -> bool:
+        """
+        True, якщо секція FROM ще 'очікує' продовження:
+        - закінчується на кому: FROM t1,
+        - закінчується на JOIN / JOIN <name> [AS alias] без ON/USING,
+        - є ON/USING, але умова ще не завершена (незбалансовані дужки / обірвана справа),
+        - після FROM стоїть лише ідентифікатор (таблиця/alias) без роздільника.
+        False — коли JOIN-умова завершена або бачимо перехід до WHERE/GROUP/ORDER/HAVING/LIMIT/OFFSET/;.
+        """
+        s = re.sub(r"\s+", " ", sql, flags=re.I)
+        m = re.search(r"(?is)\bfrom\b(.*)$", s)
+        if not m:
+            return False
+
+        tail = m.group(1)
+        # обрізати до кінця секції FROM
+        frag = re.split(r"(?is)\bwhere\b|\bgroup\s+by\b|\border\s+by\b|\bhaving\b|\blimit\b|\boffset\b|;", tail, maxsplit=1)[0]
+        frag = frag.rstrip()
+
+        if not frag:
+            return True  # "FROM" і кінець рядка
+
+        # 1) кома в кінці → чекаємо наступну таблицю
+        if re.search(r",\s*$", frag):
+            return True
+
+        # 2) закінчується на JOIN або JOIN <name> [AS alias]
+        if re.search(r"(?i)\bjoin\s*$", frag):
+            return True
+        if re.search(r"(?i)\bjoin\s+[a-z_]\w*(?:\s+as\s+[a-z_]\w*|\s+[a-z_]\w*)?\s*$", frag):
+            return True
+
+        # 3) USING ( ... без закриття
+        if re.search(r"(?i)\busing\s*\(\s*$", frag):
+            return True
+
+        # 4) ON-частина: перевірити незавершеність
+        on_pos = [mm.start() for mm in re.finditer(r"(?i)\bon\b", frag)]
+        if on_pos:
+            on_tail = frag[max(on_pos):]
+
+            # лише "ON" → незавершено
+            if re.fullmatch(r"(?is)\bon\b", on_tail.strip()):
+                return True
+
+            # незбалансовані дужки в ON (...)
+            depth = 0
+            in_s = in_d = False
+            for ch in on_tail:
+                if ch == "'" and not in_d:
+                    in_s = not in_s
+                elif ch == '"' and not in_s:
+                    in_d = not in_d
+                elif not in_s and not in_d:
+                    if ch == '(':
+                        depth += 1
+                    elif ch == ')':
+                        depth -= 1
+            if depth > 0:
+                return True
+
+            # закінчується на крапку/оператор/логічне слово — правий операнд ще не дописаний
+            if re.search(r"(\.|=|<>|<=|>=|<|>|\band\b|\bor\b)\s*$", on_tail, flags=re.I):
+                return True
+
+        # 5) лише ідентифікатор у хвості (таблиця/alias) без роздільника
+        if re.search(r"(?i)[a-z_]\w*(?:\s+as\s+[a-z_]\w*|\s+[a-z_]\w*)?\s*$", frag):
+            return True
+
+        return False
 
     # ---------- light SQL parsing ----------
     def _extract_cte_names(self, sql: str) -> Set[str]:
@@ -184,41 +242,199 @@ class SQLValidator:
         return phys_tables, derived_aliases
 
     def _extract_tables_and_aliases(self, sql: str, *, closed_only: bool = False) -> tuple[set[str], dict, set]:
-        s = re.sub(r"\s+", " ", sql, flags=re.I)
+        """
+        Повертає:
+        - tabs: множина фізичних таблиць (lowercase), що згадані у FROM/JOIN (без CTE/derived)
+        - alias_map: alias -> base_source (для фізичних таблиць та для CTE/derived alias'ів)
+        - derived_aliases: множина alias'ів для derived-джерел (FROM (SELECT ...) alias / JOIN (SELECT ...) alias)
+        """
+        s = re.sub(r"\s+", " ", sql, flags=re.I).strip()
+
         tabs: set[str] = set()
         alias_map: dict[str, str] = {}
         derived_aliases: set[str] = set()
-        ctes = self._extract_cte_names(sql)
+        ctes = self._extract_cte_names(sql)  # {"c1","c2",...}
 
-        # derived: FROM (SELECT ...) alias
+        # 0) Derived sources: FROM (SELECT ...) alias / JOIN (SELECT ...) alias
         for m in re.finditer(r"\b(from|join)\s*\(\s*select\b.*?\)\s*([a-zA-Z_]\w*)", s, flags=re.I | re.S):
             alias = m.group(2).lower()
-            alias_map[alias] = alias
+            alias_map[alias] = alias  # self-map for derived
             derived_aliases.add(alias)
 
-        # фізичні: FROM/JOIN <name> [AS] <alias>
-        if closed_only:
-            pat = r"\b(from|join)\s+([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)(?=[\s;])(?:\s+(?:as\s+)?([a-zA-Z_]\w*))?"
-        else:
-            pat = r"\b(from|join)\s+([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)?)\b(?:\s+(?:as\s+)?([a-zA-Z_]\w*))?"
+        # 1) Take the FROM section (till WHERE/GROUP/ORDER/HAVING/LIMIT/OFFSET/; or end)
+        from_m = re.search(r"(?is)\bfrom\b(.*)", s)
+        if not from_m:
+            for c in ctes:
+                alias_map.setdefault(c, c)
+            return tabs, alias_map, derived_aliases
 
-        for m in re.finditer(pat, s, flags=re.I):
-            raw = m.group(2)
+        tail = from_m.group(1)
+        from_sec_full = re.split(r"(?is)\bwhere\b|\bgroup\s+by\b|\border\s+by\b|\bhaving\b|\blimit\b|\boffset\b|;", tail, maxsplit=1)[0]
+
+        # 2) Patterns compiled with flags (no inline (?ix))
+        from_item_pat = re.compile(r"""
+            ^\s*                                   # beginning of remaining fragment
+            (?P<name>[a-z_]\w*(?:\.[a-z_]\w*)?)    # table (optionally schema.table)
+            (?:\s+(?:as\s+)?(?P<alias>[a-z_]\w*))? # optional alias
+            (?=                                    # lookahead: how this item ends
+                \s*,                               #   comma (another FROM item follows)
+            | \s+\bjoin\b                        #   JOIN-chain begins
+            | \s*$                               #   end of FROM-section
+            )
+        """, flags=re.IGNORECASE | re.VERBOSE)
+
+        sep_pat = re.compile(r"^\s*(,|\bjoin\b)", flags=re.IGNORECASE)
+
+        join_pat = re.compile(r"""
+            \bjoin\b
+            \s+
+            (?P<name>[a-z_]\w*(?:\.[a-z_]\w*)?)
+            (?:\s+(?:as\s+)?(?P<alias>[a-z_]\w*))?
+            (?=                                   # next must be one of
+                \s+\bon\b                         #   ON ...
+            | \s+\busing\b                      #   USING (...)
+            | \s*,                              #   comma
+            | \s+\bjoin\b                       #   next JOIN
+            | \s*$                              #   end of FROM-section
+            )
+        """, flags=re.IGNORECASE | re.VERBOSE)
+
+        # 3) Parse items BEFORE the first JOIN (comma-separated list)
+        #    We only consume from a working copy; we do NOT modify from_sec_full.
+        rest = from_sec_full
+        while True:
+            m = from_item_pat.match(rest)
+            if not m:
+                break
+
+            raw = m.group("name")
             base = raw.split(".")[-1].lower()
-            alias = (m.group(3) or "").lower() if m.lastindex and m.group(3) else None
+            alias = (m.group("alias") or "").lower()
 
-            if base not in ctes:
+            if base not in ctes and base not in derived_aliases:
                 tabs.add(base)
             if alias:
                 alias_map[alias] = base
             else:
                 alias_map.setdefault(base, base)
 
-        # CTE як джерела
+            # cut what we've matched
+            rest = rest[m.end():]
+
+            m_sep = sep_pat.match(rest)
+            if not m_sep:
+                break
+
+            sep = m_sep.group(1).lower()
+            rest = rest[m_sep.end():]
+            if sep == "join":
+                # Stop here; JOINs will be parsed from from_sec_full below
+                break
+            # If comma, continue to next FROM item
+
+        # 4) Parse ALL JOINs from the full FROM section
+        for jm in join_pat.finditer(from_sec_full):
+            raw = jm.group("name")
+            base = raw.split(".")[-1].lower()
+            alias = (jm.group("alias") or "").lower()
+
+            if base not in ctes and base not in derived_aliases:
+                tabs.add(base)
+            if alias:
+                alias_map[alias] = base
+            else:
+                alias_map.setdefault(base, base)
+
+        # 5) Add CTE names as sources in alias_map (so alias.col won't be checked against physical schema)
         for c in ctes:
             alias_map.setdefault(c, c)
 
+        # 6) closed_only: keep only tables whose names are "closed" by a delimiter in the FULL FROM section
+        if closed_only:
+            closed_tabs: set[str] = set()
+            for m in from_item_pat.finditer(from_sec_full):
+                base = m.group("name").split(".")[-1].lower()
+                if base in tabs:
+                    closed_tabs.add(base)
+            for jm in join_pat.finditer(from_sec_full):
+                base = jm.group("name").split(".")[-1].lower()
+                if base in tabs:
+                    closed_tabs.add(base)
+            tabs = closed_tabs
+
         return tabs, alias_map, derived_aliases
+
+    def _strip_noise_for_cols(self, s: str) -> str:
+        # прибираємо літерали, AS alias, імена функцій, кваліфіковані x.y → лишаємо y
+        s = re.sub(r"'([^']|'')*'", " ", s)                        # рядкові літерали
+        s = re.sub(r'\"([^"]|\"\")*\"', " ", s)                    # подвійні лапки (на всяк)
+        s = re.sub(r"\b(as)\s+[a-zA-Z_]\w*", " ", s, flags=re.I)   # AS alias
+        s = re.sub(r"[a-zA-Z_]\w*\s*\(", "(", s)                   # func_name( → (
+        s = re.sub(r"([a-zA-Z_]\w*)\s*\.\s*([a-zA-Z_]\w*)", r"\2", s)   # x.y → y
+        return s
+
+    def _unqualified_tokens(self, chunk: str, *, skip: set[str]) -> set[str]:
+        """
+        Повертати лише 'закриті' некваліфіковані імена:
+        - після токена обов'язково має йти ПРОБІЛ або РОЗДІЛЮВАЧ,
+        - токени, що стоять рівно в КІНЦІ фрагмента (як 'WHERE T') — ігноруємо (деферимо).
+        """
+        # Прибрати шум (літерали, AS alias, імена ф-цій, x.y -> y)
+        chunk = self._strip_noise_for_cols(chunk)
+
+        KW = {
+            "select","distinct","from","where","on","join","inner","left","right","full","outer","cross","natural",
+            "using","group","order","by","having","limit","offset","union","all","intersect","except",
+            "and","or","not","in","like","between","is","null","exists","any","some","true","false",
+            "case","when","then","else","end",
+            "count","sum","avg","min","max","cast","coalesce","substr","printf","round","abs",
+            "upper","lower","length","date","datetime","strftime","ifnull","nullif",
+            "over","partition","rows","range","preceding","following","current","row",
+            "asc","desc","nulls","first","last",
+            "as","real","int","integer","text","boolean"
+        }
+        CLOSERS = {",", ")", ";", ".", "=", "<", ">", "+", "-", "*", "/", "%"}
+        out: set[str] = set()
+
+        # Проходимо токени з позиціями, щоб перевірити "закритість"
+        for m in re.finditer(r"[A-Za-z_]\w*", chunk):
+            tok = m.group(0)
+            tl  = tok.lower()
+            if tl in KW or tl in skip or tl.isnumeric():
+                continue
+
+            j = m.end()  # позиція відразу після токена
+            # Знайти наступний НЕ-пробільний символ
+            while j < len(chunk) and chunk[j].isspace():
+                j += 1
+
+            # 1) Якщо токен стоїть у КІНЦІ фрагмента -> вважаємо НЕЗАКРИТИМ -> пропускаємо (деферимо)
+            if j >= len(chunk):
+                continue
+
+            # 2) Якщо далі йде роздільник або ключове слово — токен "закритий"
+            ch = chunk[j]
+            if ch in CLOSERS:
+                out.add(tl)
+                continue
+
+            # 3) Перевірка на ключове слово після пробілу (наприклад, "WHERE amount DESC")
+            if chunk[j].isalpha():
+                nxt = chunk[j:].lower()
+                # Достатньо короткого переліку найтиповіших, бо ми вже маємо загальний KW
+                for kw in (" on", " where", " group", " order", " having",
+                            " from", " join", " and", " or", " limit", " offset"):
+                    if nxt.startswith(kw):
+                        out.add(tl)
+                        break
+                else:
+                    # Інакше після токена йде ще один ідентифікатор/продовження — не вважаємо закритим
+                    pass
+            else:
+                # Не алфавітний символ і не з CLOSERS (рідкі випадки) — не закрито
+                pass
+
+        return out
 
 
     # ---------- public API ----------
@@ -237,6 +453,14 @@ class SQLValidator:
         return True
 
     def columns_exist(self, sql: str, *, closed_only: bool = True) -> bool:
+        """
+        1) Перевіряємо кваліфіковані alias.col / table.col (з деферингом, якщо alias не готовий).
+        2) Якщо FROM відкритий → деферимо перевірку некваліфікованих колонок (return True).
+        3) Інакше перевіряємо некваліфіковані:
+        - якщо токен є рівно в одній фізичній таблиці з FROM → OK,
+        - якщо ніде → False,
+        - якщо в кількох → деферимо (даємо шанс моделі додати alias).
+        """
         self._maybe_load_schema()
         if not self._tables:
             return True
@@ -244,9 +468,8 @@ class SQLValidator:
         ctes = self._extract_cte_names(sql)
         tabs, alias_map, derived_aliases = self._extract_tables_and_aliases(sql, closed_only=closed_only)
 
-           # --- 1) Кваліфіковані alias.col / table.col (деферимо, якщо колона ще не "закрита") ---
+        # --- 1) Кваліфіковані alias.col / table.col ---
         s = re.sub(r"\s+", " ", sql)
-
         qual_pat = r"([a-zA-Z_]\w*)\s*\.\s*([a-zA-Z_]\w*)"
         qualified_seconds = set()
 
@@ -255,20 +478,14 @@ class SQLValidator:
             col   = m.group(2).lower()
             qualified_seconds.add(col)
 
-            # перевірка "закритості" токена колонки:
-            # пропускаємо пробіли після збігу і дивимось на наступний фактичний символ
+            # чи "закрита" колонка (після неї вже роздільник/оператор/kw)
             j = m.end()
             while j < len(s) and s[j].isspace():
                 j += 1
-
-            # якщо дійшли до кінця або далі лише пробіли — колона ще НЕ закрита -> деферимо
             if j >= len(s):
                 continue
 
-            # дозволені "закривачі" колонки (після яких можна перевіряти): кома/дужка/крапка з комою,
-            # оператори порівняння/арифметики, ключові роздільники
             closers = {",", ")", ";", ".", "=", "<", ">", "+", "-", "*", "/"}
-            # також вважаємо закритою, якщо далі починається ключове слово (on, where, group, order, having, from)
             next_is_kw = False
             if s[j].isalpha():
                 nxt = s[j:].lower()
@@ -276,12 +493,10 @@ class SQLValidator:
                     if nxt.startswith(kw):
                         next_is_kw = True
                         break
-
             if (s[j] not in closers) and (not next_is_kw):
-                # між alias.col і наступним токеном ще можуть дописуватись символи колонки -> деферимо
-                continue
+                continue  # ще можуть дописуватись символи колонки
 
-            # якщо alias ще не оголошено у FROM/JOIN/CTE/derived — деферимо
+            # alias ще не оголошено -> деферимо
             alias_known = (alias in alias_map) or (alias in ctes) or (alias in derived_aliases)
             if not alias_known:
                 continue
@@ -296,43 +511,50 @@ class SQLValidator:
             if src not in self._tables:
                 continue  # деферимо
 
-            # власне перевірка колонки
             if col not in self._tables[src]:
                 return False
 
+        # --- 2) Якщо FROM ще відкритий — не чіпаємо некваліфіковані, даємо моделі дописати JOIN ---
+        if self._from_clause_open(sql):
+            return True
 
-        # --- некваліфіковані — лише коли рівно одна фізична таблиця ---
-        if len(tabs) == 1:
-            (only_tab,) = tuple(tabs)
-            m = re.search(r"(?is)\bselect\b(.*?)\bfrom\b", s)
-            if m:
-                chunk = m.group(1)
-                # прибираємо літерали, AS alias, імена функцій
-                chunk = re.sub(r"'([^']|'')*'", " ", chunk)
-                chunk = re.sub(r"\b(as)\s+[a-zA-Z_]\w*", " ", chunk, flags=re.I)
-                chunk = re.sub(r"[a-zA-Z_]\w*\s*\(", "(", chunk)
-                # прибрати кваліфіковані x.y (залишаємо лише y)
-                chunk2 = re.sub(r"([a-zA-Z_]\w*)\s*\.\s*([a-zA-Z_]\w*)", r"\2", chunk)
+        # --- 3) Некваліфіковані: універсальний підхід для 1..N таблиць ---
+        phys_tabs = {t for t in tabs if t in self._tables}
+        skip_tokens = set(qualified_seconds)
 
-                toks = re.findall(r"[a-zA-Z_]\w*", chunk2)
-                KW = {"select","distinct","case","when","then","else","end",
-                    "count","sum","avg","min","max","cast","as","real"}
-                for tok in toks:
-                    tl = tok.lower()
-                    if tl in KW or tl.isnumeric():
-                        continue
-                    if tl in qualified_seconds:  # дуже важливо: не дублюємо з t2.currency
-                        continue
-                    if tl not in self._tables.get(only_tab, set()):
-                        return False
+        s_norm = re.sub(r"\s+", " ", s)
+        sel_m   = re.search(r"(?is)\bselect\b(.*?)\bfrom\b", s_norm)
+        where_m = re.search(r"(?is)\bwhere\b(.*?)(\bgroup\b|\border\b|\bhaving\b|\blimit\b|\boffset\b|;|$)", s_norm)
+        group_m = re.search(r"(?is)\bgroup\s+by\b(.*?)(\border\b|\bhaving\b|\blimit\b|\boffset\b|;|$)", s_norm)
+        order_m = re.search(r"(?is)\border\s+by\b(.*?)(\bhaving\b|\blimit\b|\boffset\b|;|$)", s_norm)
+        having_m= re.search(r"(?is)\bhaving\b(.*?)(\blimit\b|\boffset\b|;|$)", s_norm)
+
+        chunks = []
+        if sel_m:    chunks.append(sel_m.group(1))
+        if where_m:  chunks.append(where_m.group(1))
+        if group_m:  chunks.append(group_m.group(1))
+        if order_m:  chunks.append(order_m.group(1))
+        if having_m: chunks.append(having_m.group(1))
+
+
+
+        for chunk in chunks:
+            for tok in self._unqualified_tokens(chunk, skip=skip_tokens):
+                hit_tabs = sum(1 for t in phys_tabs if tok in self._tables.get(t, set()))
+                if hit_tabs == 0:
+                    return False
+                elif hit_tabs >= 2:
+                    # неоднозначно — деферимо (дай моделі шанс додати alias)
+                    continue
+
         return True
 
 
-
 if __name__ == "__main__":
-    validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/card_games/card_games.sqlite")
+    
+    validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/debit_card_specializing/debit_card_specializing.sqlite")
 
-    sql = """select format , group_concat(name) from legalities join cards on legalities.uuid = cards.uuid where status = 'banned' group by format order by count(*) desc limit 1"""
+    sql = "SELECT SUM(CASE WHEN T2.Segment = 'Discount' THEN 1 ELSE 0 END) - SUM(CASE WHEN T1.Segment = 'Discount' THEN 1 ELSE 0 END) AS Difference\nFROM gasstations AS T1\nJOIN gasstations AS T2 ON T2.Country = 'SK'\nWHERE T"
 
     print("syntax ok:", validator.syntax_ok(sql))
     print("tables ok:", validator.tables_exist(sql))

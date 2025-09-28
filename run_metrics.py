@@ -11,7 +11,7 @@ db_root = './datasets/data_minidev/dev_databases'
 
 def main():
     ap = argparse.ArgumentParser(description="Compute Execution Accuracy for JSON predictions.")
-    ap.add_argument("--json_path", default='outputs/mini_dev_sqlite_eg_beam_qwen2.5-3B-Instruct.json', help="Вхідний JSON із записами (list of dicts).")
+    ap.add_argument("--json_path", default='outputs/mini_dev_sqlite_egla_beam_qwen2.5-3B-Instruct.json', help="Вхідний JSON із записами (list of dicts).")
     ap.add_argument("--save_json", default='test_metrics', help="Куди зберегти оновлений JSON з полями ex/err_*")
     args = ap.parse_args()
 
