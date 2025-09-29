@@ -18,13 +18,14 @@ def main():
     with open(args.json_path, "r", encoding="utf-8") as f:
         data: list[dict[str, int | str]] = json.load(f)
 
-    total, passed_ex, passed_sm, passed_cm = 0, 0, 0, 0
+    total, passed_ex, passed_sm, passed_cm, total_time = 0, 0, 0, 0, 0
     new_records = []
     for record in data[:]:
         id = record.get("id")
         db_id    = record.get("db_id")
         gold_sql = record.get("gold_sql")
         pred_sql = record.get("pred_sql")
+        exec_time = record.get("exec_time", 0)
 
         db_path = f"{db_root}/{db_id}/{db_id}.sqlite"
 
@@ -41,12 +42,14 @@ def main():
         passed_ex += ex
         passed_sm += sm
         passed_cm += cm
+        total_time += exec_time
 
         new_records.append(record)
 
     ex_acc = (passed_ex / total) if total else 0.0
     sm_acc = (passed_sm / total) if total else 0.0
     cm_acc = (passed_cm / total) if total else 0.0
+    avg_time = (total_time / total) if total else 0.0
 
     with open(args.json_path, "w", encoding="utf-8") as f:
         json.dump(new_records, f, ensure_ascii=False, indent=2)
@@ -54,6 +57,7 @@ def main():
     print(f"\nExecution Accuracy: {passed_ex}/{total} = {ex_acc:.4f}")
     print(f"String Match Accuracy: {passed_sm}/{total} = {sm_acc:.4f}")
     print(f"Component Match Accuracy: {passed_cm}/{total} = {cm_acc:.4f}")
+    print(f"AVG Generation Time: {total_time}/{total} = {avg_time:.4f}")
 
 if __name__ == "__main__":
     main()
