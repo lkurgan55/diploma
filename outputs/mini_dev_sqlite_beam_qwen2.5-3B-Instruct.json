@@ -8,7 +8,8 @@
     "pred_sql": "select cast(sum(case when t2.currency = 'czk' then 1 else 0 end) as real) * 100 / count(*) from transactions_1k as t1 inner join customers as t2 on t1.customerid = t2.customerid",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 1,
@@ -19,7 +20,8 @@
     "pred_sql": "select customerid from yearmonth where date like '2012%' and segment = 'lam' group by customerid order by sum(consumption) limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.37254901960784315
   },
   {
     "id": 2,
@@ -30,7 +32,8 @@
     "pred_sql": "select avg(consumption) from yearmonth where customerid in (select customerid from customers where segment = 'sme') and date like '2013%';",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 3,
@@ -41,7 +44,8 @@
     "pred_sql": "select sum(case when t2.currency = 'eur' then t1.consumption else 0 end) - sum(case when t2.currency = 'czk' then t1.consumption else 0 end) as difference from yearmonth t1 join customers t2 on t1.customerid = t2.customerid where t1.date like '2012%'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.5094339622641509
   },
   {
     "id": 4,
@@ -52,7 +56,8 @@
     "pred_sql": "select date, consumption from yearmonth where customerid in (select customerid from customers where currency = 'czk') group by date, consumption order by sum(consumption) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 5,
@@ -63,7 +68,8 @@
     "pred_sql": "select date from yearmonth where customerid in (select customerid from customers where segment = 'sme') and date like '2013%' group by date order by sum(consumption) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 6,
@@ -74,7 +80,8 @@
     "pred_sql": "select avg(case when t2.segment = 'sme' then t1.consumption else 0 end) - avg(case when t2.segment = 'lam' then t1.consumption else 0 end) as sme_lam, avg(case when t2.segment = 'lam' then t1.consumption else 0 end) - avg(case when t2.segment = 'kam' then t1.consum",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 7,
@@ -85,7 +92,8 @@
     "pred_sql": "with segment_consumption as ( select t2.segment, sum(t1.consumption) as totalconsumption from yearmonth as t1 join customers as t2 on t1.customerid = t2.customerid where t1.date >= '2012-01-01' and t1.date < '2013-01-01' group by t2.segment union all select t2.segment, sum(t",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 8,
@@ -96,7 +104,8 @@
     "pred_sql": "select sum(consumption) from yearmonth where customerid = 6 and date between '201308' and '201311'",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 9,
@@ -107,7 +116,8 @@
     "pred_sql": "select sum(case when t2.segment = 'discount' then 1 else 0 end) - sum(case when t1.segment = 'discount' then 1 else 0 end) as difference from gasstations as t1 join gasstations as t2 on t2.country = 'sk' where t1.country = 'cze' and t2.country = 'sk'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 10,
@@ -118,7 +128,8 @@
     "pred_sql": "select sum(case when t2.currency = 'eur' then 1 else 0 end) - sum(case when t2.currency = 'czk' then 1 else 0 end) as difference from transactions_1k as t1 join customers as t2 on t1.customerid = t2.customerid where t2.segment = 'sme'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 11,
@@ -129,7 +140,8 @@
     "pred_sql": "select cast(sum(iif(t2.consumption > 46.73, 1, 0)) as real) * 100 / count(t2.customerid) from customers as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid where t1.segment = 'lam'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.9555555555555556
   },
   {
     "id": 12,
@@ -140,7 +152,8 @@
     "pred_sql": "select cast(sum(iif(t2.consumption > 528.3, 1, 0)) as real) * 100 / count(distinct t1.customerid) from yearmonth as t1 inner join customers as t2 on t1.customerid = t2.customerid where t1.date = '201202'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4242424242424242
   },
   {
     "id": 13,
@@ -151,7 +164,8 @@
     "pred_sql": "select max(consumption) from yearmonth where date like '2012%';",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.3142857142857143
   },
   {
     "id": 14,
@@ -162,7 +176,8 @@
     "pred_sql": "select t3.description from transactions_1k as t1 inner join products as t3 on t1.productid = t3.productid where t1.date between '2013-09-01' and '2013-09-30'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.6190476190476191
   },
   {
     "id": 15,
@@ -173,7 +188,8 @@
     "pred_sql": "select distinct t2.country from transactions_1k as t1 inner join gasstations as t2 on t1.gasstationid = t2.gasstationid where t1.date between '2013-06-01' and '2013-06-30'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.627906976744186
   },
   {
     "id": 16,
@@ -184,7 +200,8 @@
     "pred_sql": "select count(customerid) from yearmonth where customerid in (select customerid from customers where currency = 'eur') and consumption > 1000",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 17,
@@ -195,7 +212,8 @@
     "pred_sql": "select t3.description from transactions_1k as t1 inner join gasstations as t2 on t1.gasstationid = t2.gasstationid inner join products as t3 on t1.productid = t3.productid where t2.country = 'cze'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.9767441860465116
   },
   {
     "id": 18,
@@ -206,7 +224,8 @@
     "pred_sql": "select distinct time from transactions_1k where gasstationid in (select gasstationid from gasstations where chainid = 11)",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 19,
@@ -217,7 +236,8 @@
     "pred_sql": "select count(*) from transactions_1k where gasstationid in (select gasstationid from gasstations where country = 'cze') and date > '2012-01-01'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 20,
@@ -228,7 +248,8 @@
     "pred_sql": "select t2.currency from transactions_1k as t1 inner join customers as t2 on t1.customerid = t2.customerid where t1.date = '2012-08-24' and t1.time = '16:25:00'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.7551020408163265
   },
   {
     "id": 21,
@@ -239,7 +260,8 @@
     "pred_sql": "select t2.segment from transactions_1k as t1 join customers as t2 on t1.customerid = t2.customerid where t1.date = '2012-08-23' and t1.time = '21:20:00'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 22,
@@ -250,7 +272,8 @@
     "pred_sql": "select count(*) from transactions_1k where date = '2012-08-26' and time >= '08:00:00' and time < '09:00:00' and gasstationid in (select gasstationid from gasstations where country = 'cze')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 23,
@@ -261,7 +284,8 @@
     "pred_sql": "select t2.country from transactions_1k as t1 inner join gasstations as t2 on t1.gasstationid = t2.gasstationid inner join customers as t3 on t1.customerid = t3.customerid where t1.date = '2012-08-24' and t1.amount = 548 and t3.customerid = (select customerid from yearmonth where date = '20120824",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 24,
@@ -272,7 +296,8 @@
     "pred_sql": "select cast(sum(case when t3.currency = 'eur' then 1 else 0 end) as real) * 100 / count(*) from transactions_1k as t1 inner join gasstations as t2 on t1.gasstationid = t2.gasstationid inner join customers as t3 on t1.customerid = t3.customerid where t1.date = '2012-08-25'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.6444444444444444
   },
   {
     "id": 25,
@@ -283,7 +308,8 @@
     "pred_sql": "select (t2.consumption - t1.consumption) / t1.consumption * 100 as decreaserate from yearmonth as t1 inner join yearmonth as t2 on t1.customerid = t2.customerid and t1.date = '2012-08-01' and t2.date = '2013-08-01' where t1.customerid = (select customerid from transactions_1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 26,
@@ -294,7 +320,8 @@
     "pred_sql": "select cast(sum(case when t2.segment = 'premium' then 1 else 0 end) as real) * 100 / count(*) from gasstations as t1 inner join transactions_1k as t2 on t1.gasstationid = t2.gasstationid where t1.country = 'svk'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 27,
@@ -305,7 +332,8 @@
     "pred_sql": "select sum(t1.amount) from transactions_1k as t1 inner join gasstations as t2 on t1.gasstationid = t2.gasstationid inner join customers as t3 on t1.customerid = t3.customerid where t3.customerid = 38508 and year(t1.date) = 2012 and month(t1.date) = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.5
   },
   {
     "id": 28,
@@ -316,7 +344,8 @@
     "pred_sql": "select segment, avg(price) as averageprice, currency from transactions_1k join customers on transactions_1k.customerid = customers.customerid where customerid = (select customerid from transactions_1k group by customerid order by sum(amount) desc limit 1) group by segment, currency",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.0
   },
   {
     "id": 29,
@@ -327,7 +356,8 @@
     "pred_sql": "select t3.customerid, t4.consumption from transactions_1k as t1 inner join products as t2 on t1.productid = t2.productid inner join customers as t3 on t1.customerid = t3.customerid inner join yearmonth as t4 on t3.customerid = t4.customerid and t1.date = t4.date where t1.price > 29.00 and t4.date = '2012-08",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 30,
@@ -338,7 +368,8 @@
     "pred_sql": "select major_name from major where member_id in (select link_to_member from member where first_name = 'angela' and last_name = 'sanders')",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 31,
@@ -349,7 +380,8 @@
     "pred_sql": "select count(*) from member where t_shirt_size = 'medium' and link_to_major in (select link_to_member from attendance where link_to_event = (select event_id from event where event_name = 'women''s soccer'))",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 32,
@@ -360,7 +392,8 @@
     "pred_sql": "select count(*) from event where event_id in (select link_to_event from attendance group by link_to_event having count(link_to_member) > 10 and event_name like 'meeting%')",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 33,
@@ -371,7 +404,8 @@
     "pred_sql": "select t1.event_name from event as t1 join attendance as t2 on t1.event_id = t2.link_to_event where t2.amount > 20 except select t1.event_name from event as t1 join budget as t2 on t1.event_id = t2.link_to_event where t2.event_status = 'fundraiser'",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.6037735849056604
   },
   {
     "id": 34,
@@ -382,7 +416,8 @@
     "pred_sql": "select amount from income where link_to_member in (select link_to_member from member where position = 'vice president')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 35,
@@ -393,7 +428,8 @@
     "pred_sql": "select first_name, last_name from member where zip in (select zip_code from zip_code where state = 'il')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 36,
@@ -404,7 +440,8 @@
     "pred_sql": "select expense_id from expense where expense_date like '2019-10-08' and approved = 'true'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.25
   },
   {
     "id": 37,
@@ -415,7 +452,8 @@
     "pred_sql": "select avg(t2.cost) from member as t1 inner join expense as t2 on t1.member_id = t2.link_to_member where t1.first_name = 'elijah' and t1.last_name = 'allen' and t2.expense_date between '2019-09-01' and '2019-10-31'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.5535714285714286
   },
   {
     "id": 38,
@@ -426,7 +464,8 @@
     "pred_sql": "select sum(case when t2.event_date like '2019%' then t1.amount else 0 end) - sum(case when t2.event_date like '2020%' then t1.amount else 0 end) as difference from expense as t1 join event as t2 on t1.link_to_event = t2.event_id join member as t3 on t1.link_to_member = t3.member_id where t3.position = 'student",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 39,
@@ -437,7 +476,8 @@
     "pred_sql": "select t3.notes from expense as t1 join income as t2 on t1.link_to_member = t2.link_to_member join budget as t4 on t1.link_to_budget = t4.budget_id join event as t5 on t4.link_to_event = t5.event_id where t1.expense_date = '2019-09-14' and t2.date_received = '2019-09-14'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 40,
@@ -448,7 +488,8 @@
     "pred_sql": "select phone from member where last_name = 'jacobs' and first_name = 'carlo'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 41,
@@ -459,7 +500,8 @@
     "pred_sql": "select t3.status from expense as t1 join budget as t2 on t1.link_to_budget = t2.budget_id join event as t3 on t2.link_to_event = t3.event_id where t1.expense_description = 'post cards, posters' and t1.expense_date = '2019-08-20'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4444444444444444
   },
   {
     "id": 42,
@@ -470,7 +512,8 @@
     "pred_sql": "select major_name from major where member_id = 'rec28orzgcm1dtqbz';",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.25
   },
   {
     "id": 43,
@@ -481,7 +524,8 @@
     "pred_sql": "select count(*) from member where link_to_major = (select major_id from major where major_name = 'business') and t_shirt_size = 'medium'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4054054054054054
   },
   {
     "id": 44,
@@ -492,7 +536,8 @@
     "pred_sql": "select t2.department from member as t1 join major as t2 on t1.link_to_major = t2.major_id where t1.position = 'president'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 45,
@@ -503,7 +548,8 @@
     "pred_sql": "select date_received from income where link_to_member = 'rec28orzgcm1dtqbz' and source = 'dues'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.33333333333333337
   },
   {
     "id": 46,
@@ -514,7 +560,8 @@
     "pred_sql": "select sum(case when t2.event_name = 'yearly kickoff' then 1 else 0 end) - sum(case when t2.event_name = 'october meeting' then 1 else 0 end) as difference from budget as t1 join event as t2 on t1.link_to_event = t2.event_id where t1.category = 'advertisement'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.75
   },
   {
     "id": 47,
@@ -525,7 +572,8 @@
     "pred_sql": "select sum(cost) from expense where expense_description like '%pizza%'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.736842105263158
   },
   {
     "id": 48,
@@ -536,7 +584,8 @@
     "pred_sql": "select count(distinct city) from zip_code where state = 'va' and county = 'orange county'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.8
   },
   {
     "id": 49,
@@ -547,7 +596,8 @@
     "pred_sql": "select major_name from major where major_id in (select link_to_major from member where phone = '809-555-3360')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 50,
@@ -558,7 +608,8 @@
     "pred_sql": "select count(distinct link_to_member) from attendance where link_to_event in (select event_id from event where event_name = 'women''s soccer')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 51,
@@ -569,7 +620,8 @@
     "pred_sql": "select m.first_name, m.last_name from member m join major j on m.link_to_major = j.major_id where j.department = 'school of applied sciences, technology and education'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.4571428571428572
   },
   {
     "id": 52,
@@ -580,7 +632,8 @@
     "pred_sql": "select event_id from budget where event_status = 'closed' order by (spent / amount) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.41463414634146345
   },
   {
     "id": 53,
@@ -591,7 +644,8 @@
     "pred_sql": "select max(spent) from budget",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 54,
@@ -602,7 +656,8 @@
     "pred_sql": "select sum(spent) from budget where category = 'food'",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 55,
@@ -613,7 +668,8 @@
     "pred_sql": "select first_name, last_name from member where member_id in (select link_to_member from attendance group by link_to_member having count(link_to_event) > 7)",
     "ex": true,
     "sm": false,
-    "cm": 0.75
+    "cm": 0.75,
+    "ast": 0.050000000000000044
   },
   {
     "id": 56,
@@ -624,7 +680,8 @@
     "pred_sql": "select m.first_name, m.last_name from member m join budget b on m.member_id = b.link_to_member where b.event_status = 'open' and b.category = 'advertisement' order by m.member_id limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.1694915254237288
   },
   {
     "id": 57,
@@ -635,7 +692,8 @@
     "pred_sql": "select event_id from expense group by event_id order by sum(cost) limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.2325581395348837
   },
   {
     "id": 58,
@@ -646,7 +704,8 @@
     "pred_sql": "select (select sum(cost) from expense where link_to_budget in (select budget_id from budget where event_status = 'open' and link_to_event = (select event_id from event where event_name = 'yearly kickoff'))) * 100 / (select sum(spent) from budget where event_status = 'open' and link_to_event = (select event_id from event where event_name = 'yearly kickoff')) from expense where link_to_budget in (select budget_id",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 59,
@@ -657,7 +716,8 @@
     "pred_sql": "select source from income where date_received like '2019-09-%' group by source order by sum(amount) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.4
   },
   {
     "id": 60,
@@ -668,7 +728,8 @@
     "pred_sql": "select count(*) from member where link_to_major in (select major_id from major where major_name = 'physics teaching')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 61,
@@ -679,7 +740,8 @@
     "pred_sql": "select event_id from budget where category = 'advertisement' order by spent desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.45945945945945943
   },
   {
     "id": 62,
@@ -690,7 +752,8 @@
     "pred_sql": "select t1.event_id from event as t1 inner join attendance as t2 on t1.event_id = t2.link_to_event inner join member as t3 on t2.link_to_member = t3.member_id where t1.event_name = 'women''s soccer' and t3.first_name = 'maya' and t3.last_name = 'clean'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.5660377358490566
   },
   {
     "id": 63,
@@ -701,7 +764,8 @@
     "pred_sql": "select t3.cost from expense as t1 inner join budget as t2 on t1.link_to_budget = t2.budget_id inner join event as t3 on t2.link_to_event = t3.event_id where t1.expense_description = 'post cards, posters' and t3.event_name = 'september speaker'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6041666666666667
   },
   {
     "id": 64,
@@ -712,7 +776,8 @@
     "pred_sql": "select e.event_name from event e join budget b on e.event_id = b.link_to_event where b.event_status = 'closed' order by b.spent - b.remaining desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.34883720930232553
   },
   {
     "id": 65,
@@ -723,7 +788,8 @@
     "pred_sql": "select e.type, sum(e.cost) as total_cost from expense e join budget b on e.link_to_budget = b.link_to_event join event ev on b.link_to_event = ev.event_id where ev.event_name = 'october meeting' and e.approved = 'true' group by e.type",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.1875
   },
   {
     "id": 66,
@@ -734,7 +800,8 @@
     "pred_sql": "select category from budget where link_to_event = (select event_id from event where event_name = 'april speaker') order by spent asc",
     "ex": true,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.2954545454545454
   },
   {
     "id": 67,
@@ -745,7 +812,8 @@
     "pred_sql": "select sum(cost) from expense where expense_date = '2019-08-20'",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 68,
@@ -756,7 +824,8 @@
     "pred_sql": "select first_name, last_name, sum(cost) as total_cost from expense where link_to_member = 'rec4bldzhs2blfp4v' group by first_name, last_name",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.29268292682926833
   },
   {
     "id": 69,
@@ -767,7 +836,8 @@
     "pred_sql": "select expense_description from expense where link_to_member = 'rec28orzgcm1dtqbz'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.25
   },
   {
     "id": 70,
@@ -778,7 +848,8 @@
     "pred_sql": "select category from budget where link_to_event in (select event_id from event where location = 'mu 215')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 71,
@@ -789,7 +860,8 @@
     "pred_sql": "select t1.last_name, t2.department, t2.college from member as t1 inner join major as t2 on t1.link_to_major = t2.major_id where t2.major_name like '%environmental engineering%'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.5869565217391304
   },
   {
     "id": 72,
@@ -800,7 +872,8 @@
     "pred_sql": "select t2.category from budget as t1 join event as t2 on t1.link_to_event = t2.event_id where t2.location = 'mu 215' and t1.spent = 0 and t2.type = 'guest speaker'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6458333333333333
   },
   {
     "id": 73,
@@ -811,7 +884,8 @@
     "pred_sql": "select sum(case when t2.source = 'dues' then t1.amount else 0 end) / sum(t1.amount) * 100 as percentage from income as t1 join member as t2 on t1.link_to_member = t2.member_id where t2.t_shirt_size = 'medium' and t1.amount = 50 and t2.link_to_major = 'recxk3mhqfbr9j5uo",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 74,
@@ -822,7 +896,8 @@
     "pred_sql": "select event_name from event where status = 'closed' and event_name like '%game%' and event_date between '2019-03-15' and '2020-03-20'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.18367346938775508
   },
   {
     "id": 75,
@@ -833,7 +908,8 @@
     "pred_sql": "select t2.first_name , t2.last_name , t2.phone from expense as t1 join member as t2 on t1.link_to_member = t2.member_id where t1.cost > (select avg(cost) from expense)",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.47959183673469385
   },
   {
     "id": 76,
@@ -844,7 +920,8 @@
     "pred_sql": "select t3.first_name, t3.last_name, sum(t2.cost) as total_cost from expense as t2 join member as t3 on t2.link_to_member = t3.member_id join budget as t1 on t2.link_to_budget = t1.budget_id where t2.expense_description like '%water, cookies%' or t2.expense_description like '%veggie tray%' or t2.expense_description like '%supplies%' group by t2.link_to_member",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.050000000000000044
   },
   {
     "id": 77,
@@ -855,7 +932,8 @@
     "pred_sql": "select t3.first_name, t3.last_name, t4.amount from expense as t1 join income as t4 on t1.link_to_member = t4.link_to_member join member as t2 on t1.link_to_member = t2.member_id join member as t3 on t4.link_to_member = t3.member_id where t1.expense_date = '2019-09-09' and t4.date_received = '2019-0",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 78,
@@ -866,7 +944,8 @@
     "pred_sql": "select abs((count(case when sex = 'm' then id else null end) - count(case when sex = 'f' then id else null end)) / count(case when sex is not null then id else null end) * 100) as deviation from patient",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 79,
@@ -877,7 +956,8 @@
     "pred_sql": "select cast(sum(case when t2.sex = 'f' then 1 else 0 end) as real) * 100 / count(t2.id) from patient as t1 inner join examination as t2 on t1.id = t2.id where year(t1.birthday) > 1930",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 80,
@@ -888,7 +968,8 @@
     "pred_sql": "select cast(sum(case when admission = '+' then 1 else 0 end) as real) * 100 / count(*) from patient where diagnosis = 'sle'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.4444444444444444
   },
   {
     "id": 81,
@@ -899,7 +980,8 @@
     "pred_sql": "select diagnosis, date from laboratory where id = 30609",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.37142857142857144
   },
   {
     "id": 82,
@@ -910,7 +992,8 @@
     "pred_sql": "select id, sex, birthday from patient where id in (select id from laboratory where ldh > (select avg(ldh) from laboratory))",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 83,
@@ -921,7 +1004,8 @@
     "pred_sql": "select e.id, datediff(current_date, p.birthday) as age from examination e join patient p on e.id = p.id where e.thrombosis = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.045454545454545414
   },
   {
     "id": 84,
@@ -932,7 +1016,8 @@
     "pred_sql": "select id, sex, diagnosis from patient where diagnosis in (select diagnosis from examination where thrombosis = 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 85,
@@ -943,7 +1028,8 @@
     "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and year(e.`examination date`) = 1997 and e.`examination date` < (select max(`examination date`) from examination)",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 86,
@@ -954,7 +1040,8 @@
     "pred_sql": "select count(t2.id) from examination as t1 inner join patient as t2 on t1.id = t2.id where t1.thrombosis = (select max(thrombosis) from examination where year(`examination date`) = 1997) and t2.sex = 'f'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.13636363636363635
   },
   {
     "id": 87,
@@ -965,7 +1052,8 @@
     "pred_sql": "select t1.symptoms, t1.diagnosis from examination as t1 join patient as t2 on t1.id = t2.id where t2.`first date` = (select min(`first date`) from patient)",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.2093023255813954
   },
   {
     "id": 88,
@@ -976,7 +1064,8 @@
     "pred_sql": "select t2.date, datediff(t1.first_date, t2.birthday) from patient as t1 join laboratory as t2 on t1.id = t2.id where t1.sm = 'sjs' order by t2.date asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.296875
   },
   {
     "id": 89,
@@ -987,7 +1076,8 @@
     "pred_sql": "select cast(sum(case when sex = 'f' then 1 else 0 end) as real) / sum(case when sex = 'm' then 1 else 0 end) from patient where tp > 200",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0535714285714286
   },
   {
     "id": 90,
@@ -998,7 +1088,8 @@
     "pred_sql": "select count(*) from patient where id in (select id from examination where `examination date` between '1990-01-01' and '1993-12-31') and `first date` < '1990-01-01'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 91,
@@ -1009,7 +1100,8 @@
     "pred_sql": "select t2.diagnosis from examination as t1 inner join patient as t2 on t1.id = t2.id where t2.hgb = (select max(hgb) from examination)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.23913043478260865
   },
   {
     "id": 92,
@@ -1020,7 +1112,8 @@
     "pred_sql": "select t2.`acl igg`, t2.`acl igm` from patient as t1 inner join examination as t2 on t1.id = t2.id where t1.diagnosis = 'sle' and t1.first date = '1994-02-19' and t2.`examination date` = '1993-11-12'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 93,
@@ -1031,7 +1124,8 @@
     "pred_sql": "select ((select `t-cho` from laboratory where date between '1981-11-01' and '1981-11-30' and id = (select id from patient where birthday = '1959-02-18')) - (select `t-cho` from laboratory where date between '1981-12-01' and '1981-12-31' and",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 94,
@@ -1042,7 +1136,8 @@
     "pred_sql": "select id from laboratory where date between '1987-07-06' and '1996-01-31' and gpt > 30 and alb < 4 group by id",
     "ex": true,
     "sm": false,
-    "cm": 0.75
+    "cm": 0.75,
+    "ast": 0.9189189189189189
   },
   {
     "id": 95,
@@ -1053,7 +1148,8 @@
     "pred_sql": "select count(t2.id) from examination as t1 inner join laboratory as t2 on t1.id = t2.id where t1.thrombosis = 2 and t1.`ana pattern` = 's' and t2.`acl igm` > (select avg(`acl igm`) from laboratory) * 1.2",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.109375
   },
   {
     "id": 96,
@@ -1064,7 +1160,8 @@
     "pred_sql": "select distinct p.id from patient as p join examination as e on p.id = e.id join laboratory as l on p.id = l.id where l.date between '1991-10-01' and '1991-10-31' and l.`t-bil` between 0 and 1.5 and e.kct = 'outpatient clinic'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 97,
@@ -1075,7 +1172,8 @@
     "pred_sql": "select avg(alb) from laboratory where id in (select id from patient where sex = 'f' and plt > 400 and diagnosis = 'sle')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 98,
@@ -1086,7 +1184,8 @@
     "pred_sql": "select count(*) from patient where sex = 'f' and diagnosis = 'aps'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.76
   },
   {
     "id": 99,
@@ -1097,7 +1196,8 @@
     "pred_sql": "select cast(sum(case when t2.sex = 'f' then 1 else 0 end) as real) * 100 / count(t1.id) from patient as t1 inner join examination as t2 on t1.id = t2.id where t1.diagnosis = 'ra' and year(t1.birthday) = 1980",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.32558139534883723
   },
   {
     "id": 100,
@@ -1108,7 +1208,8 @@
     "pred_sql": "select count(*) > 0 as within_normal from laboratory where id = 57266 and ua between 20 and 200",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.08064516129032262
   },
   {
     "id": 101,
@@ -1119,7 +1220,8 @@
     "pred_sql": "select id from laboratory where gpt > 34 and sex = 'f' group by id",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 102,
@@ -1130,7 +1232,8 @@
     "pred_sql": "select distinct p.id, p.diagnosis from patient p join laboratory l on p.id = l.id where l.gpt > 30 order by p.birthday asc",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.41666666666666663
   },
   {
     "id": 103,
@@ -1141,7 +1244,8 @@
     "pred_sql": "select id, sex, birthday from patient where un = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.19512195121951215
   },
   {
     "id": 104,
@@ -1152,7 +1256,8 @@
     "pred_sql": "select sex, t-bil from laboratory group by sex having t-bil not in (select t-bil from laboratory where t-bil is not null and t-bil between 0 and 1.2)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 105,
@@ -1163,7 +1268,8 @@
     "pred_sql": "select avg(datediff(curdate(), birthday)) / 365 from patient where sex = 'm' and tp > 200",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 106,
@@ -1174,7 +1280,8 @@
     "pred_sql": "select count(*) from patient as p join laboratory as l on p.id = l.id where l.tg > 1.5 and p.birthday < '1963-01-01'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.10869565217391308
   },
   {
     "id": 107,
@@ -1185,7 +1292,8 @@
     "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'm' and e.cre > 1.0 and p.birthday between '1936-01-01' and '1956-12-31'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0714285714285714
   },
   {
     "id": 108,
@@ -1196,7 +1304,8 @@
     "pred_sql": "select p.id, p.sex, timestampdiff(year, p.birthday, e.`examination date`) as age from patient p join examination e on p.id = e.id join laboratory l on p.id = l.id where l.glu > 200 and l.t-cho < 200",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 109,
@@ -1207,7 +1316,8 @@
     "pred_sql": "select t1.id, timestampdiff(year, t1.birthday, current_date) as age from patient as t1 join examination as t2 on t1.id = t2.id where t2.rbc < (select min(rbc) from examination)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 110,
@@ -1218,7 +1328,8 @@
     "pred_sql": "select id, sex from patient where diagnosis = 'sle' and hgb = 'normal' order by birthday asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.2777777777777778
   },
   {
     "id": 111,
@@ -1229,7 +1340,8 @@
     "pred_sql": "select p.id, timestampdiff(year, p.birthday, l.date) as age from patient p join laboratory l on p.id = l.id where l.hct > 0.4 group by p.id having count(distinct l.date) >= 2",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.0
   },
   {
     "id": 112,
@@ -1240,7 +1352,8 @@
     "pred_sql": "select sum(case when plt < 150 then 1 else 0 end) as lowerthannormal, sum(case when plt > 350 then 1 else 0 end) as higherthannormal from laboratory join patient on laboratory.id = patient.id where plt not between 150 and 350",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 113,
@@ -1251,7 +1364,8 @@
     "pred_sql": "select distinct p.id from patient p join laboratory l on p.id = l.id where l.date between '1984-01-01' and '1984-12-31' and p.plt = 150 and strftime('%y', p.birthday) > '1954' and strftime('%y', p.birthday) < '1955'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.14516129032258063
   },
   {
     "id": 114,
@@ -1262,7 +1376,8 @@
     "pred_sql": "select cast(sum(case when t2.sex = 'f' then 1 else 0 end) as real) * 100 / count(t1.id) from examination as t1 inner join patient as t2 on t1.id = t2.id where t2.birthday < date_sub(curdate(), interval 55 year) and t1.pt > 30",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.25757575757575757
   },
   {
     "id": 115,
@@ -1273,7 +1388,8 @@
     "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'm' and e.wbc = 7.2 group by e.id having count(distinct e.id) > 0 and sum(case when e.crp = 'abnormal' then 1 else 0 end) > 0",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.038461538461538436
   },
   {
     "id": 116,
@@ -1284,7 +1400,8 @@
     "pred_sql": "select count(*) from patient where igg > 1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.20454545454545459
   },
   {
     "id": 117,
@@ -1295,7 +1412,8 @@
     "pred_sql": "select count(*) from patient where id in (select p.id from patient p join examination e on p.id = e.id where e.`acl igg` = 1 and e.symptoms is not null)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 118,
@@ -1306,7 +1424,8 @@
     "pred_sql": "select count(*) from patient where id in (select p.id from patient p join examination e on p.id = e.id where e.`acl iga` = 0 and p.`first date` > '1990-01-01')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 119,
@@ -1317,7 +1436,8 @@
     "pred_sql": "select diagnosis from examination where `acl igm` > 1 group by diagnosis order by count(*) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.20408163265306123
   },
   {
     "id": 120,
@@ -1328,7 +1448,8 @@
     "pred_sql": "select count(*) from laboratory where crp = 'abnormal' and id not in (select id from examination)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 121,
@@ -1339,7 +1460,8 @@
     "pred_sql": "select count(*) from patient where id in (select p.id from examination as e join laboratory as l on e.id = l.id where l.cre > 1.5 or l.cre < 0.5 and e.thrombosis = 1) and id in (select id from patient where birthday < '1970-01-01')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 122,
@@ -1350,7 +1472,8 @@
     "pred_sql": "select count(*) from patient where sc170 = 'negative' and admission is not null",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.11538461538461542
   },
   {
     "id": 123,
@@ -1361,7 +1484,8 @@
     "pred_sql": "select count(*) from patient where sc170 = 'none' and thrombosis = 0",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.1578947368421053
   },
   {
     "id": 124,
@@ -1372,7 +1496,8 @@
     "pred_sql": "select count(*) from patient as p join examination as e on p.id = e.id where p.sex = 'f' and e.symptoms is null and e.sc170 = 0",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.31746031746031744
   },
   {
     "id": 125,
@@ -1383,7 +1508,8 @@
     "pred_sql": "select count(*) from patient where sex = 'm' and `centromea` = 'negative' and `ssb` = 'negative'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.13043478260869568
   },
   {
     "id": 126,
@@ -1394,7 +1520,8 @@
     "pred_sql": "select min(t2.birthday) from laboratory as t1 join patient as t2 on t1.id = t2.id where t1.got > 30",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.4864864864864865
   },
   {
     "id": 127,
@@ -1405,7 +1532,8 @@
     "pred_sql": "select count(*) from examination inner join laboratory on examination.id = laboratory.id where examination.thrombosis = 0 and laboratory.cpk < 200 and examination.`thrombosis` = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.016129032258064502
   },
   {
     "id": 128,
@@ -1416,7 +1544,8 @@
     "pred_sql": "select league_id from match where season = '2016' group by league_id order by sum(home_team_goal) + sum(away_team_goal) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.34782608695652173
   },
   {
     "id": 129,
@@ -1427,7 +1556,8 @@
     "pred_sql": "select away_team_api_id from match where season='2010' and away_team_goal>home_team_goal group by away_team_api_id order by count(*) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.4411764705882353
   },
   {
     "id": 130,
@@ -1438,7 +1568,8 @@
     "pred_sql": "select t.team_long_name, ta.buildupplayspeed from team as t join team_attributes as ta on t.team_api_id = ta.team_api_id order by ta.buildupplayspeed desc limit 4",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.4193548387096774
   },
   {
     "id": 131,
@@ -1449,7 +1580,8 @@
     "pred_sql": "select t2.name from match as t1 join league as t2 on t1.league_id = t2.id where t1.stage = 1 and t1.season = '2016' and t1.card = 'd' group by t2.name order by count(*) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.56
   },
   {
     "id": 132,
@@ -1460,7 +1592,8 @@
     "pred_sql": "select t2.player_name from player as t1 join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.sprint_speed >= 97 and t1.birthday like '2013-%' or t1.birthday like '2014-%' or t1.birthday like '2015-%'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.07843137254901966
   },
   {
     "id": 133,
@@ -1471,7 +1604,8 @@
     "pred_sql": "select name, count(*) from match join league on match.league_id = league.id group by name order by count(*) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.0
   },
   {
     "id": 134,
@@ -1482,7 +1616,8 @@
     "pred_sql": "select team_fifa_api_id from team_attributes where buildupplayspeed > 50 and buildupplayspeed < 60",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.96
   },
   {
     "id": 135,
@@ -1493,7 +1628,8 @@
     "pred_sql": "select t.team_long_name from team as t join team_attributes as ta on t.team_api_id = ta.team_api_id where ta.date = '2012-12-31' and ta.buildupplaypassing > (select avg(buildupplaypassing) from team_attributes where date = '2012-12-31')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.2359550561797753
   },
   {
     "id": 136,
@@ -1504,7 +1640,8 @@
     "pred_sql": "select cast(sum(case when t2.preferred_foot = 'left' then 1 else 0 end) as real) * 100 / count(t1.player_api_id) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.birthday between '1987-01-01' and '1992-12-31'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.3666666666666667
   },
   {
     "id": 137,
@@ -1515,7 +1652,8 @@
     "pred_sql": "select avg(t2.long_shots) from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'ahmed samir farag'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.736842105263158
   },
   {
     "id": 138,
@@ -1526,7 +1664,8 @@
     "pred_sql": "select p.player_name from player as p join player_attributes as pa on p.player_api_id = pa.player_api_id where p.height > 180 group by p.player_name order by avg(pa.heading_accuracy) desc limit 10",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.30612244897959184
   },
   {
     "id": 139,
@@ -1537,7 +1676,8 @@
     "pred_sql": "select t2.name from match as m join league as t2 on m.league_id = t2.id where m.season = '2009/2010' and m.home_team_goal > m.away_team_goal group by t2.name",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.359375
   },
   {
     "id": 140,
@@ -1548,7 +1688,8 @@
     "pred_sql": "select player_name from player where birthday like '1970-10%'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6666666666666667
   },
   {
     "id": 141,
@@ -1559,7 +1700,8 @@
     "pred_sql": "select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'gabriel tamas') and date like '2011%'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.2564102564102564
   },
   {
     "id": 142,
@@ -1570,7 +1712,8 @@
     "pred_sql": "select avg(home_team_goal) from match where season = '2010/2011' and country_id = (select id from country where name = 'poland')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.2272727272727273
   },
   {
     "id": 143,
@@ -1581,7 +1724,8 @@
     "pred_sql": "select avg(t2.finishing) from player_attributes as t1 join player as t2 on t1.player_api_id = t2.player_api_id where t2.height in (select min(height) from player) and t2.height in (select max(height) from player)",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.0
   },
   {
     "id": 144,
@@ -1592,7 +1736,8 @@
     "pred_sql": "select avg(overall_rating) from player_attributes where player_api_id in (select player_api_id from player where height > 170 and date between '2010-01-01' and '2015-12-31')",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 145,
@@ -1603,7 +1748,8 @@
     "pred_sql": "select avg(`ball_control`) - (select avg(`ball_control`) from player_attributes where player_api_id in (select player_api_id from player where player_name = 'abdou diallo') or player_api_id in (select player_api_id from player where player_name = 'aaron appindangoye')) from player_attributes",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 146,
@@ -1614,7 +1760,8 @@
     "pred_sql": "select player_name from player where player_name in ('aaron lennon', 'abdelaziz barrada') order by birthday asc limit 1",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 147,
@@ -1625,7 +1772,8 @@
     "pred_sql": "select player_name from player order by height desc limit 1",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 148,
@@ -1636,7 +1784,8 @@
     "pred_sql": "select count(*) from player_attributes where preferred_foot = 'left' and attacking_work_rate = 'left'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.6
   },
   {
     "id": 149,
@@ -1647,7 +1796,8 @@
     "pred_sql": "select count(*) from player_attributes pa join player p on pa.player_api_id = p.player_api_id join team_attributes ta on pa.player_fifa_api_id = ta.team_fifa_api_id where p.birthday < '1986-01-01' and ta.defencepressureclass = 'balanced' and ta.defenceaggressionclass = 'balanced' and ta.defenceteamwidthclass = 'balanced' and ta.defencedefenderlineclass",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 150,
@@ -1658,7 +1808,8 @@
     "pred_sql": "select t2.player_name from player_attributes as t1 join player as t2 on t1.player_api_id = t2.player_api_id where t1.volley > 70 and t1.dribbling > 70",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6486486486486487
   },
   {
     "id": 151,
@@ -1669,7 +1820,8 @@
     "pred_sql": "select count(*) from match join league on match.league_id = league.id join country on league.country_id = country.id where league.name = 'belgium jupiler league' and month(date) = 4 and year(date) = 2009",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 152,
@@ -1680,7 +1832,8 @@
     "pred_sql": "select league_id, count(*) as match_count from match where season = '2008/2009' group by league_id order by match_count desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.34090909090909094
   },
   {
     "id": 153,
@@ -1691,7 +1844,8 @@
     "pred_sql": "select cast((select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'ariel borysiuk') - (select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'paulin puel'))) as real) * 100 / (select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'paul",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 154,
@@ -1702,7 +1856,8 @@
     "pred_sql": "select avg(overall_rating) from player_attributes where player_api_id = (select player_api_id from player where player_name = 'pietro marino')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.2894736842105263
   },
   {
     "id": 155,
@@ -1713,7 +1868,8 @@
     "pred_sql": "select max(chancecreationpassing), max(chancecreationpassingclass) from team_attributes where team_api_id = (select team_api_id from team where name = 'ajax')",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.38095238095238093
   },
   {
     "id": 156,
@@ -1724,7 +1880,8 @@
     "pred_sql": "select player_name from player where player_api_id in (select player_api_id from player_attributes where date = '2016-06-23' and overall_rating = 77) order by birthday asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.0
   },
   {
     "id": 157,
@@ -1735,7 +1892,8 @@
     "pred_sql": "select overall_rating from player_attributes where player_name = 'aaron mooy' and date = '2016-02-04 00:00:00'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.23076923076923073
   },
   {
     "id": 158,
@@ -1746,7 +1904,8 @@
     "pred_sql": "select `attacking_work_rate` from player where player_name = 'francesco migliore' and date = '2015-05-01'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.33333333333333337
   },
   {
     "id": 159,
@@ -1757,7 +1916,8 @@
     "pred_sql": "select t2.date from player as t1 join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.player_name = 'kevin constant' order by t2.crossing desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.7777777777777778
   },
   {
     "id": 160,
@@ -1768,7 +1928,8 @@
     "pred_sql": "select buildupplaypassingclass from team_attributes where team_api_id = (select team_api_id from team where name = 'fc lorient') and date = '2010-02-22 00:00:00'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.2777777777777778
   },
   {
     "id": 161,
@@ -1779,7 +1940,8 @@
     "pred_sql": "select defenceaggressionclass from team_attributes where team_fifa_api_id in (select team_fifa_api_id from team where team_short_name = 'hannover 96') and date = '2015-09-10'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 162,
@@ -1790,7 +1952,8 @@
     "pred_sql": "select avg(overall_rating) from player_attributes where player_api_id = (select player_api_id from player where player_name = 'marko arnautovic') and date between '2007-02-22' and '2016-04-21'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.1071428571428571
   },
   {
     "id": 163,
@@ -1801,7 +1964,8 @@
     "pred_sql": "select cast((select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'landon donovan') and date = '2013-07-12') as real) / cast((select overall_rating from player_attributes where player_api_id = (select player_api_id from player where player_name = 'jordan bowery') and date = '2013-07-12') as real) *",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 164,
@@ -1812,7 +1976,8 @@
     "pred_sql": "select player_name from player order by height desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.46341463414634143
   },
   {
     "id": 165,
@@ -1823,7 +1988,8 @@
     "pred_sql": "select player_name from player where overall_rating = (select max(overall_rating) from player_attributes join player on player_attributes.player_api_id = player.player_api_id)",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6153846153846154
   },
   {
     "id": 166,
@@ -1834,7 +2000,8 @@
     "pred_sql": "select t2.player_name from team_attributes as ta join match as m on ta.team_api_id = m.home_team_api_id or ta.team_api_id = m.away_team_api_id join player_attributes as pa on pa.player_api_id = m.home_player_x1 or pa.player_api_id = m.away_player_x1 where ta.buildupplayspeedclass = 'balanced' and ta.buildupplaydribblingclass = 'little' and ta.buildupplaypassingclass",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 167,
@@ -1845,7 +2012,8 @@
     "pred_sql": "select t2.team_short_name from team as t1 join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t2.chancecreationpassingclass = 'safe'",
     "ex": false,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.9032258064516129
   },
   {
     "id": 168,
@@ -1856,7 +2024,8 @@
     "pred_sql": "select count(*) from player where player_name like 'aaron%' and strftime('%y', birthday) > '1990'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.48
   },
   {
     "id": 169,
@@ -1867,7 +2036,8 @@
     "pred_sql": "select `jumping` from player where player_api_id in (6, 23)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.11764705882352944
   },
   {
     "id": 170,
@@ -1878,7 +2048,8 @@
     "pred_sql": "select player_api_id from player where potential in (select potential from player order by potential asc limit 4) and preferred_foot = 'right'",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.0
   },
   {
     "id": 171,
@@ -1889,7 +2060,8 @@
     "pred_sql": "select count(*) from player_attributes where preferred_foot = 'left' and attacking_work_rate = 'high' and crossing = (select max(crossing) from player_attributes where preferred_foot = 'left' and attacking_work_rate = 'high')",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.23913043478260865
   },
   {
     "id": 172,
@@ -1900,7 +2072,8 @@
     "pred_sql": "select home_team_goal, away_team_goal from match where date=\"2008-09-24 00:00:00\" and league_id=1 and season=\"2008/2009\" and stage=1",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.07317073170731703
   },
   {
     "id": 173,
@@ -1911,7 +2084,8 @@
     "pred_sql": "select t2.buildupplayspeedclass from team as t1 inner join team_attributes as t2 on t1.team_api_id = t2.team_api_id where t1.team_long_name = 'ksv cercle brugge'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.6774193548387097
   },
   {
     "id": 174,
@@ -1922,7 +2096,8 @@
     "pred_sql": "select t2.finishing, t2.curve from player as t1 inner join player_attributes as t2 on t1.player_api_id = t2.player_api_id where t1.weight = (select max(weight) from player) limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.24561403508771928
   },
   {
     "id": 175,
@@ -1933,7 +2108,8 @@
     "pred_sql": "select league_id, count(*) as game_count from match where season = '2015/2016' group by league_id order by game_count desc limit 4",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.16666666666666663
   },
   {
     "id": 176,
@@ -1944,7 +2120,8 @@
     "pred_sql": "select t.team_long_name from match m join team t on m.away_team_api_id = t.team_api_id group by t.team_long_name order by count(m.away_team_goal) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.4193548387096774
   },
   {
     "id": 177,
@@ -1955,7 +2132,8 @@
     "pred_sql": "select player_name from player where player_fifa_api_id = (select player_fifa_api_id from player_attributes order by strength desc limit 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.3653846153846154
   },
   {
     "id": 178,
@@ -1966,7 +2144,8 @@
     "pred_sql": "select cast(sum(case when t2.height < 180 then 1 else 0 end) as real) * 100 / count(*) from player as t1 inner join `player_attributes` as t2 on t1.player_api_id = t2.player_api_id where t2.strength > 70",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.33333333333333337
   },
   {
     "id": 179,
@@ -1977,7 +2156,8 @@
     "pred_sql": "select t2.driverref from results as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.raceid = 20 and t1.positionorder = 1 and t1.statusid = 2",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.5405405405405406
   },
   {
     "id": 180,
@@ -1988,7 +2168,8 @@
     "pred_sql": "select t3.surname from qualifying as t1 join drivers as t3 on t1.driverid = t3.driverid join races as t2 on t1.raceid = t2.raceid where t1.number = 2 and t2.round = 19 order by t1.q2 desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.5135135135135135
   },
   {
     "id": 181,
@@ -1999,7 +2180,8 @@
     "pred_sql": "select t2.name from circuits as t1 join races as t2 on t1.circuitid = t2.circuitid where t1.country = 'germany'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.967741935483871
   },
   {
     "id": 182,
@@ -2010,7 +2192,8 @@
     "pred_sql": "select t2.location, t2.lat, t2.lng from races as t1 join circuits as t2 on t1.circuitid = t2.circuitid where t1.name = 'australian grand prix'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6111111111111112
   },
   {
     "id": 183,
@@ -2021,7 +2204,8 @@
     "pred_sql": "select lat, lng from circuits where name = 'abu dhabi grand prix'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.3055555555555556
   },
   {
     "id": 184,
@@ -2032,7 +2216,8 @@
     "pred_sql": "select q1 from qualifying where raceid = 354 and driverid = (select driverid from drivers where forename = 'bruno' and surname = 'senna')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.45238095238095233
   },
   {
     "id": 185,
@@ -2043,7 +2228,8 @@
     "pred_sql": "select t2.number from qualifying as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.qualifyid = 903 and t1.position = 3 and t1.q3 = '01:54.000'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.5833333333333333
   },
   {
     "id": 186,
@@ -2054,7 +2240,8 @@
     "pred_sql": "select count(*) from results where raceid in (select raceid from races where name = 'bahrain grand prix' and year = 2007 and statusid = 2) and position is null",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 187,
@@ -2065,7 +2252,8 @@
     "pred_sql": "select min(surname) from drivers where driverid in (select driverid from results where resultid in (select resultid from races where raceid = 592))",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 188,
@@ -2076,7 +2264,8 @@
     "pred_sql": "select url from drivers where driverid = (select driverid from laptimes where raceid = 161 and time = '0:01:27')",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.276595744680851
   },
   {
     "id": 189,
@@ -2087,7 +2276,8 @@
     "pred_sql": "select location, lat, lng from circuits where name = 'malaysian grand prix'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.25
   },
   {
     "id": 190,
@@ -2098,7 +2288,8 @@
     "pred_sql": "select url from constructors where constructorid = (select constructorid from constructorresults where raceid = 9 order by points desc limit 1)",
     "ex": true,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.0
   },
   {
     "id": 191,
@@ -2109,7 +2300,8 @@
     "pred_sql": "select t2.code from qualifying as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.raceid = 45 and t1.q3 = '0:01:33' limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.8055555555555556
   },
   {
     "id": 192,
@@ -2120,7 +2312,8 @@
     "pred_sql": "select url from races where raceid = 901 limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.30000000000000004
   },
   {
     "id": 193,
@@ -2131,7 +2324,8 @@
     "pred_sql": "select min(surname) from drivers where driverid in (select driverid from results where resultid in (select resultid from races where raceid = 872))",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 194,
@@ -2142,7 +2336,8 @@
     "pred_sql": "select nationality from drivers where driverid = (select driverid from results where statusid = (select statusid from status where status = 'finished') order by fastestlapspeed desc limit 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.0
   },
   {
     "id": 195,
@@ -2153,7 +2348,8 @@
     "pred_sql": "select cast(t2.fastestlapspeed as real) - t1.fastestlapspeed * 100 / t2.fastestlapspeed from results as t1 inner join results as t2 on t1.raceid = t2.raceid where t1.driverid = (select driverid from drivers where number = 853) and t2.driverid = (select driverid from drivers where number = 8) and t1.raceid",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.11267605633802813
   },
   {
     "id": 196,
@@ -2164,7 +2360,8 @@
     "pred_sql": "select cast(sum(case when t2.time is not null then 1 else 0 end) as real) * 100 / count(t1.driverid) from drivers as t1 inner join results as t2 on t1.driverid = t2.driverid where t2.date = '1983-07-16'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.6041666666666667
   },
   {
     "id": 197,
@@ -2175,7 +2372,8 @@
     "pred_sql": "select name from races where date >= '1950-01-01' order by date limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.4044943820224719
   },
   {
     "id": 198,
@@ -2186,7 +2384,8 @@
     "pred_sql": "select t1.forename , t1.surname from drivers as t1 join driverstandings as t2 on t1.driverid = t2.driverid order by t2.points desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.679245283018868
   },
   {
     "id": 199,
@@ -2197,7 +2396,8 @@
     "pred_sql": "select t2.forename, t2.surname, t1.time from laptimes as t1 join drivers as t2 on t1.driverid = t2.driverid order by t1.milliseconds asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.6724137931034483
   },
   {
     "id": 200,
@@ -2208,7 +2408,8 @@
     "pred_sql": "select avg(milliseconds) from laptimes where raceid = (select raceid from races where name = 'malaysian grand prix' and year = 2009) and driverid = (select driverid from drivers where forename = 'lewis' and surname = 'hamilton')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.4918032786885246
   },
   {
     "id": 201,
@@ -2219,7 +2420,8 @@
     "pred_sql": "select cast(sum(case when t2.position = 1 then 1 else 0 end) as real) * 100 / count(*) from races as t1 inner join results as t2 on t1.raceid = t2.raceid where t2.driverid = (select driverid from drivers where forename = 'lewis' and surname = 'hamilton') and t1.year >= 2010",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.523076923076923
   },
   {
     "id": 202,
@@ -2230,7 +2432,8 @@
     "pred_sql": "select t3.nationality, max(t1.points) from driverstandings as t1 join drivers as t3 on t1.driverid = t3.driverid where t1.position = 1 group by t3.nationality order by max(t1.points) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.421875
   },
   {
     "id": 203,
@@ -2241,7 +2444,8 @@
     "pred_sql": "select min(dob), surname from drivers where nationality = 'japanese' order by dob asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.6511627906976745
   },
   {
     "id": 204,
@@ -2252,7 +2456,8 @@
     "pred_sql": "select t1.name, t1.location from races as t1 join circuits as t2 on t1.circuitid = t2.circuitid where t1.date like '2005-09-%'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.48
   },
   {
     "id": 205,
@@ -2263,7 +2468,8 @@
     "pred_sql": "select r.name from races r join results res on r.raceid = res.raceid join drivers d on res.driverid = d.driverid where d.forename = 'alex' and d.surname = 'yoong' and res.grid < 20",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.5
   },
   {
     "id": 206,
@@ -2274,7 +2480,8 @@
     "pred_sql": "select t2.year from drivers as t1 join results as t2 on t1.driverid = t2.driverid where t1.forename = 'michael' and t1.surname = 'schumacher' and t2.fastestlap = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.55
   },
   {
     "id": 207,
@@ -2285,7 +2492,8 @@
     "pred_sql": "select t2.points from drivers as t1 join results as t2 on t1.driverid = t2.driverid where t1.forename = 'lewis' and t1.surname = 'hamilton' order by t2.raceid limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.6
   },
   {
     "id": 208,
@@ -2296,7 +2504,8 @@
     "pred_sql": "select cast(sum(case when t2.country = 'germany' then 1 else 0 end) as real) * 100 / count(*) from races as t1 inner join circuits as t2 on t1.circuitid = t2.circuitid inner join seasons as t3 on t1.year = t3.year where t3.url like '%european grand prix%'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.2978723404255319
   },
   {
     "id": 209,
@@ -2307,7 +2516,8 @@
     "pred_sql": "select location, lng, lat from circuits where name = 'silverstone circuit'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8695652173913043
   },
   {
     "id": 210,
@@ -2318,7 +2528,8 @@
     "pred_sql": "select circuitref from circuits where name = 'marina bay street circuit'",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 211,
@@ -2329,7 +2540,8 @@
     "pred_sql": "select nationality from drivers order by dob limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.8076923076923077
   },
   {
     "id": 212,
@@ -2340,7 +2552,8 @@
     "pred_sql": "select t2.driverref from races as t1 join results as t2 on t1.raceid = t2.raceid where t1.name = 'canadian grand prix' and t1.year = 2007 and t2.position = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.734375
   },
   {
     "id": 213,
@@ -2351,7 +2564,8 @@
     "pred_sql": "select r.name from results r join drivers d on r.driverid = d.driverid where d.forename = 'lewis' and d.surname = 'hamilton' order by r.position limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.379746835443038
   },
   {
     "id": 214,
@@ -2362,7 +2576,8 @@
     "pred_sql": "select fastestlapspeed from results where raceid = (select raceid from races where name = 'spanish grand prix 2009') order by fastestlapspeed desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.36
   },
   {
     "id": 215,
@@ -2373,7 +2588,8 @@
     "pred_sql": "select t3.rank from results as t3 join drivers as t1 on t3.driverid = t1.driverid join races as t2 on t3.raceid = t2.raceid where t1.forename = 'lewis' and t1.surname = 'hamilton' and t2.name = 'chinese grand prix' and t2.year = 2008 order by t3.positionorder desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.5833333333333333
   },
   {
     "id": 216,
@@ -2384,7 +2600,8 @@
     "pred_sql": "select t2.time from results as t1 join races as t3 on t1.raceid = t3.raceid join drivers as t4 on t1.driverid = t4.driverid where t1.position = 2 and t3.name = 'austchineseralian grand prix 2008'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 217,
@@ -2395,7 +2612,8 @@
     "pred_sql": "select count(distinct t2.driverid) from races as t1 join results as t2 on t1.raceid = t2.raceid where t1.name = 'chinese grand prix' and t1.year = 2008 and t2.position is not null",
     "ex": true,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.49230769230769234
   },
   {
     "id": 218,
@@ -2406,7 +2624,8 @@
     "pred_sql": "select cast((select max(points) from driverstandings where raceid = (select raceid from races where name = 'australian grand prix' and year = 2008) - (select min(points) from driverstandings where raceid = (select raceid from races where name = 'australian grand prix' and year = 2008)) as real) * 100 / (select max(points) from driverstandings where raceid = (select race",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 219,
@@ -2417,7 +2636,8 @@
     "pred_sql": "select count(*) from circuits where location = 'adelaide' and country = 'australia'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.76
   },
   {
     "id": 220,
@@ -2428,7 +2648,8 @@
     "pred_sql": "select max(t2.points) from constructors as t1 inner join constructorstandings as t2 on t1.constructorid = t2.constructorid where t1.nationality = 'british'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.7096774193548387
   },
   {
     "id": 221,
@@ -2439,7 +2660,8 @@
     "pred_sql": "select name from constructors where constructorid in (select constructorid from constructorresults where raceid = 291 and points = 0)",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 222,
@@ -2450,7 +2672,8 @@
     "pred_sql": "select count(t2.constructorid) from constructors as t1 inner join constructorstandings as t2 on t1.constructorid = t2.constructorid where t1.nationality = 'japanese' and t2.points = 0 and t2.raceid in (select raceid from races where year = 2009 limit 2)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.276595744680851
   },
   {
     "id": 223,
@@ -2461,7 +2684,8 @@
     "pred_sql": "select cast(sum(case when t2.nationality = 'japan' then 1 else 0 end) as real) * 100 / count(t1.driverid) from results as t1 inner join drivers as t2 on t1.driverid = t2.driverid where t1.year between 2007 and 2009",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.5
   },
   {
     "id": 224,
@@ -2472,7 +2696,8 @@
     "pred_sql": "select t2.year, avg(t1.time/1000) from results as t1 join races as t3 on t1.raceid = t3.raceid join seasons as t2 on t3.year = t2.year where t1.positiontext = 'champion' and t2.year < 1975 group by t2.year",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.2582781456953642
   },
   {
     "id": 225,
@@ -2483,7 +2708,8 @@
     "pred_sql": "select t2.position from drivers as t1 inner join results as t2 on t1.driverid = t2.driverid where t1.forename = 'nico' and t1.surname = 'rosberg' and t2.year = 2009 order by t2.points desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.16666666666666663
   },
   {
     "id": 226,
@@ -2494,7 +2720,8 @@
     "pred_sql": "select avg(milliseconds) from results where raceid = (select raceid from races where name = 'spanish grand prix 2009') and fastestlapspeed is not null",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.08108108108108103
   },
   {
     "id": 227,
@@ -2505,7 +2732,8 @@
     "pred_sql": "select cast(sum(case when t2.lap > 50 then 1 else 0 end) as real) * 100 / count(*) from drivers as t1 inner join laptimes as t2 on t1.driverid = t2.driverid where t1.dob < '1985-01-01' and t2.lap > 50 and t1.driverid in (select driverid from results where resultid in (",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 228,
@@ -2516,7 +2744,8 @@
     "pred_sql": "select count(driverid) from laptimes where driverid in (select driverid from drivers where nationality = 'french') and time < '02:00.00'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 229,
@@ -2527,7 +2756,8 @@
     "pred_sql": "select driverid, forename, surname from drivers where nationality = 'american'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6666666666666667
   },
   {
     "id": 230,
@@ -2538,7 +2768,8 @@
     "pred_sql": "select driverid from drivers where nationality = 'netherlands' order by dob asc limit 3",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.1282051282051282
   },
   {
     "id": 231,
@@ -2549,7 +2780,8 @@
     "pred_sql": "select t3.forename , t3.surname from drivers as t3 join results as t2 on t3.driverid = t2.driverid join constructors as t1 on t2.constructorid = t1.constructorid where t1.nationality = 'german' order by t2.year limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.0
   },
   {
     "id": 232,
@@ -2560,7 +2792,8 @@
     "pred_sql": "select t2.driverid, t2.code from qualifying as t1 join drivers as t2 on t1.driverid = t2.driverid where t2.dob = '1971-01-01' and t1.position = 1",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.6222222222222222
   },
   {
     "id": 233,
@@ -2571,7 +2804,8 @@
     "pred_sql": "select count(*) from results where raceid between 50 and 100 and statusid = 2",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.45945945945945943
   },
   {
     "id": 234,
@@ -2582,7 +2816,8 @@
     "pred_sql": "select t1.location, t1.lat, t1.lng from circuits as t1 inner join results as t2 on t1.circuitid = t2.circuitid where t1.country = 'austria'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.1724137931034483
   },
   {
     "id": 235,
@@ -2593,7 +2828,8 @@
     "pred_sql": "select t2.year, t1.name, t1.date, t1.time from qualifying as t1 join races as t2 on t1.raceid = t2.raceid join drivers as t3 on t1.driverid = t3.driverid where t3.dob = (select min(dob) from drivers) order by t2.year asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.5714285714285714
   },
   {
     "id": 236,
@@ -2604,7 +2840,8 @@
     "pred_sql": "select driverid, sum(milliseconds)/3 as avgduration from pitstops where driverid in (select driverid from drivers where nationality = 'german' and dob between '1980-01-01' and '1985-12-31') group by driverid order by avgduration limit 3",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 237,
@@ -2615,7 +2852,8 @@
     "pred_sql": "select t2.time from races as t1 inner join results as t2 on t1.raceid = t2.raceid where t1.name = 'canadian grand prix' and t1.year = 2008 order by t2.points desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.5
   },
   {
     "id": 238,
@@ -2626,7 +2864,8 @@
     "pred_sql": "select t3.url from races as t1 inner join constructorresults as t2 on t1.raceid = t2.raceid inner join constructors as t3 on t2.constructorid = t3.constructorid where t1.name = 'singapore grand prix 2009' order by t2.points desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.576271186440678
   },
   {
     "id": 239,
@@ -2637,7 +2876,8 @@
     "pred_sql": "select power_name from superpower where id in (select power_id from hero_power where hero_id = (select id from superhero where superhero_name = '3-d man'))",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 240,
@@ -2648,7 +2888,8 @@
     "pred_sql": "select t3.name, t3.nationality, max(t1.points) from races as t1 join constructorresults as t2 on t1.raceid = t2.raceid join constructors as t3 on t2.constructorid = t3.constructorid join seasons as t4 on t1.year = t4.year where t1.name = 'monaco grand prix' and t4.year >= 1980 and t4.year <= 2010 group by",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.42666666666666664
   },
   {
     "id": 241,
@@ -2659,7 +2900,8 @@
     "pred_sql": "select t3.forename, t3.surname from qualifying as t1 inner join drivers as t3 on t1.driverid = t3.driverid inner join races as t2 on t1.raceid = t2.raceid where t2.name = 'marina bay street circuit' and t2.year = 2008 and t1.position = 1",
     "ex": true,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.0
   },
   {
     "id": 242,
@@ -2670,7 +2912,8 @@
     "pred_sql": "select t3.forename, t3.surname, t3.nationality, t1.name from races as t1 join results as t2 on t1.year = t2.raceid join drivers as t3 on t2.driverid = t3.driverid where t3.dob = (select min(dob) from drivers) order by t2.raceid asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.35593220338983056
   },
   {
     "id": 243,
@@ -2681,7 +2924,8 @@
     "pred_sql": "select count(*) from results as r join drivers as d on r.driverid = d.driverid where r.positiontext like '%accident%' and r.raceid = (select raceid from races where name like 'canadian grand prix') and d.driverid = (select driverid from results group by driverid order by count(*) desc limit 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 244,
@@ -2692,7 +2936,8 @@
     "pred_sql": "select t2.forename, t2.surname from driverstandings as t1 join drivers as t2 on t1.driverid = t2.driverid where t1.position = 1 order by t1.milliseconds asc limit 20",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.3532608695652174
   },
   {
     "id": 245,
@@ -2703,7 +2948,8 @@
     "pred_sql": "select raceid, driverid, lap, position, time, milliseconds from laptimes where circuitid in (select circuitid from circuits where country = 'italy')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.21759259259259256
   },
   {
     "id": 246,
@@ -2714,7 +2960,8 @@
     "pred_sql": "select count(*) from superhero as s join hero_power as hp on s.id = hp.hero_id join superpower as p on hp.power_id = p.id where p.power_name = 'super strength' and s.height_cm > 200",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.44897959183673475
   },
   {
     "id": 247,
@@ -2725,7 +2972,8 @@
     "pred_sql": "select count(*) from superhero as s join hero_attribute as ha on s.id = ha.hero_id join colour as c on ha.eye_colour_id = c.id join hero_power as hp on s.id = hp.hero_id join superpower as sp on hp.power_id = sp.id where c.colour = 'blue' and sp.power_name = 'agility'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.34426229508196726
   },
   {
     "id": 248,
@@ -2736,7 +2984,8 @@
     "pred_sql": "select superhero_name from superhero where eye_colour_id = (select id from colour where colour = 'blue') and hair_colour_id = (select id from colour where colour = 'blond');",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.35416666666666663
   },
   {
     "id": 249,
@@ -2747,7 +2996,8 @@
     "pred_sql": "select superhero_name, full_name, height_cm from superhero where publisher_id = 2 order by height_cm desc",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 250,
@@ -2758,7 +3008,8 @@
     "pred_sql": "select colour.colour, count(*) as count from superhero join hero_attribute on superhero.id = hero_attribute.hero_id join colour on hero_attribute.eye_colour_id = colour.id where superhero.publisher_id = 13 group by colour.colour order by count desc",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.4032258064516129
   },
   {
     "id": 251,
@@ -2769,7 +3020,8 @@
     "pred_sql": "select superhero_name from superhero where publisher_id = (select id from publisher where publisher_name = 'marvel comics') and id in (select hero_id from hero_power where power_id = (select id from superpower where power_name = 'super strength'))",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.25688073394495414
   },
   {
     "id": 252,
@@ -2780,7 +3032,8 @@
     "pred_sql": "select publisher_name from publisher where id = (select publisher_id from superhero order by height_cm asc limit 1);",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.180327868852459
   },
   {
     "id": 253,
@@ -2791,7 +3044,8 @@
     "pred_sql": "select count(*) from superhero where eye_colour_id = (select id from colour where colour = 'gold') and publisher_id = (select id from publisher where publisher_name = 'marvel comics')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.34693877551020413
   },
   {
     "id": 254,
@@ -2802,7 +3056,8 @@
     "pred_sql": "select superhero_name from superhero order by attribute_value asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.4285714285714286
   },
   {
     "id": 255,
@@ -2813,7 +3068,8 @@
     "pred_sql": "select race from superhero where superhero_name = 'copycat' limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.30000000000000004
   },
   {
     "id": 256,
@@ -2824,7 +3080,8 @@
     "pred_sql": "select superhero_name from superhero where skin_colour_id in (select id from colour where colour = 'no colour') and id in (select hero_id from hero_attribute where attribute_id = (select id from attribute where attribute_name = 'durability')) and attribute_value < 50",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 257,
@@ -2835,7 +3092,8 @@
     "pred_sql": "select superhero_name from superhero where id in (select hero_id from hero_power where power_id = (select id from superpower where power_name = 'death touch'))",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 258,
@@ -2846,7 +3104,8 @@
     "pred_sql": "select count(*) from superhero where gender_id = 2 and attribute_value in (select attribute_value from hero_attribute where attribute_id = (select id from attribute where attribute_name = 'strength'))",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.014925373134328401
   },
   {
     "id": 259,
@@ -2857,7 +3116,8 @@
     "pred_sql": "select cast(sum(case when t2.alignment = 'good' then 1 else 0 end) as real) * 100 / count(*) as percentage, count(*) as total from superhero as t1 inner join hero_power as t3 on t1.id = t3.hero_id inner join superpower as t4 on t3.power_id = t4.id inner join hero_attribute as t5 on t1.id = t5.hero_id inner join attribute as t6 on",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 260,
@@ -2868,7 +3128,8 @@
     "pred_sql": "select sum(case when t2.publisher_id = 2 then 1 else 0 end) - sum(case when t2.publisher_id = 1 then 1 else 0 end) as difference from superhero as t1 inner join publisher as t2 on t1.publisher_id = t2.id",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.8333333333333334
   },
   {
     "id": 261,
@@ -2879,7 +3140,8 @@
     "pred_sql": "select id from publisher where publisher_name = 'star trek';",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 262,
@@ -2890,7 +3152,8 @@
     "pred_sql": "select count(id) from superhero where full_name is null",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 263,
@@ -2901,7 +3164,8 @@
     "pred_sql": "select avg(weight_kg) from superhero where gender_id = 2",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.25806451612903225
   },
   {
     "id": 264,
@@ -2912,7 +3176,8 @@
     "pred_sql": "select t2.power_name from superhero as t1 inner join hero_power as t3 on t1.id = t3.hero_id inner join superpower as t2 on t3.power_id = t2.id where t1.gender_id = 1 group by t2.power_name limit 5",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.6071428571428572
   },
   {
     "id": 265,
@@ -2923,7 +3188,8 @@
     "pred_sql": "select superhero_name from superhero where height_cm between 170 and 190 and eye_colour_id is null",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.39534883720930236
   },
   {
     "id": 266,
@@ -2934,7 +3200,8 @@
     "pred_sql": "select t2.colour from superhero as t1 inner join colour as t2 on t1.hair_colour_id = t2.id where t1.height_cm = 185 and t1.gender_id = (select id from gender where gender = 'male')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.34693877551020413
   },
   {
     "id": 267,
@@ -2945,7 +3212,8 @@
     "pred_sql": "select cast(sum(case when t2.publisher_name = 'marvel comics' then 1 else 0 end) as real) * 100 / count(t1.id) from superhero as t1 inner join publisher as t2 on t1.publisher_id = t2.id where t1.height_cm between 150 and 180",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.9038461538461539
   },
   {
     "id": 268,
@@ -2956,7 +3224,8 @@
     "pred_sql": "select superhero_name from superhero where gender_id = 1 and weight_kg > (select avg(weight_kg) from superhero) and gender_id in (select id from gender where gender = 'male')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.1311475409836066
   },
   {
     "id": 269,
@@ -2967,7 +3236,8 @@
     "pred_sql": "select power_name from superpower where id in (select power_id from hero_power where hero_id = 1);",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 270,
@@ -2978,7 +3248,8 @@
     "pred_sql": "select count(distinct t1.hero_id) from hero_power as t1 inner join superpower as t2 on t1.power_id = t2.id where t2.power_name = 'stealth'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.9032258064516129
   },
   {
     "id": 271,
@@ -2989,7 +3260,8 @@
     "pred_sql": "select full_name from superhero where id = (select hero_id from hero_attribute where attribute_id = (select id from attribute where attribute_name = 'strength') order by attribute_value desc limit 1);",
     "ex": true,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.22448979591836737
   },
   {
     "id": 272,
@@ -3000,7 +3272,8 @@
     "pred_sql": "select superhero_name from superhero where publisher_id = (select id from publisher where publisher_name = 'dark horse comics') order by weight_kg desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.3880597014925373
   },
   {
     "id": 273,
@@ -3011,7 +3284,8 @@
     "pred_sql": "select t3.colour as eye_colour, t4.colour as hair_colour, t5.colour as skin_colour from superhero as t1 inner join gender as t2 on t1.gender_id = t2.id inner join colour as t3 on t1.eye_colour_id = t3.id inner join colour as t4 on t1.hair_colour_id = t4.id inner join colour as t5 on t1.skin_colour_id = t5.id inner join publisher as t6 on",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.2068965517241379
   },
   {
     "id": 274,
@@ -3022,7 +3296,8 @@
     "pred_sql": "select t1.publisher_name from superhero as t1 inner join colour as t2 on t1.eye_colour_id = t2.id inner join colour as t3 on t1.hair_colour_id = t3.id inner join colour as t4 on t1.skin_colour_id = t4.id where t2.id = t3.id and t3.id = t4.id",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.33333333333333337
   },
   {
     "id": 275,
@@ -3033,7 +3308,8 @@
     "pred_sql": "select cast(sum(case when t2.colour = 'blue' then 1 else 0 end) as real) * 100 / count(t1.id) from superhero as t1 inner join colour as t2 on t1.hair_colour_id = t2.id inner join gender as t3 on t1.gender_id = t3.id where t3.gender = 'female' and t2.colour = 'blue'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.6166666666666667
   },
   {
     "id": 276,
@@ -3044,7 +3320,8 @@
     "pred_sql": "select count(distinct power_id) from hero_power where hero_id = (select id from superhero where superhero_name = 'amazo')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.22580645161290325
   },
   {
     "id": 277,
@@ -3055,7 +3332,8 @@
     "pred_sql": "select t3.height_cm from colour as t1 inner join superhero as t2 on t1.id = t2.eye_colour_id inner join alignment as t3 on t2.alignment_id = t3.id where t1.colour = 'amber'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.43333333333333335
   },
   {
     "id": 278,
@@ -3066,7 +3344,8 @@
     "pred_sql": "select superhero_name from superhero where eye_colour_id = (select id from colour where colour = 'black') and hair_colour_id = (select id from colour where colour = 'black')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.052631578947368474
   },
   {
     "id": 279,
@@ -3077,7 +3356,8 @@
     "pred_sql": "select superhero_name from superhero where alignment_id = (select id from alignment where alignment = 'neutral')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.33333333333333337
   },
   {
     "id": 280,
@@ -3088,7 +3368,8 @@
     "pred_sql": "select hero_id from hero_attribute where attribute_id = (select id from attribute where attribute_name = 'strength') order by attribute_value desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.3793103448275862
   },
   {
     "id": 281,
@@ -3099,7 +3380,8 @@
     "pred_sql": "select cast(sum(case when t2.gender = 'female' then 1 else 0 end) as real) * 100 / count(t1.id) from superhero as t1 inner join gender as t2 on t1.gender_id = t2.id inner join publisher as t3 on t1.publisher_id = t3.id where t3.publisher_name = 'marvel comics'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4375
   },
   {
     "id": 282,
@@ -3110,7 +3392,8 @@
     "pred_sql": "select (t1.weight_kg - t2.weight_kg) as weight_difference from superhero as t1 inner join superhero as t2 on t1.superhero_name = 'emil blonsky' and t2.superhero_name = 'charles chandler'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.14634146341463417
   },
   {
     "id": 283,
@@ -3121,7 +3404,8 @@
     "pred_sql": "select avg(height_cm) from superhero",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.5
   },
   {
     "id": 284,
@@ -3132,7 +3416,8 @@
     "pred_sql": "select t1.power_name from superpower as t1 join hero_power as t2 on t1.id = t2.power_id join superhero as t3 on t2.hero_id = t3.id where t3.superhero_name = 'abomination';",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.7380952380952381
   },
   {
     "id": 285,
@@ -3143,7 +3428,8 @@
     "pred_sql": "select superhero_name from superhero order by height_cm asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.326530612244898
   },
   {
     "id": 286,
@@ -3154,7 +3440,8 @@
     "pred_sql": "select h.attribute_id, h.attribute_value from hero_attribute h join attribute a on h.attribute_id = a.id where h.hero_id = (select id from superhero where superhero_name = '3-d man') limit 3",
     "ex": true,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.25531914893617025
   },
   {
     "id": 287,
@@ -3165,7 +3452,8 @@
     "pred_sql": "select superhero_name from superhero where eye_colour_id = (select id from colour where colour = 'blue') and hair_colour_id = (select id from colour where colour = 'brown')",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.35416666666666663
   },
   {
     "id": 288,
@@ -3176,7 +3464,8 @@
     "pred_sql": "select t.publisher_name from superhero as t join publisher as p on t.publisher_id = p.id where t.superhero_name in ('hawkman', 'karate kid', 'speedy')",
     "ex": false,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.5
   },
   {
     "id": 289,
@@ -3187,7 +3476,8 @@
     "pred_sql": "select cast(count(case when t2.colour = 'blue' then 1 else null end) as real) * 100 / count(*) from superhero as t1 inner join colour as t2 on t1.eye_colour_id = t2.id where t2.colour = 'blue'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.75
   },
   {
     "id": 290,
@@ -3198,7 +3488,8 @@
     "pred_sql": "select cast(sum(case when t2.gender = 'male' then 1 else 0 end) as real) / sum(case when t2.gender = 'female' then 1 else 0 end) from superhero as t1 inner join gender as t2 on t1.gender_id = t2.id",
     "ex": true,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.6666666666666667
   },
   {
     "id": 291,
@@ -3209,7 +3500,8 @@
     "pred_sql": "select t1.eye_colour_id from superhero as t1 inner join hero_attribute as t2 on t1.id = t2.hero_id where t1.full_name = 'karen beecher-duncan';",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.7666666666666666
   },
   {
     "id": 292,
@@ -3220,7 +3512,8 @@
     "pred_sql": "select (select count(*) from superhero where eye_colour_id = (select id from colour where colour = 'blue') and eye_colour_id is null) - (select count(*) from superhero where eye_colour_id = (select id from colour where colour = 'no colour') and eye_colour_id is null) as difference",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 293,
@@ -3231,7 +3524,8 @@
     "pred_sql": "select count(*) from superhero where skin_colour_id = (select id from colour where colour = 'green') and alignment_id = (select id from alignment where alignment = 'bad')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.30612244897959184
   },
   {
     "id": 294,
@@ -3242,7 +3536,8 @@
     "pred_sql": "select superhero_name from superhero where id in (select hero_id from hero_power where power_id = (select id from superpower where power_name = 'wind control')) order by superhero_name asc",
     "ex": true,
     "sm": false,
-    "cm": 0.75
+    "cm": 0.75,
+    "ast": 0.04255319148936165
   },
   {
     "id": 295,
@@ -3253,7 +3548,8 @@
     "pred_sql": "select t1.gender from superhero as t1 inner join hero_power as t2 on t1.id = t2.hero_id inner join superpower as t3 on t2.power_id = t3.id where t3.power_name = 'phoenix force'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8518518518518519
   },
   {
     "id": 296,
@@ -3264,7 +3560,8 @@
     "pred_sql": "select sum(case when t1.publisher_id = 2 then 1 else 0 end) - sum(case when t1.publisher_id = 1 then 1 else 0 end) as difference from superhero as t1 inner join publisher as t2 on t1.publisher_id = t2.id",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.7380952380952381
   },
   {
     "id": 297,
@@ -3275,7 +3572,8 @@
     "pred_sql": "select displayname from users where displayname in ('harlan', 'jarrod dixon') order by reputation desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.4528301886792453
   },
   {
     "id": 298,
@@ -3286,7 +3584,8 @@
     "pred_sql": "select displayname from users where year(creationdate) = 2011",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.5238095238095238
   },
   {
     "id": 299,
@@ -3297,7 +3596,8 @@
     "pred_sql": "select count(*) from users where lastaccessdate > '2014-09-01' ';'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.40909090909090906
   },
   {
     "id": 300,
@@ -3308,7 +3608,8 @@
     "pred_sql": "select owneruserid from posts where title = 'eliciting priors from experts'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.43333333333333335
   },
   {
     "id": 301,
@@ -3319,7 +3620,8 @@
     "pred_sql": "select count(*) from posts where owneruserid = (select id from users where displayname = 'csgillespie')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.29032258064516125
   },
   {
     "id": 302,
@@ -3330,7 +3632,8 @@
     "pred_sql": "select t2.displayname from posts as t1 inner join users as t2 on t1.owneruserid = t2.id where t1.title = 'examples for teaching: correlation does not mean causation' order by t1.lasteditdate desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.8
   },
   {
     "id": 303,
@@ -3341,7 +3644,8 @@
     "pred_sql": "select count(*) from posts where owneruserid in (select id from users where age > 30) and score > 19",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 304,
@@ -3352,7 +3656,8 @@
     "pred_sql": "select t1.body from posts as t1 join tags as t2 on t1.id = t2.excerptpostid where t2.tagname = 'bayesian'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.6666666666666667
   },
   {
     "id": 305,
@@ -3363,7 +3668,8 @@
     "pred_sql": "select avg(t2.score) from users as t1 join posts as t2 on t1.id = t2.owneruserid where t1.displayname = 'csgillespie'",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.6451612903225806
   },
   {
     "id": 306,
@@ -3374,7 +3680,8 @@
     "pred_sql": "select cast(sum(case when u.age > 30 then 1 else 0 end) as real) * 100 / count(*) from posts p join users u on p.owneruserid = u.id where p.score > 5",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.48888888888888893
   },
   {
     "id": 307,
@@ -3385,7 +3692,8 @@
     "pred_sql": "select favoritecount from posts where id = (select postid from comments where userid = 3025 and creationdate = '2014-04-23 20:29:39')",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.4722222222222222
   },
   {
     "id": 308,
@@ -3396,7 +3704,8 @@
     "pred_sql": "select p.title from posts p join comments c on p.id = c.postid where c.userid = 23853 and c.creationdate = '2013-07-12 09:08:18'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.2682926829268293
   },
   {
     "id": 309,
@@ -3407,7 +3716,8 @@
     "pred_sql": "select count(*) from posts where owneruserid = (select id from users where displayname = 'tiago pasqualini')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.16129032258064513
   },
   {
     "id": 310,
@@ -3418,7 +3728,8 @@
     "pred_sql": "select t2.displayname from votes as t1 join users as t2 on t1.userid = t2.id where t1.id = 6347",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.6
   },
   {
     "id": 311,
@@ -3429,7 +3740,8 @@
     "pred_sql": "select cast(count(id) as real) / count(userid) from posts where owneruserid = 24",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.275
   },
   {
     "id": 312,
@@ -3440,7 +3752,8 @@
     "pred_sql": "select viewcount from posts where title = 'integration of weka and/or rapidminer into informatica powercenter/developer'",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 313,
@@ -3451,7 +3764,8 @@
     "pred_sql": "select * from comments where score = 17",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8333333333333334
   },
   {
     "id": 314,
@@ -3462,7 +3776,8 @@
     "pred_sql": "select userdisplayname from comments where text = 'thank you user93!'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.2666666666666667
   },
   {
     "id": 315,
@@ -3473,7 +3788,8 @@
     "pred_sql": "select displayname, reputation from users where id = (select userid from posts where title = 'understanding what dassault isight is doing?')",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.2857142857142857
   },
   {
     "id": 316,
@@ -3484,7 +3800,8 @@
     "pred_sql": "select t2.owneruserid from posts as t1 inner join users as t2 on t1.owneruserid = t2.id where t1.title = 'open source tools for visualizing multi-dimensional data?'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8666666666666667
   },
   {
     "id": 317,
@@ -3495,7 +3812,8 @@
     "pred_sql": "select t2.text from posts as t1 inner join posthistory as t2 on t1.id = t2.postid where t1.title = 'why square the difference instead of taking the absolute value in standard deviation?' and t2.userid is not null and t2.comment is not null",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.5333333333333333
   },
   {
     "id": 318,
@@ -3506,7 +3824,8 @@
     "pred_sql": "select userid from votes where bountyamount = 50 and postid in (select id from posts where title like '%variance%')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.07547169811320753
   },
   {
     "id": 319,
@@ -3517,7 +3836,8 @@
     "pred_sql": "select t1.title , t1.comment from posts as t1 join tags as t2 on t1.id = t2.excerptpostid where t2.tagname = 'humor' group by t1.id",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.5208333333333333
   },
   {
     "id": 320,
@@ -3528,7 +3848,8 @@
     "pred_sql": "select count(distinct userid) from badges where id in (select userid from badges group by userid having count(id) > 5)",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.2325581395348837
   },
   {
     "id": 321,
@@ -3539,7 +3860,8 @@
     "pred_sql": "select userid from posthistory group by userid having count(id) = 1 and sum(viewcount) >= 1000",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.31481481481481477
   },
   {
     "id": 322,
@@ -3550,7 +3872,8 @@
     "pred_sql": "select cast(sum(case when strftime('%y', date) = '2011' then 1 else 0 end) as real) * 100 / sum(case when strftime('%y', date) = '2010' then 1 else 0 end) from badges",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.5689655172413793
   },
   {
     "id": 323,
@@ -3561,7 +3884,8 @@
     "pred_sql": "select avg(upvotes), avg(age) from users where id in (select userid from posts group by userid having count(id) > 10)",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.20370370370370372
   },
   {
     "id": 324,
@@ -3572,7 +3896,8 @@
     "pred_sql": "select cast(sum(case when strftime('%y', creationdate) = '2010', 1, 0) as real) / sum(case when strftime('%y', creationdate) = '2011', 1, 0) from votes",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 325,
@@ -3583,7 +3908,8 @@
     "pred_sql": "select id from posts where owneruserid = (select userid from users where displayname = 'slashnick') order by answercount desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.34693877551020413
   },
   {
     "id": 326,
@@ -3594,7 +3920,8 @@
     "pred_sql": "select id from posts where owneruserid in (select id from users where displayname like 'harvey motulsky') union select id from posts where owneruserid in (select id from users where displayname like 'noah snyder') order by (answercount + commentcount + favoritecount) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.0
   },
   {
     "id": 327,
@@ -3605,7 +3932,8 @@
     "pred_sql": "select t1.tagname from tags as t1 join posts as t2 on t1.id = t2.tagid where t2.owneruserid = (select userid from users where displayname = 'mark meckes') and t2.id not in (select postid from comments)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.08333333333333337
   },
   {
     "id": 328,
@@ -3616,7 +3944,8 @@
     "pred_sql": "select cast(sum(case when t2.tagname = 'r' then 1 else 0 end) as real) * 100 / count(*) from posts as t1 inner join tags as t2 on t1.id = t2.excerptpostid where t1.owneruserid = -1 and t2.tagname = 'r'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.49122807017543857
   },
   {
     "id": 329,
@@ -3627,7 +3956,8 @@
     "pred_sql": "select sum(case when t1.owneruserid = (select id from users where displayname = 'mornington') then t1.viewcount else 0 end) - sum(case when t1.owneruserid = (select id from users where displayname = 'amos') then t1.viewcount else 0 end) as difference from posts as t1",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.3035714285714286
   },
   {
     "id": 330,
@@ -3638,7 +3968,8 @@
     "pred_sql": "select avg(t2.count) from posts as t1 inner join postlinks as t2 on t1.id = t2.postid where t1.answercount <= 2 and t1.creaiondate between '2010-01-01' and '2010-12-31'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.20454545454545459
   },
   {
     "id": 331,
@@ -3649,7 +3980,8 @@
     "pred_sql": "select t2.creationdate from users as t1 inner join votes as t2 on t1.id = t2.userid where t1.displayname = 'chl' limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.9189189189189189
   },
   {
     "id": 332,
@@ -3660,7 +3992,8 @@
     "pred_sql": "select t2.displayname from badges as t1 join users as t2 on t1.userid = t2.id where t1.name = 'autobiographer' order by t1.date asc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.6756756756756757
   },
   {
     "id": 333,
@@ -3671,7 +4004,8 @@
     "pred_sql": "select count(*) from users where id in (select userid from posts where id in (select postid from votes where bountyamount is null group by postid having sum(case when votetypeid = 2 then 1 else 0 end) >= 4)) and location like '%united kingdom%'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 334,
@@ -3682,7 +4016,8 @@
     "pred_sql": "select id, title from posts where owneruserid = (select userid from users where displayname = 'harvey motulsky') order by viewcount desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.40476190476190477
   },
   {
     "id": 335,
@@ -3693,7 +4028,8 @@
     "pred_sql": "select id, u.displayname from posts p join users u on p.owneruserid = u.id where p.score = (select max(score) from posts where year(creationdate) = 2010) order by p.score desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.0
   },
   {
     "id": 336,
@@ -3704,7 +4040,8 @@
     "pred_sql": "select cast(sum(case when t2.reputation > 1000 then 1 else 0 end) as real) * 100 / count(*) from posts as t1 inner join users as t2 on t1.owneruserid = t2.id where year(t1.creaiondate) = 2011",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.45833333333333337
   },
   {
     "id": 337,
@@ -3715,7 +4052,8 @@
     "pred_sql": "select t1.views, t2.displayname from posts as t1 join users as t2 on t1.owneruserid = t2.id where t1.id = (select postid from posts where title = 'computer game datasets')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.4893617021276596
   },
   {
     "id": 338,
@@ -3726,7 +4064,8 @@
     "pred_sql": "select count(*) from comments where postid = (select postid from posts order by score desc limit 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.0
   },
   {
     "id": 339,
@@ -3737,7 +4076,8 @@
     "pred_sql": "select text, userdisplayname from comments where postid = (select id from posts where title = 'analysing wind data with r' order by creationdate desc limit 1) order by creationdate desc limit 10",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.05555555555555558
   },
   {
     "id": 340,
@@ -3748,7 +4088,8 @@
     "pred_sql": "select cast(sum(iif(t2.score > 50, 1, 0)) as real) * 100 / count(*) from posts as t1 inner join votes as t2 on t1.id = t2.postid inner join users as t3 on t1.owneruserid = t3.id where t3.id = (select top 1 id from users order by reputation desc)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 341,
@@ -3759,7 +4100,8 @@
     "pred_sql": "select excerptpostid, wikipostid from tags where tagname = 'sample'",
     "ex": true,
     "sm": true,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 1.0
   },
   {
     "id": 342,
@@ -3770,7 +4112,8 @@
     "pred_sql": "select userid, upvotes from users where displayname = 'fine, you win :)'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.4
   },
   {
     "id": 343,
@@ -3781,7 +4124,8 @@
     "pred_sql": "select comment from posthistory where postid in (select id from posts where viewcount between 100 and 150) order by score desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.75
   },
   {
     "id": 344,
@@ -3792,7 +4136,8 @@
     "pred_sql": "select count(*) from comments where postid in (select id from posts where commentcount = 1) and score = 0",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 345,
@@ -3803,7 +4148,8 @@
     "pred_sql": "select cast(sum(case when t2.upvotes = 0 then 1 else 0 end) as real) * 100 / count(*) from comments as t1 inner join users as t2 on t1.userid = t2.id where t1.score between 5 and 10",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.607843137254902
   },
   {
     "id": 346,
@@ -3814,7 +4160,8 @@
     "pred_sql": "select uuid from cards where hasfoil = 1 order by convertedmanacost desc limit 10",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.07692307692307687
   },
   {
     "id": 347,
@@ -3825,7 +4172,8 @@
     "pred_sql": "select name from cards where bordercolor is null and hasfoil = 0 and hasnonfoil = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.125
   },
   {
     "id": 348,
@@ -3836,7 +4184,8 @@
     "pred_sql": "select t1.uuid from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.format = 'gladiator' and t1.rarity = 'mythic'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.7441860465116279
   },
   {
     "id": 349,
@@ -3847,7 +4196,8 @@
     "pred_sql": "select t2.status from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t1.type = 'artifact' and t1.faces = 1 and t2.format = 'vintage'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8372093023255813
   },
   {
     "id": 350,
@@ -3858,7 +4208,8 @@
     "pred_sql": "select id, artist from cards where power is null and uuid in (select uuid from legalities where format = 'commander')",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.018867924528301883
   },
   {
     "id": 351,
@@ -3869,7 +4220,8 @@
     "pred_sql": "select c.name, r.text, case when c.asciiname is null then 'missing ascii name' else '' end as asciinamemissing, case when c.flavortext is null then 'missing flavor text' else '' end as flavortextmissing from cards c join rulings r on c.uuid = r.uuid where c.artist = 'stephen daniel'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 352,
@@ -3880,7 +4232,8 @@
     "pred_sql": "select name, artist, ispromo from cards where uuid = (select uuid from rulings group by uuid order by count(*) desc limit 1) and ispromo = 1",
     "ex": false,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.33834586466165417
   },
   {
     "id": 353,
@@ -3891,7 +4244,8 @@
     "pred_sql": "select cast(sum(case when t2.language = 'chinese simplified' then 1 else 0 end) as real) * 100 / count(*) from cards as t1 inner join set_translations as t2 on t1.uuid = t2.setcode",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.8
   },
   {
     "id": 354,
@@ -3902,7 +4256,8 @@
     "pred_sql": "select count(*) from cards where power = '∞'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8823529411764706
   },
   {
     "id": 355,
@@ -3913,7 +4268,8 @@
     "pred_sql": "select bordercolor from cards where name = 'ancestor\\'s chosen'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 356,
@@ -3924,7 +4280,8 @@
     "pred_sql": "select text from rulings where uuid = (select uuid from cards where name = 'benalish knight')",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.19999999999999996
   },
   {
     "id": 357,
@@ -3935,7 +4292,8 @@
     "pred_sql": "select cast(sum(case when bordercolor = 'borderless' then 1 else 0 end) as real) * 100 / count(*) from cards",
     "ex": true,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.8214285714285714
   },
   {
     "id": 358,
@@ -3946,7 +4304,8 @@
     "pred_sql": "select cast(count(case when t2.language = 'french' then 1 else null end) as real) * 100 / count(*) from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.isstoryspotlight = 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8043478260869565
   },
   {
     "id": 359,
@@ -3957,7 +4316,8 @@
     "pred_sql": "select count(*) from cards where originaltype = 'summon - angel' and subtypes not like '%angel%'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.52
   },
   {
     "id": 360,
@@ -3968,7 +4328,8 @@
     "pred_sql": "select id from cards where dueldeck = 'duel' ';'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8888888888888888
   },
   {
     "id": 361,
@@ -3979,7 +4340,8 @@
     "pred_sql": "select count(*) from cards join legalities on cards.uuid = legalities.uuid where cards.bordercolor = 'white' and legalities.status = 'banned'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.29729729729729726
   },
   {
     "id": 362,
@@ -3990,7 +4352,8 @@
     "pred_sql": "select t1.asciiname from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.types like '%artifact%' and t1.coloridentity like '%w%' and t2.language != 'english'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.5135135135135135
   },
   {
     "id": 363,
@@ -4001,7 +4364,8 @@
     "pred_sql": "select manacost from cards where layout = 'normal' and frameversion = '2003' and bordercolor = 'black' and availability like '%paper%' and availability like '%mtgo%'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.7222222222222222
   },
   {
     "id": 364,
@@ -4012,7 +4376,8 @@
     "pred_sql": "select id from cards where isstoryspotlight = 1 and text = '' group by id",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.32352941176470584
   },
   {
     "id": 365,
@@ -4023,7 +4388,8 @@
     "pred_sql": "select count(*) from set_translations where language = 'brazilian portuguese' and setcode in (select code from sets where block = 'commander')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 366,
@@ -4034,7 +4400,8 @@
     "pred_sql": "select distinct type from cards where uuid in (select uuid from foreign_data where language='german')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 367,
@@ -4045,7 +4412,8 @@
     "pred_sql": "select count(*) from cards where power is null and keywords like '%triggered%'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.20454545454545459
   },
   {
     "id": 368,
@@ -4056,7 +4424,8 @@
     "pred_sql": "select count(*) from cards as t1 inner join rulings as t2 on t1.uuid = t2.uuid where t1.types like '%creature%' and t2.text like '%this is a triggered mana ability.%' and t1.facename is null",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.36363636363636365
   },
   {
     "id": 369,
@@ -4067,7 +4436,8 @@
     "pred_sql": "select t2.flavortext from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.layout = 'creature' and t1.type = 'normal' and t1.bordercolor = 'black' and t1.artist = 'matthew d. wilson' and t2.language = 'french'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.36708860759493667
   },
   {
     "id": 370,
@@ -4078,7 +4448,8 @@
     "pred_sql": "select t2.language from sets as t1 join set_translations as t2 on t1.code = t2.setcode where t1.block = 'ravnica' and t1.totalsetsize = 180",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.9444444444444444
   },
   {
     "id": 371,
@@ -4089,7 +4460,8 @@
     "pred_sql": "select cast(count(case when hascontentwarning = 0 then 1 else null end) as real) * 100 / count(*) from cards where uuid in (select uuid from legalities where format = 'commander' and status = 'legal') and hascontentwarning = 1",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 372,
@@ -4100,7 +4472,8 @@
     "pred_sql": "select cast(count(*) as real) * 100 / count(distinct uuid) from cards where power is null and uuid in (select uuid from foreign_data where language = 'french')",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 373,
@@ -4111,7 +4484,8 @@
     "pred_sql": "select t2.language from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.multiverseid = 149934",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 374,
@@ -4122,7 +4496,8 @@
     "pred_sql": "select cast(count(*) as real) * 100 / (select count(*) from cards) from cards where layout != 'normal'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 375,
@@ -4133,7 +4508,8 @@
     "pred_sql": "select distinct t1.language from set_translations as t1 inner join sets as t2 on t1.setcode = t2.code where t2.code = 'arc' and t1.language in (select t3.language from foreign_data as t3 where t3.uuid in (select uuid from cards where multiverseid = (select multiverseid from legalities where format = 'archenemy')))",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 376,
@@ -4144,7 +4520,8 @@
     "pred_sql": "select t2.language from cards as t1 inner join foreign_data as t2 on t1.uuid = t2.uuid where t1.name = 'a pedra fellwar'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 377,
@@ -4155,7 +4532,8 @@
     "pred_sql": "select name, convertedmanacost from cards where name = 'serra angel' or name = 'shrine keeper' order by convertedmanacost desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.42307692307692313
   },
   {
     "id": 378,
@@ -4166,7 +4544,8 @@
     "pred_sql": "select t2.translation from cards as t1 inner join set_translations as t2 on t1.uuid = t2.setcode where t1.name = 'ancestor\\'s chosen' and t2.language = 'italian'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 379,
@@ -4177,7 +4556,8 @@
     "pred_sql": "select t3.translation from cards as t1 inner join set_translations as t2 on t1.setcode = t2.setcode inner join foreign_data as t3 on t1.uuid = t3.uuid where t1.name = 'ancestor\\'s chosen' and t2.language = 'korean'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 380,
@@ -4188,7 +4568,8 @@
     "pred_sql": "select count(*) from cards join foreign_data on cards.uuid = foreign_data.uuid where foreign_data.name like '%adam rex%' and cards.setcode = '10e'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 381,
@@ -4199,7 +4580,8 @@
     "pred_sql": "select translation from set_translations where setcode = '8ed' and language = 'chinese simplified'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.16666666666666663
   },
   {
     "id": 382,
@@ -4210,7 +4592,8 @@
     "pred_sql": "select t2.name from cards as t1 inner join sets as t2 on t1.setcode = t2.code where t1.name = 'angel of mercy' and t2.isonlineonly = 1",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.5833333333333333
   },
   {
     "id": 383,
@@ -4221,7 +4604,8 @@
     "pred_sql": "select count(*) from set_translations join sets on set_translations.setcode = sets.code where set_translations.language = 'italian' and sets.block = 'ice age'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.19999999999999996
   },
   {
     "id": 384,
@@ -4232,7 +4616,8 @@
     "pred_sql": "select s.code from cards c join sets s on c.setcode = s.code where c.name = 'adarkar valkyrie' and s.isforeignonly = 1 and s.isnonfoilonly = 0 and s.isonlineonly = 0 and s.ispartialpreview = 0",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 385,
@@ -4243,7 +4628,8 @@
     "pred_sql": "select count(*) from sets where isforeignonly = 0 and basesetsize < 100 and code in (select setcode from set_translations where language = 'italian')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 386,
@@ -4254,7 +4640,8 @@
     "pred_sql": "select artist from cards where artist in ('jeremy jarvis', 'aaron miller', 'chippy') and multiverseid in (select multiverseid from sets where name = 'coldsnap')",
     "ex": true,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.0
   },
   {
     "id": 387,
@@ -4265,7 +4652,8 @@
     "pred_sql": "select count(*) from cards where convertedmanacost > 5 and power is null and multiverseid in (select multiverseid from sets where name = 'coldsnap')",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 388,
@@ -4276,7 +4664,8 @@
     "pred_sql": "select flavortext from foreign_data where name = 'ancestor\\'s chosen' and language = 'italian'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 389,
@@ -4287,7 +4676,8 @@
     "pred_sql": "select t3.text from cards as t1 inner join rulings as t3 on t1.uuid = t3.uuid inner join sets as t2 on t1.setcode = t2.code where t2.name = 'coldsnap' and t3.date = (select max(date) from rulings where uuid = t3.uuid) and t3.text like '%italian%'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.061224489795918324
   },
   {
     "id": 390,
@@ -4298,7 +4688,8 @@
     "pred_sql": "select t1.asciiname from cards as t1 inner join sets as t2 on t1.setcode = t2.setcode where t2.name = 'coldsnap' order by t1.convertedmanacost desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.5094339622641509
   },
   {
     "id": 391,
@@ -4309,7 +4700,8 @@
     "pred_sql": "select cast(sum(case when convertedmanacost = 7 then 1 else 0 end) as real) * 100 / count(*) from cards where multiverseid in (select multiverseid from sets where name = 'coldsnap')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.04347826086956519
   },
   {
     "id": 392,
@@ -4320,7 +4712,8 @@
     "pred_sql": "select cast(sum(case when rarity = 'legendary' then 1 else 0 end) as real) * 100 / count(*) from cards where multiverseid in (select multiverseid from sets where name = 'coldsnap')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 393,
@@ -4331,7 +4724,8 @@
     "pred_sql": "select format , group_concat(name) from legalities join cards on legalities.uuid = cards.uuid where status = 'banned' group by format order by count(*) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 394,
@@ -4342,7 +4736,8 @@
     "pred_sql": "select t1.name from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.status = 'banned' and t1.edhrecrank = 1",
     "ex": true,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.875
   },
   {
     "id": 395,
@@ -4353,7 +4748,8 @@
     "pred_sql": "select t1.name from cards as t1 inner join legalities as t2 on t1.uuid = t2.uuid where t2.format = 'hour of devastation' ';'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.45679012345679015
   },
   {
     "id": 396,
@@ -4364,7 +4760,8 @@
     "pred_sql": "select setcode from set_translations where language = 'japanese' intersect select setcode from set_translations where language = 'korean' except select setcode from set_translations where language = 'japanese' and setcode in (select setcode from set_translations where language = 'korean')",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.06451612903225812
   },
   {
     "id": 397,
@@ -4375,7 +4772,8 @@
     "pred_sql": "select distinct frameeffects, name from cards where artist = 'allen williams' and status = 'banned'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.41666666666666663
   },
   {
     "id": 398,
@@ -4386,7 +4784,8 @@
     "pred_sql": "select bond_type from bond group by bond_type order by count(*) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.5714285714285714
   },
   {
     "id": 399,
@@ -4397,7 +4796,8 @@
     "pred_sql": "select avg(a.atom_id2) from atom a join connected c on a.atom_id = c.atom_id2 join atom b on c.atom_id2 = b.atom_id where b.element = 'o' and c.bond_id in (select bond_id from bond where bond_type = '-')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 400,
@@ -4408,7 +4808,8 @@
     "pred_sql": "select avg(case when t2.bond_type = 'single' then 1 else 0 end) as avg_single_bonded from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t1.atom_id in (select atom_id from atom where element = 'carcinogenic')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 401,
@@ -4419,7 +4820,8 @@
     "pred_sql": "select m.molecule_id, m.label from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = 'triple' and m.label = 'carcinogenic'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.1351351351351351
   },
   {
     "id": 402,
@@ -4430,7 +4832,8 @@
     "pred_sql": "select cast(sum(case when t1.element = 'c' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'double'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.26
   },
   {
     "id": 403,
@@ -4441,7 +4844,8 @@
     "pred_sql": "select t1.element , t2.element from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join atom as t2 on t3.atom_id2 = t2.atom_id where t3.bond_id = (select bond_id from bond where molecule_id = 'tr004_8_9')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.29032258064516125
   },
   {
     "id": 404,
@@ -4452,7 +4856,8 @@
     "pred_sql": "select distinct t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'double'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.6046511627906976
   },
   {
     "id": 405,
@@ -4463,7 +4868,8 @@
     "pred_sql": "select bond_type from bond where molecule_id in (select molecule_id from atom where element = 'h') group by bond_type order by count(*) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.033333333333333326
   },
   {
     "id": 406,
@@ -4474,7 +4880,8 @@
     "pred_sql": "select element from atom where molecule_id not in (select molecule_id from molecule where label = '-') group by element order by count(*) limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.08196721311475408
   },
   {
     "id": 407,
@@ -4485,7 +4892,8 @@
     "pred_sql": "select bond.bond_type from bond join connected on bond.bond_id = connected.bond_id where connected.atom_id = 'tr004_8' and connected.atom_id2 = 'tr004_20'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.3421052631578947
   },
   {
     "id": 408,
@@ -4496,7 +4904,8 @@
     "pred_sql": "select count(distinct atom_id) from atom where element in ('iodine', 'sulfur') and atom_id in (select atom_id from connected where bond_id in (select bond_id from bond where bond_type = '-'))",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 409,
@@ -4507,7 +4916,8 @@
     "pred_sql": "select cast(count(*) as real) * 100 / (select count(*) from molecule where label = '-') from atom where element = 'f' and molecule_id in (select molecule_id from bond where bond_type = 'carcinogenic')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 410,
@@ -4518,7 +4928,8 @@
     "pred_sql": "select cast(sum(case when t2.bond_type = 'triple' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join atom as t4 on t3.atom_id2 = t4.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t2.bond_type = 'triple'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 411,
@@ -4529,7 +4940,8 @@
     "pred_sql": "select element from atom where molecule_id = 'tr000' order by element limit 3",
     "ex": true,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.5769230769230769
   },
   {
     "id": 412,
@@ -4540,7 +4952,8 @@
     "pred_sql": "select cast(sum(case when t2.bond_type = 'double' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join connected as t3 on t1.atom_id = t3.atom_id join bond as t2 on t3.bond_id = t2.bond_id where t1.molecule_id = 'tr008'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 413,
@@ -4551,7 +4964,8 @@
     "pred_sql": "select cast(sum(case when t2.label = '+' then 1 else 0 end) as real) * 100 / count(*) from atom join connected on atom.atom_id = connected.atom_id join molecule t2 on atom.molecule_id = t2.molecule_id",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 414,
@@ -4562,7 +4976,8 @@
     "pred_sql": "select cast(sum(case when t1.element = 'h' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.element = 'h' and t2.molecule_id = 'tr206'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 415,
@@ -4573,7 +4988,8 @@
     "pred_sql": "select t1.element , t3.label from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t2.atom_id2 = t3.atom_id where t3.molecule_id = 'tr060'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.33333333333333337
   },
   {
     "id": 416,
@@ -4584,7 +5000,8 @@
     "pred_sql": "select bond_type from bond where molecule_id = 'tr010' group by bond_type order by count(*) desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.8333333333333334
+    "cm": 0.8333333333333334,
+    "ast": 0.35416666666666663
   },
   {
     "id": 417,
@@ -4595,7 +5012,8 @@
     "pred_sql": "select molecule_id from bond where bond_type = 'single' except select molecule_id from molecule where label = 'carcinogenic' order by molecule_id asc limit 3",
     "ex": false,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.18181818181818177
   },
   {
     "id": 418,
@@ -4606,7 +5024,8 @@
     "pred_sql": "select count(*) from connected as t1 join atom as t2 on t1.atom_id = t2.atom_id join bond as t3 on t1.bond_id = t3.bond_id where t2.atom_id = '12' and t3.molecule_id = 'tr009'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.33333333333333337
   },
   {
     "id": 419,
@@ -4617,7 +5036,8 @@
     "pred_sql": "select t3.bond_type, t1.element, t2.element from connected as t3 join atom as t1 on t3.atom_id = t1.atom_id join atom as t2 on t3.atom_id2 = t2.atom_id where t3.bond_id = 'tr001_6_9'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.19999999999999996
   },
   {
     "id": 420,
@@ -4628,7 +5048,8 @@
     "pred_sql": "select count(*) from connected where atom_id = '19'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.045454545454545414
   },
   {
     "id": 421,
@@ -4639,7 +5060,8 @@
     "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id1 join molecule as t4 on t4.molecule_id = t2.molecule_id where t4.label = 'tr004' group by t1.element",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 422,
@@ -4650,7 +5072,8 @@
     "pred_sql": "select molecule_id from molecule where label = '+' and molecule_id in (select molecule_id from atom where atom_id between 'tr000_21' and 'tr000_25')",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 423,
@@ -4661,7 +5084,8 @@
     "pred_sql": "select b.bond_id from bond b join atom a on b.bond_id = a.atom_id join atom a2 on b.bond_id = a2.atom_id where a.element = 'phosphorus', where a2.element = 'nitrogen'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 424,
@@ -4672,7 +5096,8 @@
     "pred_sql": "select m.label from molecule m join bond b on m.molecule_id = b.molecule_id where b.bond_type = 'double' group by m.molecule_id order by count(*) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.2666666666666667
   },
   {
     "id": 425,
@@ -4683,7 +5108,8 @@
     "pred_sql": "select avg(t1.bond_id_count) from (select atom_id, count(bond_id) as bond_id_count from atom join connected on atom.atom_id = connected.atom_id where element = 'iodine' group by atom_id) t1",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 426,
@@ -4694,7 +5120,8 @@
     "pred_sql": "select element from atom where atom_id not in (select atom_id from connected)",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.25806451612903225
   },
   {
     "id": 427,
@@ -4705,7 +5132,8 @@
     "pred_sql": "select a.atom_id from atom a join connected c on a.atom_id = c.atom_id2 join bond b on c.bond_id = b.bond_id where b.bond_type = 'triple' and a.molecule_id = 'tr041'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.339622641509434
   },
   {
     "id": 428,
@@ -4716,7 +5144,8 @@
     "pred_sql": "select element from atom where atom_id = 'tr144_8_19'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.43333333333333335
   },
   {
     "id": 429,
@@ -4727,7 +5156,8 @@
     "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id3 where t2.bond_id in (select bond_id from bond where bond_type = '-');",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.16279069767441856
   },
   {
     "id": 430,
@@ -4738,7 +5168,8 @@
     "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(t1.bond_id) from connected as t1 join bond as t2 on t1.bond_id = t2.bond_id where t2.bond_type = 'single'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.09999999999999998
   },
   {
     "id": 431,
@@ -4749,7 +5180,8 @@
     "pred_sql": "select count(distinct t1.atom_id) from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join bond as t3 on t2.bond_id = t3.bond_id where t3.bond_type = 'triple' and (t1.element = 'phosphorus' or t1.element = 'bromine')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.19999999999999996
   },
   {
     "id": 432,
@@ -4760,7 +5192,8 @@
     "pred_sql": "select cast(sum(case when t2.bond_type = 'single' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 inner join connected as t3 on t1.atom_id = t3.atom_id2 inner join bond as t2 on t3.bond_id = t2.bond_id where t1.element = 'cl' and t2.bond_type = 'single' inner join molecule as t4 on",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.06666666666666665
   },
   {
     "id": 433,
@@ -4771,7 +5204,8 @@
     "pred_sql": "select t1.element from atom as t1 join connected as t2 on t1.atom_id = t2.atom_id2 join atom as t3 on t3.atom_id = t2.atom_id1 where t2.bond_id = 'tr001_10_11'",
     "ex": false,
     "sm": false,
-    "cm": 1.0
+    "cm": 1.0,
+    "ast": 0.5
   },
   {
     "id": 434,
@@ -4782,7 +5216,8 @@
     "pred_sql": "select cast(sum(case when t1.element = 'cl' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.label = '-'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.6666666666666667
   },
   {
     "id": 435,
@@ -4793,7 +5228,8 @@
     "pred_sql": "select count(t1.element) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t1.atom_id = (select atom_id from atom where molecule_id = t2.molecule_id order by atom_id limit 3 offset 3) and t2.label = '-'",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.021276595744680882
   },
   {
     "id": 436,
@@ -4804,7 +5240,8 @@
     "pred_sql": "select cast(sum(case when t1.element = 'hydrogen' then 1 else 0 end) as real) * 100 / count(*) from atom as t1 join molecule as t2 on t1.molecule_id = t2.molecule_id where t2.molecule_id = 'tr006'",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.3894736842105263
   },
   {
     "id": 437,
@@ -4815,7 +5252,8 @@
     "pred_sql": "select molecule_id from molecule where label = '-' group by molecule_id having count(distinct atom_id) > 5",
     "ex": false,
     "sm": false,
-    "cm": 0.75
+    "cm": 0.75,
+    "ast": 0.4363636363636364
   },
   {
     "id": 438,
@@ -4826,7 +5264,8 @@
     "pred_sql": "select count(*) from satscores join schools on satscores.cds = schools.cdscode where satscores.avgscrmath > 400 and satscores.rtype = 's' and schools.virtual = 'y'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.10526315789473684
   },
   {
     "id": 439,
@@ -4837,7 +5276,8 @@
     "pred_sql": "select cds from schools where enroll12 > 500",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.20588235294117652
   },
   {
     "id": 440,
@@ -4848,7 +5288,8 @@
     "pred_sql": "select max(`percent (%) eligible free (ages 5-17)`) from frpm where cdscode in (select cds from satscores where numge1500 / enroll12 > 0.3)",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 441,
@@ -4859,7 +5300,8 @@
     "pred_sql": "select cds, charternum from satscores where avgscrwrite > 499 order by avgscrwrite desc",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 442,
@@ -4870,7 +5312,8 @@
     "pred_sql": "select school, street from schools where cdscode in (select cds from satscores where enroll12 - (select enrollment (ages 5-17) from frpm where cds = satscores.cds) > 30)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 443,
@@ -4881,7 +5324,8 @@
     "pred_sql": "select distinct t1.school from frpm as t1 inner join satscores as t2 on t1.cdscode = t2.cds where t1.`percent (%) eligible free (k-12)` > 0.1 and t2.numge1500 > 0",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4285714285714286
   },
   {
     "id": 444,
@@ -4892,7 +5336,8 @@
     "pred_sql": "select t1.fundingtype from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.county = 'riverside' and t2.avgscrmath > 400",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.4464285714285714
   },
   {
     "id": 445,
@@ -4903,7 +5348,8 @@
     "pred_sql": "select school, street, streetabr, city, zip, state, mailstreet, mailstrabr, mailcity, mailzip, mailstate from schools where magnet = 1 and county = 'monterey' and school in (select school from frpm where `ages 5-17` > 800)",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 446,
@@ -4914,7 +5360,8 @@
     "pred_sql": "select s.school, ss.avgscrwrite, s.phone from schools s join satscores ss on s.cdscode = ss.cds where s.opendate > '1991-12-31' or s.closeddate < '2000-01-01'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.23076923076923073
   },
   {
     "id": 447,
@@ -4925,7 +5372,8 @@
     "pred_sql": "select s.doc, s.doctype from schools s join frpm f on s.cdscode = f.cdscode where f.nslp provision status = 'local' and f.enrollment (k-12) - f.enrollment (ages 5-17) > (select avg(enrollment (k-12) - enrollment (ages 5-17)) from frpm where nslp provision status = 'local') group by s",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 448,
@@ -4936,7 +5384,8 @@
     "pred_sql": "select t1.cdscode, t1.enrollment (k-12), t1.percent (%) eligible free (k-12) from frpm as t1 join (select cdscode, max(enrollment (k-12)) as maxenrollment from frpm group by cdscode order by maxenrollment desc limit 10) as t2 on t1.cdscode = t2.cdscode where t1.enrollment (k-1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 449,
@@ -4947,7 +5396,8 @@
     "pred_sql": "select school, `percent (%) eligible free (k-12)`, `percent (%) eligible frpm (k-12)` from frpm where `educational option type` = 'traditional' and `district type` = 'high schools (public)' and `school type` = 'trad' and `edopscode` = '66' order by `frpm count (k-12)` desc limit 5",
     "ex": false,
     "sm": false,
-    "cm": 0.4
+    "cm": 0.4,
+    "ast": 0.0
   },
   {
     "id": 450,
@@ -4958,7 +5408,8 @@
     "pred_sql": "select t1.street, t1.city, t1.zip, t1.state from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode order by t2.percent (%) eligible free (k-12) limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 451,
@@ -4969,7 +5420,8 @@
     "pred_sql": "select admfname1, admfname2, admfname3, admlname1, admlname2, admlname3 from schools join satscores on schools.cdscode = satscores.cds where numge1500 > 0 order by numge1500 desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.8
+    "cm": 0.8,
+    "ast": 0.0
   },
   {
     "id": 452,
@@ -4980,7 +5432,8 @@
     "pred_sql": "select avg(numtsttakr) from satscores inner join schools on satscores.cds = schools.cdscode where schools.opendate between '1980-01-01' and '1980-12-31' and schools.county = 'fresno'",
     "ex": true,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.0
   },
   {
     "id": 453,
@@ -4991,7 +5444,8 @@
     "pred_sql": "select t1.phone from schools as t1 join frpm as t2 on t1.cdscode = t2.cdscode join satscores as t3 on t1.cdscode = t3.cds where t3.cname = 'fresno unified' and t3.rtype = 'd' order by t3.avgscrread asc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.38636363636363635
   },
   {
     "id": 454,
@@ -5002,7 +5456,8 @@
     "pred_sql": "select t1.school from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.virtual = 1 group by t1.school order by avg(t2.avgscrread) desc limit 5",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4354838709677419
   },
   {
     "id": 455,
@@ -5013,7 +5468,8 @@
     "pred_sql": "select t1.school,t2.avgscrwrite from schools as t1 join satscores as t2 on t1.cdscode = t2.cds where t1.admfname1 = 'ricci' and t1.admlname1 = 'ulrich' group by t1.school",
     "ex": true,
     "sm": false,
-    "cm": 0.75
+    "cm": 0.75,
+    "ast": 0.5609756097560976
   },
   {
     "id": 456,
@@ -5024,7 +5480,8 @@
     "pred_sql": "select state from schools where magnet = 1 group by state order by sum(enroll12) desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.027027027027026973
   },
   {
     "id": 457,
@@ -5035,7 +5492,8 @@
     "pred_sql": "select avg(enroll12 / 12) as monthlyaverage from satscores inner join schools on satscores.cds = schools.cdscode where schools.county = 'alameda' and schools.doctype = 'elementary school district' and year(opendate) = 1980",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 458,
@@ -5046,7 +5504,8 @@
     "pred_sql": "select cast(sum(case when t2.county = 'orange' then 1 else 0 end) as real) * 100 / count(*) from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.statustype = 'merged unified school district' or t2.statustype = 'merged elementary school district'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 459,
@@ -5057,7 +5516,8 @@
     "pred_sql": "with ranked_satscores as ( select cds, sname, dname, cname, avgscrmath, rank() over (order by avgscrmath desc) as rank from satscores join schools on satscores.cds = schools.cdscode where rtype = 's' ) select schools.school from ranked_satscores join schools on ranked_satscores.cds = schools.cdscode where rank = 7",
     "ex": false,
     "sm": false,
-    "cm": 0.2
+    "cm": 0.2,
+    "ast": 0.0
   },
   {
     "id": 460,
@@ -5068,7 +5528,8 @@
     "pred_sql": "select count(*) from frpm join schools on frpm.cdscode = schools.cdscode where schools.county = 'los angeles' and frpm.`percent (%) eligible free (k-12)` < 0.18 and schools.charter = 0",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.3137254901960784
   },
   {
     "id": 461,
@@ -5079,7 +5540,8 @@
     "pred_sql": "select sum(`enrollment (ages 5-17)`) from frpm where `school name` = 'state special school' and `county name` = 'fremont' and `academic year` = '2014-2015'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.16666666666666663
   },
   {
     "id": 462,
@@ -5090,7 +5552,8 @@
     "pred_sql": "select t1.school , t1.`percent (%) eligible frpm (ages 5-17)` from schools as t1 inner join frpm as t2 on t1.cdscode = t2.cdscode where t1.county = 'los angeles' and t2.`low grade` = 'k' and t2.`high grade` = '9'",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.44680851063829785
   },
   {
     "id": 463,
@@ -5101,7 +5564,8 @@
     "pred_sql": "select count(*) from schools where magnet = 1 and county in ('san diego', 'santa barbara')",
     "ex": false,
     "sm": false,
-    "cm": 0.16666666666666666
+    "cm": 0.16666666666666666,
+    "ast": 0.23404255319148937
   },
   {
     "id": 464,
@@ -5112,7 +5576,8 @@
     "pred_sql": "select distinct gsoffered from schools order by longitude desc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.75
+    "cm": 0.75,
+    "ast": 0.8
   },
   {
     "id": 465,
@@ -5123,7 +5588,8 @@
     "pred_sql": "select count(t1.cdscode), t2.city from schools as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t1.magnet = 1 and t1.gsoffered = 'k-8' group by t2.city",
     "ex": true,
     "sm": false,
-    "cm": 0.5
+    "cm": 0.5,
+    "ast": 0.7115384615384616
   },
   {
     "id": 466,
@@ -5134,7 +5600,8 @@
     "pred_sql": "select t1.districtcode from frpm as t1 inner join schools as t2 on t1.cdscode = t2.cdscode where t2.admfname1 = 'alusine'",
     "ex": false,
     "sm": false,
-    "cm": 0.6666666666666666
+    "cm": 0.6666666666666666,
+    "ast": 0.8048780487804879
   },
   {
     "id": 467,
@@ -5145,7 +5612,8 @@
     "pred_sql": "select admemail1, admemail2, admemail3 from schools where county = 'san bernardino' and city = 'san bernardino city unified' and opendate between '2009-01-01' and '2010-12-31' and school like '%public intermediate/middle schools%' or school like '%unified schools%' and statustype = 'active'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 468,
@@ -5156,7 +5624,8 @@
     "pred_sql": "select count(distinct t1.account_id) from trans as t1 inner join account as t2 on t1.account_id = t2.account_id inner join district as t3 on t2.district_id = t3.district_id where t1.date > (select max(date) from trans as t4 inner join account as t5 on t4.account_id = t5.account_id inner join district as t6 on t5.district_id = t6.district_id where t",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 469,
@@ -5167,7 +5636,8 @@
     "pred_sql": "select count(*) from district where a10 > 6000 and a10 < 10000 and a16 in (select district_id from client where gender = 'f')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 470,
@@ -5178,7 +5648,8 @@
     "pred_sql": "select count(*) from client where gender = 'm' and district_id in (select district_id from district where a3 = 'north bohemia') and district_id in (select district_id from client group by district_id having avg(a10) > 8000)",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 471,
@@ -5189,7 +5660,8 @@
     "pred_sql": "select account_id from client where gender = 'f' and district_id in (select district_id from client where gender = 'm' order by avg(a10) desc limit 1) group by account_id having avg(a10) = (select min(avg(a10)) from client where gender = 'f' group by district_id) - (select max(avg(a10)) from client where gender = 'm' group by district_id) ';'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 472,
@@ -5200,7 +5672,8 @@
     "pred_sql": "select account_id from client where district_id in (select district_id from account group by district_id order by avg(a10) desc limit 1) order by birth_date asc limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.38636363636363635
   },
   {
     "id": 473,
@@ -5211,7 +5684,8 @@
     "pred_sql": "select account_id from loan where status = 'a' and year(date) = 1997 group by account_id order by sum(amount) limit 1",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.17391304347826086
   },
   {
     "id": 474,
@@ -5222,7 +5696,8 @@
     "pred_sql": "select account_id from loan where status = 'a' and duration > 12 and date between '1993-01-01' and '1993-12-31' order by amount desc limit 1",
     "ex": true,
     "sm": false,
-    "cm": 0.6
+    "cm": 0.6,
+    "ast": 0.15217391304347827
   },
   {
     "id": 475,
@@ -5233,7 +5708,8 @@
     "pred_sql": "select count(*) from client where gender = 'f' and birth_date < '1950-01-01' and district_id in (select district_id from district where a2 = 'sokolov')",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 476,
@@ -5244,7 +5720,8 @@
     "pred_sql": "select t3.district_id from client as t1 inner join disp as t2 on t1.client_id = t2.client_id inner join account as t3 on t2.account_id = t3.account_id where t1.birth_date = '1976-01-29' and t1.gender = 'f'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.2777777777777778
   },
   {
     "id": 477,
@@ -5255,7 +5732,8 @@
     "pred_sql": "select cast(sum(case when t2.gender = 'm' then 1 else 0 end) as real) * 100 / count(*) from district as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.a8 = (select a8 from district order by a8 desc limit 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.09433962264150941
   },
   {
     "id": 478,
@@ -5266,7 +5744,8 @@
     "pred_sql": "select (max(t.balance) - t2.balance) * 100 / t2.balance from loan as t join account as t2 on t.account_id = t2.account_id where t.date = '1993-07-05' and t.status = 'a' and t2.date between '1993-03-22' and '1998-12-27'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.21518987341772156
   },
   {
     "id": 479,
@@ -5277,7 +5756,8 @@
     "pred_sql": "select cast(sum(case when t2.status = 'a' then t1.amount else 0 end) as real) * 100 / sum(t1.amount) from loan as t1 inner join account as t2 on t1.account_id = t2.account_id",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.3870967741935484
   },
   {
     "id": 480,
@@ -5288,7 +5768,8 @@
     "pred_sql": "select cast(count(case when t2.status = 'a' then 1 else null end) as real) * 100 / count(*) from loan as t1 inner join account as t2 on t1.account_id = t2.account_id where t1.amount < 100000",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 481,
@@ -5299,7 +5780,8 @@
     "pred_sql": "select t1.district_id, t1.a16, (t1.a10 - t2.a10) * 100 / t2.a10 as unemployment_increase from district as t1 join district as t2 on t1.district_id = t2.district_id where t1.a5 = '1996' and t2.a5 = '1995' and t1.a16 > 0 and t",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 482,
@@ -5310,7 +5792,8 @@
     "pred_sql": "select district_id, count(*) from client where gender = 'f' group by district_id order by count(*) desc limit 9",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4285714285714286
   },
   {
     "id": 483,
@@ -5321,7 +5804,8 @@
     "pred_sql": "select count(*) from loan where account_id in (select account_id from account where date between '1995-01-01' and '1997-12-31' and frequency = 'poplatek mesicne') and amount >= 250000 and status = 'a'",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 484,
@@ -5332,7 +5816,8 @@
     "pred_sql": "select count(*) from account where district_id = 1 and status = 'running'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.25
   },
   {
     "id": 485,
@@ -5343,7 +5828,8 @@
     "pred_sql": "select count(*) from client where gender = 'm' and district_id in (select district_id from loan where strftime('%y', date) = '1995' group by district_id order by count(*) desc limit 2 offset 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 486,
@@ -5354,7 +5840,8 @@
     "pred_sql": "select district.a2, sum(trans.amount) as total_withdrawals from trans join account on trans.account_id = account.account_id join district on account.district_id = district.district_id where trans.type = 'prijem' and strftime('%y-%m', trans.date) = '1996-01' group by district.a2 order by total_withdrawals desc limit 10",
     "ex": true,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 487,
@@ -5365,7 +5852,8 @@
     "pred_sql": "select count(*) from account where district_id = 1 and status = 'running'",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.25
   },
   {
     "id": 488,
@@ -5376,7 +5864,8 @@
     "pred_sql": "select count(*) from client where gender = 'm' and district_id in (select district_id from loan where strftime('%y', date) = '1995' group by district_id order by count(*) desc limit 2 offset 1)",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 489,
@@ -5387,7 +5876,8 @@
     "pred_sql": "select account_id from trans where account_id in (select account_id from trans where type = 'prijem' and amount < (select avg(amount) from trans where date between '1998-01-01' and '1998-12-31' and type = 'prijem')) and date between '1998-01-01' and '1998-12-31' and type =",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 490,
@@ -5398,7 +5888,8 @@
     "pred_sql": "select type from disp where account_id not in (select account_id from account where account_id in (select account_id from loan)) group by type having avg(a10) between 8000 and 9000",
     "ex": false,
     "sm": false,
-    "cm": 0.25
+    "cm": 0.25,
+    "ast": 0.0
   },
   {
     "id": 491,
@@ -5409,7 +5900,8 @@
     "pred_sql": "select avg(t2.crimes) from trans as t1 inner join district as t2 on t1.district_id = t2.district_id where t2.crimes > 4000 and t1.date >= '1997-01-01' group by t2.district_id having count(t1.account_id) > 0",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.15000000000000002
   },
   {
     "id": 492,
@@ -5420,7 +5912,8 @@
     "pred_sql": "select trans_id, account_id, date, type, operation, amount, balance, k_symbol, bank, account from trans where account_id = 3356 and type = 'prijem' and operation = 'prevod z uctu'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.01666666666666672
   },
   {
     "id": 493,
@@ -5431,7 +5924,8 @@
     "pred_sql": "select cast(sum(case when t1.gender = 'f' then 1 else 0 end) as real) * 100 / count(t1.gender) from client as t1 inner join account as t2 on t1.client_id = t2.client_id inner join district as t3 on t2.district_id = t3.district_id where t3.a10 > 10000",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.33333333333333337
   },
   {
     "id": 494,
@@ -5442,7 +5936,8 @@
     "pred_sql": "select sum(amount) * 100 / nullif((select sum(amount) from loan where account_id in (select account_id from disp where client_id in (select client_id from client where gender = 'm' and date between '1996-01-01' and '1997-12-31'))), 0) as growth_rate from loan where account_id in (select account_id from disp where client_id in (select client_id",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   },
   {
     "id": 495,
@@ -5453,7 +5948,8 @@
     "pred_sql": "select count(*) from trans where account_id = 3 and type = 'vydaj' and amount = 3539",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.34246575342465757
   },
   {
     "id": 496,
@@ -5464,7 +5960,8 @@
     "pred_sql": "select cast(sum(case when t2.gender = 'm' then 1 else 0 end) as real) * 100 / count(*) from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t1.frequency = 'poplatek mesicne'",
     "ex": true,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.43243243243243246
   },
   {
     "id": 497,
@@ -5475,7 +5972,8 @@
     "pred_sql": "select t1.account_id from account as t1 inner join client as t2 on t1.district_id = t2.district_id where t2.gender = 'f' group by t1.account_id having min(t2.birth_date) and avg(t1.a10)",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.4794520547945206
   },
   {
     "id": 498,
@@ -5486,7 +5984,8 @@
     "pred_sql": "select avg(t.amount) from trans t join loan l on t.account_id = l.account_id where l.status = 'a' and t.date between l.date and l.date + interval l.duration month",
     "ex": false,
     "sm": false,
-    "cm": 0.3333333333333333
+    "cm": 0.3333333333333333,
+    "ast": 0.0
   },
   {
     "id": 499,
@@ -5497,6 +5996,7 @@
     "pred_sql": "select c.client_id, datediff(current_date, c.birth_date) / 365 as age from client c join card d on c.client_id = d.disp_id where d.type = 'gold' and c.district_id in (select district_id from account where frequency = 'poplatek mesicne')",
     "ex": false,
     "sm": false,
-    "cm": 0.0
+    "cm": 0.0,
+    "ast": 0.0
   }
 ]

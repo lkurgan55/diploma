@@ -549,6 +549,65 @@ class SQLValidator:
 
         return True
 
+# --- SQLGlot-based fixer ---
+from sqlglot import transpile, parse_one
+from sqlglot.optimizer.qualify import qualify
+from sqlglot.optimizer.normalize import normalize
+from sqlglot.optimizer.simplify import simplify
+from contextlib import closing
+import sqlite3
+from sqlglot.errors import SchemaError, ParseError, TokenError, OptimizeError
+
+LIGHT_RULES = (qualify, normalize, simplify)  # за бажанням: + (canonicalize,)
+
+def _load_sqlite_schema(db_path: str, two_level: bool = False) -> dict:
+    """
+    Повертає plain-dict схему з lower-case іменами.
+    Якщо two_level=True -> {"main": {"table": {"col": "ANY"}}}
+    Інакше -> {"table": {"col": "ANY"}}
+    """
+    import sqlite3
+    from contextlib import closing
+
+    mapping: dict[str, dict] = {}
+    with closing(sqlite3.connect(db_path)) as conn:
+        cur = conn.cursor()
+        rows = cur.execute(
+            "SELECT name, type FROM sqlite_master "
+            "WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%';"
+        ).fetchall()
+
+        for name, _ in rows:
+            t = name.lower()
+            cols = cur.execute(f"PRAGMA table_info('{name}')").fetchall()
+            cols_map = {row[1].lower(): "ANY" for row in cols}
+
+            if two_level:
+                mapping.setdefault("main", {})[t] = cols_map
+            else:
+                mapping[t] = cols_map
+    return mapping
+
+def sql_fix(sql: str, *, dialect: str = "sqlite", db_path: str | None = None,
+            ):
+    try:
+        fixed = transpile(sql, read=dialect, write=dialect, pretty=False)[0]
+        expr = parse_one(fixed, read=dialect)
+    except (ParseError, TokenError):
+        return sql
+
+    if db_path:
+        try:
+            schema = _load_sqlite_schema(db_path)
+            expr = qualify(expr, schema=schema, dialect=dialect)
+        except (SchemaError, OptimizeError):
+            pass
+
+    expr = normalize(expr)
+    expr = simplify(expr, dialect=dialect)
+    return expr.sql(dialect=dialect)
+
+
 
 if __name__ == "__main__":
     
