@@ -28,3 +28,9 @@ This repository contains code and experiments for a master’s thesis exploring 
 | Top-p    | 176/500 = **0.3520**   | 11/500 = **0.0220**   | 180.0500/500 = **0.3601** | - |
 | **EG-Beam** (table/column/syntax check) | 208/500 = **0.4160** | 11/500 = **0.0220** | 190.8/500 = **0.3816** | **168.7207** |
 | **EGLA-Beam** (table/column/syntax check) | 208/500 = **0.4160** | 12/500 = **0.0240** | 190.25/500 = **0.3805** | **172.6664** |
+
+--- SUMMARY ---
+Execution Accuracy: 235/500 = 0.4700
+String Match Accuracy: 0/500 = 0.0000
+Component Match Accuracy: 189.5500000000003/500 = 0.3791
+AVG Generation Time: 84360.37/500 = 168.7207
