@@ -42,7 +42,7 @@ def main():
     ap = argparse.ArgumentParser(description="Compute metrics with SQL fix (sqlglot).")
     ap.add_argument(
         "--json_path",
-        default="outputs/mini_dev_sqlite_eg_beam_sqlglot_qwen2.5-3B-Instruct.json",
+        default="outputs/mini_dev_sqlite_top_p_qwen2.5-3B-Instruct.json",
         help="Вхідний JSON із записами (list of dicts).",
     )
     args = ap.parse_args()

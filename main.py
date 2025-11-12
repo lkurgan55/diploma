@@ -71,17 +71,17 @@ def main():
     ap.add_argument("--model", type=str, default="qwen2.5-3B-Instruct")
     ap.add_argument("--data_json", type=str, default="./datasets/data_minidev/mini_dev_sqlite.json")
     ap.add_argument("--db_root", type=str, default="./datasets/data_minidev/dev_databases")
-    ap.add_argument("--strategy", type=str, default="egla_beam",
+    ap.add_argument("--strategy", type=str, default="beam",
                     choices=["greedy", "beam", "top_k", "top_p", "eg_beam", 'egla_beam'])
     ap.add_argument("--max_new_tokens", type=int, default=100)
     ap.add_argument("--limit", type=int, default=0, help="0 = всі; >0 = перші N")
     ap.add_argument("--save_csv", type=str, default="./outputs/mini_dev_sqlite_eval.csv")
-    ap.add_argument("--device", type=str, default="cuda", choices=["auto", "cpu", "cuda"]) # only cpu 
-    ap.add_argument("--schema_rows", type=int, default=0, help="Додати N прикладів рядків у prompt (0=без рядків)")
+    ap.add_argument("--device", type=str, default="cpu", choices=["auto", "cpu", "cuda"]) # only cpu 
+    ap.add_argument("--schema_rows", type=int, default=3, help="Додати N прикладів рядків у prompt (0=без рядків)")
     args = ap.parse_args()
     
     model_path = f'./models/{args.model}'
-    save_file_path = f'outputs/mini_dev_sqlite_{args.strategy}_{args.model}_wo_rows.json'
+    save_file_path = f'outputs/mini_dev_sqlite_{args.strategy}_{args.model}.json'
     os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
 
 

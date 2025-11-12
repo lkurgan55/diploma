@@ -162,7 +162,7 @@ class EGLALogitsProcessor(LogitsProcessor):
         self.dead_cache = set()  # хеші/рядки префіксів, уже позначених як мертві
 
         self.penalty = 4.0
-        self.topk = 32
+        self.topk = 16
 
     def __call__(self, input_ids, scores):
         # input_ids: [batch_beam, seq_len]
