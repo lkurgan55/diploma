@@ -106,7 +106,7 @@ class SQLValidator:
         return True
 
     # ---------- schema loading ----------
-    def _maybe_load_schema(self) -> None:
+    def _load_schema(self) -> None:
         if self._schema_loaded or not self.db_path:
             return
         self._schema_loaded = True
@@ -549,6 +549,25 @@ class SQLValidator:
 
         return True
 
+    def sql_fix(self, sql: str, *, dialect: str = "sqlite"):
+        try:
+            fixed = transpile(sql, read=dialect, write=dialect, pretty=False)[0]
+            expr = parse_one(fixed, read=dialect)
+        except (ParseError, TokenError):
+            return sql
+
+        if self.db_path:
+            try:
+                schema = _load_sqlite_schema(self.db_path)
+                expr = qualify(expr, schema=schema, dialect=dialect)
+            except (SchemaError, OptimizeError):
+                pass
+
+        expr = normalize(expr)
+        expr = simplify(expr, dialect=dialect)
+        return expr.sql(dialect=dialect)
+
+
 # --- SQLGlot-based fixer ---
 from sqlglot import transpile, parse_one
 from sqlglot.optimizer.qualify import qualify
@@ -588,29 +607,10 @@ def _load_sqlite_schema(db_path: str, two_level: bool = False) -> dict:
                 mapping[t] = cols_map
     return mapping
 
-def sql_fix(sql: str, *, dialect: str = "sqlite", db_path: str | None = None,
-            ):
-    try:
-        fixed = transpile(sql, read=dialect, write=dialect, pretty=False)[0]
-        expr = parse_one(fixed, read=dialect)
-    except (ParseError, TokenError):
-        return sql
-
-    if db_path:
-        try:
-            schema = _load_sqlite_schema(db_path)
-            expr = qualify(expr, schema=schema, dialect=dialect)
-        except (SchemaError, OptimizeError):
-            pass
-
-    expr = normalize(expr)
-    expr = simplify(expr, dialect=dialect)
-    return expr.sql(dialect=dialect)
-
 
 
 if __name__ == "__main__":
-    
+
     validator = SQLValidator(db_path="datasets/data_minidev/dev_databases/debit_card_specializing/debit_card_specializing.sqlite")
 
     sql = "SELECT SUM(CASE WHEN T2.Segment = 'Discount' THEN 1 ELSE 0 END) - SUM(CASE WHEN T1.Segment = 'Discount' THEN 1 ELSE 0 END) AS Difference\nFROM gasstations AS T1\nJOIN gasstations AS T2 ON T2.Country = 'SK'\nWHERE T"

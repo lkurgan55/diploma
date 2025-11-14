@@ -10,13 +10,6 @@ os.environ["PYTHONHASHSEED"] = "5"
 class TopKStrategy(BaseStrategy):
     """Top-k sampling strategy for text generation."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    @staticmethod
-    def _make_generator(device, seed: Optional[int]):
-        return torch.Generator(device=device).manual_seed(seed) if seed is not None else None
-
     def generate(
         self,
         prompt: str,
@@ -24,27 +17,18 @@ class TopKStrategy(BaseStrategy):
         k: int = 20,
         temperature: float = 0.5,
         seed: Optional[int] = 5,
-        deterministic: bool = True,
     ) -> str:
         """Generates text using built-in top-k sampling."""
         self.model.eval()
-
-        if deterministic:
-            torch.backends.cudnn.benchmark = False
-            torch.backends.cudnn.deterministic = True
-            torch.use_deterministic_algorithms(True)
-
-        if seed is not None:
-            torch.manual_seed(seed)
 
         enc = self.tokenizer(prompt, return_tensors="pt")
         enc = {k: v.to(self.model.device) for k, v in enc.items()}
 
         out = self.model.generate(
             **enc,
-            do_sample=True,                  
-            top_k=k,                         
-            temperature=max(temperature, 1e-8),  
+            do_sample=True,
+            top_k=k,
+            temperature=max(temperature, 1e-8),
             max_new_tokens=max_new_tokens,
             pad_token_id=self.tokenizer.eos_token_id,
             eos_token_id=self.tokenizer.eos_token_id,

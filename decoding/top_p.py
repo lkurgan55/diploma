@@ -10,32 +10,15 @@ from typing import Optional
 class TopPStrategy(BaseStrategy):
     """Top-p (nucleus) sampling strategy for text generation."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    @staticmethod
-    def _make_generator(device, seed: Optional[int]):
-        return torch.Generator(device=device).manual_seed(seed) if seed is not None else None
-
     def generate(
         self,
         prompt: str,
         max_new_tokens: int = 256,
         p: float = 0.9,
         temperature: float = 0.5,
-        seed: Optional[int] = 5,
-        deterministic: bool = True,
     ) -> str:
         """Generates text using built-in top-p (nucleus) sampling."""
         self.model.eval()
-
-        if deterministic:
-            torch.backends.cudnn.benchmark = False
-            torch.backends.cudnn.deterministic = True
-            torch.use_deterministic_algorithms(True)
-
-        if seed is not None:
-            torch.manual_seed(seed)
 
         enc = self.tokenizer(prompt, return_tensors="pt")
         enc = {k: v.to(self.model.device) for k, v in enc.items()}
@@ -43,8 +26,8 @@ class TopPStrategy(BaseStrategy):
         out = self.model.generate(
             **enc,
             do_sample=True,
-            top_p=max(min(p, 1.0), 1e-8),
-            temperature=max(temperature, 1e-8),
+            top_p=p,
+            temperature=temperature,
             max_new_tokens=max_new_tokens,
             pad_token_id=self.tokenizer.eos_token_id,
             eos_token_id=self.tokenizer.eos_token_id,
