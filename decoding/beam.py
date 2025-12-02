@@ -75,7 +75,7 @@ class BeamStrategy(BaseStrategy):
     ) -> str:
         if db_path:
             self.validator = SQLValidator(db_path=db_path)
-            self.validator._maybe_load_schema()
+            self.validator._load_schema()
 
         self.model.eval()
         enc = self.tokenizer(prompt, return_tensors="pt")
@@ -109,7 +109,7 @@ class BeamStrategy(BaseStrategy):
     ) -> str:
         if db_path:
             self.validator = SQLValidator(db_path=db_path)
-            self.validator._maybe_load_schema()
+            self.validator._load_schema()
 
         self.model.eval()
         enc = self.tokenizer(prompt, return_tensors="pt")

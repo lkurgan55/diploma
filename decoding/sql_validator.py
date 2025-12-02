@@ -439,7 +439,7 @@ class SQLValidator:
 
     # ---------- public API ----------
     def tables_exist(self, sql: str, *, closed_only: bool = True) -> bool:
-        self._maybe_load_schema()
+        self._load_schema()
         if not self._table_names:
             return True
 
@@ -461,7 +461,7 @@ class SQLValidator:
         - якщо ніде → False,
         - якщо в кількох → деферимо (даємо шанс моделі додати alias).
         """
-        self._maybe_load_schema()
+        self._load_schema()
         if not self._tables:
             return True
 
